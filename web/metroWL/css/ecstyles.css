@@ -1,0 +1,162 @@
+#spi_investing_content{width:800px;_width:790px;float:left;margin-top:0;font:13px/1.22 arial,helvetica,clean,sans-serif;margin:0px;text-align:center;}
+.rtq_div{position:relative;}
+#spi_bd:after,#spi_market_info:after,#spi_investing_head:after,.spi_morning_star_rating:after,#spi_headlines .hd:after,.myLinks:after,.spui_-g:after,.spi_quote_summary:after,#spi_quote_summary_data:after,.sup:after,#spi_featured_video li:after,#spi_tech_ticker li:after{content:".";display:block;height:0;clear:both;visibility:hidden;}
+#bd:after,.spui_-g:after,.spui_-gb:after,.spui_-gc:after,.spui_-gd:after,.spui_-ge:after,.spui_-gf:after{content:".";display:block;height:0;clear:both;visibility:hidden;}
+#spi_bd,#spi_market_info,#spi_investing_head,.spi_morning_star_rating,#spi_headlines .hd,.myLinks,.spui_-g,.spi_quote_summary,#spi_quote_summary_data,.sup,#spi_featured_video li,#spi_tech_ticker li{*height:1%;}
+#bd,.spui_-g,.spui_-gb,.spui_-gc,.spui_-gd,.spui_-ge,.spui_-gf{zoom:1;}
+.spi_rt_quote_summary{padding:5px 0 9px 5px;margin-top:0;border-bottom:2px solid #000;font-size:13px;}
+.spi_rt_quote_summary .hd{margin-top:8px;padding:0;font:normal 15px arial;background:none;color:#000;border:none;}
+.hd{padding:10px 5px 5px 10px;font:bold 110%/138.5% arial;color:#000;border-top:2px solid #000;}
+#spi_quote_summary_page{text-align:center;}
+#spi_quote_promo{clear:both;margin-left:135px;padding:15px;text-align:center;font-size:108%;}
+.hd h2{font-weight:bold;}
+.spi_rt_quote_summary .rtq_exch{color:#999;font:normal 12px arial;}
+.spi_rt_quote_summary .rtq_exch .rtq_dash{margin-right:5px;}
+.spi_rt_quote_summary_rt_top{padding:0;margin:0;font:normal 93% arial;}
+.spi_rt_quote_summary_rt_top .time_rtq_ticker{font:bold 30px arial;padding-right:6px;}
+.spi_rt_quote_summary_rt_top .time_rtq_content{font:bold 20px arial;}
+.spi_rt_quote_summary_rt_top .up_g,spi_rt_quote_summary_rt_top .up_g span{color:#080;font-weight:bold;}
+.spi_rt_quote_summary_rt_top .down_r,.spi_rt_quote_summary_rt_top .down_r span{color:#c00;font-weight:bold;}
+.spi_quote_summary_rt_top .up_g,spi_quote_summary_rt_top .up_g span{color:#080;font-weight:normal;}
+.spi_quote_summary_rt_top .down_r,.spi_quote_summary_rt_top .down_r span{color:#c00;}
+.spi_quote_summary_rt_top .time{font-size:85%;}
+.spi_rt_quote_summary_rt_top .time_rtq_content span{padding-right:1px;}
+.spi_rt_quote_summary_rt_top .up_g span img{margin-bottom:-1px;}
+.yfin_gs span.yfi-price-change-red,.yfin_gs span.yfi-price-change-green{font-weight:200;}
+.yfin_gs .yfi-price-change-green,.yfin_gs .yfi-price-change-green b,.yfin_gs .yfi-price-change-red,.yfin_gs .yfi-price-change-red b{font-weight:normal;}
+span.yfi-price-change-green{color:#080!important;font-weight:bold;}
+span.yfi-price-change-up{color:#080!important;font-weight:bold;}
+span.yfi-price-change-red{color:#c00!important;font-weight:bold;}
+span.yfi-price-change-down{color:#c00!important;font-weight:bold;}
+.yfi-price-change-green{color:#080!important;font-weight:bold;}
+.yfi-price-change-up{color:#080!important;font-weight:bold;}
+.yfi-price-change-red{color:#c00!important;font-weight:bold;}
+.yfi-price-change-down{color:#c00!important;font-weight:bold;}
+.spi_rt_quote_summary_rt_top .time_rtq{margin-left:1px;}
+.yfi-start-content{float:left;margin-right:15px;width:475px;_width:465px;}
+.spi_quote_summary{width:470px;}
+.spi_quote_summary{float:left;padding:0 0 0 5px;margin-top:0;}
+#spi_quote_summary_page #spi_quote_summary_data{border-bottom:none;}
+#spi_investing_content .rtq_table{border-top:0!important;}
+.spi_quote_summary_rt_top,#spi_quote_summary_data{clear:left;}
+#spi_quote_summary_data{margin-top:5px;border-top:1px solid #ccc;border-bottom:1px solid #ccc;}
+#spi_quote_summary_data table{width:215px;}
+#spi_quote_summary_data #table1,.spi_quote_summary .sup1,#spi_quote_summary_data #table2,.spi_quote_summary .sup2{width:215px;min-width:215px;font-size:inherit}
+#spi_quote_summary_data #table1,.spi_quote_summary .sup1{float:left;margin:5px 0 0 0;}
+#spi_quote_summary_data table{margin:0 5px;}
+#spi_quote_summary_data table th,#spi_quote_summary_data td.yfnc_tablehead1{border-bottom:1px solid #e4e4e4;padding:5px 5px 5px 0;text-align:left;font:93%/93% arial;color:#333;line-height:1em!important;}
+#spi_quote_summary_data table td{padding:5px 0;border-bottom:1px solid #e4e4e4;font:bold 93%/93% arial;text-align:right;}
+html>body .rtq_table table td{height:15px;}
+.rtq_table table td{*height:15px!important;_height:15px;}
+#spi_quote_summary_data #table2,.spi_quote_summary .sup2{float:right;margin:5px 0 0 0;}
+#spi_summary_chart,.spi_summary_chart{text-align:right;padding-top:10px;}
+#spi_summary_chart .chart p,.spi_summary_chart .chart p{padding:40px 0;text-align:center;}
+.spi_rt_quote_summary .hd h2{display:inline;margin-right:2px;font:bold 15px arial;}
+
+.popform
+{
+    background: #F8F8FF;
+    border-radius: 3px;
+}
+
+#pop_form_body
+{
+	padding: 2px;
+    white-space: nowrap;
+}
+
+.popmenu_outline, .popmenu, .popform
+{
+    position: absolute;
+    display: block;
+    cursor: default;
+    text-decoration: none;
+    white-space: nowrap;
+    border: 1px solid #BFC9C9;
+    background: #FFFFFF;
+    font-size: 13px;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+}
+
+div.hdr_section,
+div#gk_header,
+.popmenu .hdr,
+.popform .hdr,
+.hdr_fancy
+{
+    background-size: 30px 30px;
+    background-image: -webkit-linear-gradient(-45deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0) 25%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.05) 75%, rgba(255,255,255,0) 75%, rgba(255,255,255,0) 100%);
+    background-image: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0) 25%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.05) 75%, rgba(255,255,255,0) 75%, rgba(255,255,255,0) 100%);
+}
+
+.popmenu .hdr, .popform .hdr
+{
+    font-weight: bold;
+    color: #000000;
+    background: #E7EFFC;
+    line-height: 22px;
+    padding: 0 6px;
+    margin: -2px -2px 0 -2px;
+    border-radius: 3px;
+    border: 1px solid #BFC6C9;
+}
+
+.hdr
+{
+    font-weight: bold;
+    background: #8585AD;
+    color: #FFEECB;
+}
+
+.span-q:after
+{
+    content: "\200B";
+}
+
+.span-q
+{
+    cursor: pointer;
+    padding-right: 18px;
+    background: transparent url(/img/qb.png) center right no-repeat;
+}
+
+.sml, .sml TD
+{ 
+    font-size: 11px !important;
+}
+
+.med, .med TD
+{ 
+	color:#039;
+    font-size: 12px !important;
+}
+
+EM, B
+{
+    text-decoration: inherit;
+}
+
+EM
+{
+    font-weight: bold;
+    font-style: normal;
+}
+
+.dialog TD
+{
+    
+    text-align: left;
+    vertical-align: middle;
+}
+
+.dialog TD.lbl
+{
+    text-align: right;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+.dialog INPUT, .dialog SELECT
+{
+    vertical-align: middle;
+}

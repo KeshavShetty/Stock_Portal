@@ -1,0 +1,13 @@
+<!--
+    <error-page>
+    	<error-code>404</error-code>
+    	<location>/404.jsp</location>
+    </error-page>
+-->
+
+<!--  Error Page    -->
+<error-page>
+    <exception-type>java.lang.Throwable</exception-type>
+    <location>/errorHandler/WEB-INF/jsp/error.jsp</location>
+</error-page>
+

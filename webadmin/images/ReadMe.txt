@@ -1,0 +1,1 @@
+This folder for applet related code images

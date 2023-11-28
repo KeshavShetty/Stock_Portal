@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+        "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/tiles-config_2_0.dtd">
+
+<tiles-definitions>
+    
+     <!-- New WL based metro layout starts from here. All previous needs to be cleanedup -->
+    
+    <definition name="wlMetroDefault" template="/WEB-INF/jsp/metroWL/layout/fullScreenLayout.jsp">
+    	<put-attribute name="topHeader" value="/WEB-INF/jsp/metroWL/tile/topHeader.jsp"/>
+    	<put-attribute name="mainMenu" value="/WEB-INF/jsp/metroWL/layout/plainMainMenu.jsp"/>    	
+    	<put-attribute name="rightAdPane" value="/WEB-INF/jsp/metroWL/tile/rightPane.jsp"/>	
+    	<put-attribute name="footer" value="/WEB-INF/jsp/metroWL/tile/footer.jsp"/>
+    </definition>
+    
+    <definition name="wlMetroScripLayout" template="/WEB-INF/jsp/metroWL/layout/fullScreenWithoutRightPaneLayout.jsp">
+    	<put-attribute name="topHeader" value="/WEB-INF/jsp/metroWL/tile/topHeader.jsp"/>
+    	<put-attribute name="mainMenu" value="/WEB-INF/jsp/metroWL/layout/plainMainMenu.jsp"/>    	
+    	<put-attribute name="rightAdPane" value="/WEB-INF/jsp/metroWL/tile/rightPane.jsp"/>	
+    	<put-attribute name="footer" value="/WEB-INF/jsp/metroWL/tile/footer.jsp"/>
+    </definition>
+    
+    <definition name="LeanScripSummaryLayout" template="/WEB-INF/jsp/metroWL/layout/leanScripSummaryLayout.jsp"/>
+    
+    <definition name="defaultHome" extends="wlMetroDefault"/> 
+    
+    <definition name="tiles.mainMenu" template="/WEB-INF/jsp/metroWL/layout/plainMainMenu.jsp"/>
+    
+     <definition name="pageLayout" template="/WEB-INF/jsp/metroWL/layout/bodyOnlyLayout.jsp"> <!--  pageLayout applicable to individual body for each menu -->
+    	<put-attribute name="messages" value="/WEB-INF/jsp/metroWL/tile/messages.jsp"/>    	
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/dummyBody.jsp"/>
+    </definition>
+    
+     <definition name="emptyLayout" template="/WEB-INF/jsp/metroWL/layout/emptyLayout.jsp">    		
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/empty.jsp"/>
+    </definition>
+    
+    <definition name="tableLayout" template="/WEB-INF/jsp/metroWL/layout/tableOnlyLayout.jsp">    		
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/scripSearchResult.jsp"/>
+    </definition>
+    <definition name="tiles.table.scrip.search.result" extends="tableLayout"/>
+     
+    <definition name="tiles.publicHome" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/publicHome.jsp"/>
+    </definition>
+    
+    <definition name="tiles.userHome" extends="pageLayout">    
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/userHome.jsp"/>
+    </definition>
+    
+    <definition name="tiles.showJavaChart" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/javaChart.jsp"/>
+    </definition>
+    
+	<definition name="empltyFullScreen" extends="wlMetroDefault">   	    	
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/bodyWithEmptyPageDivs.jsp"/>
+    </definition>
+    
+    <definition name="tiles.dashboardMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainDashboardPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.search.scrip.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/mainScripPage.jsp"/>
+    </definition>
+    
+    <!-- All popup related tiles below -->
+     <definition name="floatingBodyOnlyLayout" template="/WEB-INF/jsp/metroWL/layout/bodyOnlyLayout.jsp">    	
+    	<put-attribute name="messages" value="/WEB-INF/jsp/metroWL/tile/messages.jsp"/>    	
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/dummyBody.jsp"/>
+    </definition>
+    
+    <definition name="tiles.prepareLogin" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/user/login.jsp"/> 
+    </definition>
+    
+    <definition name="tiles.loginSuccess" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/user/loginSuccess.jsp"/> 
+    </definition>
+    
+	<definition name="tiles.default.misc.home" extends="pageLayout"> 
+		<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/responseDailyJobs.jsp"/>
+   	</definition>
+   	
+   	<definition name="tiles.prepare.add.to.watchlist" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/watchlist/addToWatchlist.jsp"/> 
+    </definition>
+   	
+   	<definition name="tiles.add.watchlist.success" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/watchlist/addToWatchlistSuccess.jsp"/> 
+    </definition>
+   	
+   	<definition name="tiles.default.error" extends="pageLayout">    
+        <put-attribute name="title" value="error.unexpected"/>
+        <put-attribute name="body" value="/WEB-INF/jsp/error.jsp"/>
+    </definition> 
+    
+    <definition name="tiles.default.misc.data.page" extends="pageLayout"> 
+		<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/data/defaultPage.jsp"/>
+   	</definition>
+   	
+   	<definition name="tiles.showScripInfoPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/scripInfoPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.news.search.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/newsSearchResult.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.analysis.search.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/analysisSearchResult.jsp"/>
+    </definition>
+    
+    <definition name="tiles.showAnalysisMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainAnalysisPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.advanved.analysis.search.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/advancedAnalysisSearchResult.jsp"/>
+    </definition>
+      
+    <definition name="tiles.table.watchlist.item.result.scrip" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/watchlistItemsScripwiseResult.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.watchlist.item.result.date" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/watchlistItemsDatewiseResult.jsp"/>
+    </definition>
+    
+    <definition name="tiles.showNewsMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainNewsPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.advanved.news.search.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/advancedNewsSearchResult.jsp"/>
+    </definition>
+    
+    <definition name="tiles.quick.chart" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/quickchart.jsp"/>
+    </definition>
+    
+    <definition name="tiles.prepare.edit.masters" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/editMasters.jsp"/> 
+    </definition>
+   	
+   	<definition name="tiles.edit.masters.success" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/genericFloatingPopupSuccess.jsp"/> 
+    </definition>
+    
+    <definition name="tiles.showPastAchieversMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainAchieversPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.past.achievers.search.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/pastAchieversResult.jsp"/>
+    </definition>
+    
+    <definition name="tiles.prepare.icici.place.order" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/order/placeOrder.jsp"/> 
+    </definition>
+   	
+   	<definition name="tiles.icici.place.order.success" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/order/placeOrderSuccess.jsp"/> 
+    </definition>
+    
+     <definition name="tiles.showCandlePatternMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainCandlePatternSearchPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.candle.pattern.search.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/candlePatternSearchResult.jsp"/>
+    </definition>
+    
+    <definition name="tiles.showCandlePatternScripMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainCandlePatternScripPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.candle.pattern.scrip.search.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/advancedCandlePatternScripSearchResult.jsp"/>
+    </definition>
+    
+     <definition name="tiles.google.candle" extends="emptyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/data/googleCandle.jsp"/>
+    </definition>
+    
+    <definition name="tiles.prepare.add.to.watchlist.transaction" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/watchlist/addToWLTransaction.jsp"/> 
+    </definition>
+    
+    <definition name="tiles.add.watchlist.transaction.success" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/watchlist/addToWLTransactionSuccess.jsp"/> 
+    </definition>
+    
+    <definition name="tiles.highstock.chart" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/highstockchart.jsp"/>
+    </definition>
+    
+    <definition name="tiles.showIntradaySnapshotMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainIntradaySnapshotPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.intraday.snapshot.search.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/intradaySnapshotResult.jsp"/>
+    </definition>
+    
+    <definition name="tiles.highstock.eod.chart" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/highstockchartEOD.jsp"/>
+    </definition>
+    
+    <definition name="tiles.showIntradayBTSTMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainIntradayBTSTPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.intraday.btst.search.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/intradayBTSTResult.jsp"/>
+    </definition>
+    
+    <definition name="tiles.showIndexViewMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainIndexViewPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.index.view.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/indexViewResult.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.index.scrips.view.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/indexScripsResult.jsp"/>
+    </definition>
+    
+     <definition name="tiles.showTreePerformanceMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainTreePerformancePage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.tree.performance.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/treePerformanceResult.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.sub.tree.performance.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/subTreePerformanceResult.jsp"/>
+    </definition>
+    
+     <definition name="tiles.showFinancialResultMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainFinancialResultPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.financial.result.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/financialResult.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.latest.financial.scrip.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/latestFinancialResultScripsResult.jsp"/>
+    </definition>
+    <definition name="tiles.highcharts.graph.financial.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/highchartsFinancialGraph.jsp"/>
+    </definition>
+    
+    <definition name="tiles.watchlist.genericSuccess" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/watchlist/watchlistActionSuccess.jsp"/> 
+    </definition>
+    
+    <definition name="tiles.table.prepare.scrip.info" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/scrip/prepareScripInfo.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.scrip.keys.ratios.info" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/scrip/scripInfoShortTable.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.scrip.twitter.feeds" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/scrip/scripTwitterStatus.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.scrip.user.watchlists" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/scrip/userWatchlists.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.scrip.technical.analysis" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/scrip/technicalAnalysisTable.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.scrip.peers" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/scrip/peersAnalysisTable.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.scrip.intraday.snapshot" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/scrip/intradaySnapshotTable.jsp"/>
+    </definition>
+    
+    <definition name="tiles.layout.scrip.info" extends="wlMetroScripLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/scrip/prepareScripInfo.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.scrip.news.feeds" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/scrip/newsAndFeedsTable.jsp"/>
+    </definition>
+    
+    <definition name="tiles.volume.analysis" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/volumeAnalysis.jsp"/>
+    </definition>
+    
+     <definition name="tiles.volume.analysis.calculate" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/volumeAnalysisResult.jsp"/>
+    </definition>
+    
+     <definition name="tiles.showWatchlistDiffViewMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainWatchlistDiffViewPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.watchlist.diff.view.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/watchlistDiffViewResult.jsp"/>
+    </definition>
+    
+    <definition name="tiles.scripsHistoryMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainScripsHistoryPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.aScripHistoryMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/scrip/aScripHistoryTable.jsp"/>
+    </definition>
+    
+    <definition name="tiles.prepare.NOW.place.order" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/order/placeNOWOrder.jsp"/> 
+    </definition>
+   	
+   	<definition name="tiles.NOW.place.order.success" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/order/placeNOWOrderSuccess.jsp"/> 
+    </definition>
+    
+    <definition name="tiles.table.manual.watchlist.fetch" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/manualWatchlistViewResult.jsp"/>
+    </definition>
+    
+     <definition name="tiles.layout.lean.scrip.summary" extends="LeanScripSummaryLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/scrip/leanScripSummary.jsp"/>
+    </definition>
+    
+    <definition name="tiles.showBubbleGraphMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainBubbleGraphPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.highcharts.bubblegraph.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/bubbleGraph.jsp"/>
+    </definition>
+    
+    <definition name="tiles.highcharts.scripsCompareChart.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/scripCompare.jsp"/>
+    </definition>
+    
+    <definition name="tiles.highcharts.scripsLevelPriceVsRatioCompareChart.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/scripLevelPriceVsRatioCompare.jsp"/>
+    </definition>
+    
+    <definition name="tiles.highcharts.bubblegraph.sqg.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/bubbleGraphSqg.jsp"/>
+    </definition>
+    
+    <definition name="tiles.highcharts.bubblegraph.sqg.margin.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/bubbleGraphSqgMargin.jsp"/>
+    </definition>
+    
+    <definition name="tiles.showRatiochartMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainRatiochartPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.Ratiochart.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/highchartsRatioChart.jsp"/>
+    </definition>
+    
+    <definition name="tiles.prepare.add.new.qtrResult" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/addNewQtrResult.jsp"/> 
+    </definition>
+   	
+   	<definition name="tiles.add.qtr.result.success" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/watchlist/addToWatchlistSuccess.jsp"/> <!-- You can retain same sucesse response with timer to close the window -->
+    </definition>
+    
+    <definition name="tiles.table.scrip.daily.achievement" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/scrip/dailyAchievementTable.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.scrip.option.chain" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/scrip/optionchainTable.jsp"/>
+    </definition>
+    
+    <definition name="tiles.scrip2wl.criteria.match" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/scripWLCriteriaMatch.jsp"/>
+    </definition>
+    
+     <definition name="tiles.scrip2wl.criteria.match.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/scripWLCriteriaMatchResult.jsp"/>
+    </definition>
+    
+    <definition name="tiles.intraVolumeAnalysis.chart" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/intradayVolumeAnalysis.jsp"/>
+    </definition>
+    
+    <definition name="tiles.kiteSuccess" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/user/kiteSuccess.jsp"/> 
+    </definition>
+    
+    <definition name="tiles.optionorder.Success" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/user/optionordersuccess.jsp"/> 
+    </definition>
+    
+    <definition name="tiles.streamingtick.chart" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/streamingTickChart.jsp"/>
+    </definition>
+    
+    <definition name="tiles.showDomMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainDomAnalysisPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.highcharts.graph.dom" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/highchartsDomGraph.jsp"/>
+    </definition>
+    
+</tiles-definitions>

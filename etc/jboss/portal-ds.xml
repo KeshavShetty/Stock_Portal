@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<datasources>
+  <local-tx-datasource>
+    <jndi-name>jdbc/@ds.name@</jndi-name>
+    <use-java-context>true</use-java-context>    
+    <connection-url>@ds.jdbc.url@</connection-url>	
+    <driver-class>@ds.jdbc.driver@</driver-class>    
+    <user-name>@ds.jdbc.user@</user-name>
+    <password>@ds.jdbc.pass@</password>
+    <validation>
+		<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"></valid-connection-checker>
+    	<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"></exception-sorter>
+	</validation>
+    <max-pool-size>10</max-pool-size>
+    <min-pool-size>1</min-pool-size>
+    <idle-timeout-minutes>10</idle-timeout-minutes>
+    <blocking-timeout-millis>50000</blocking-timeout-millis>
+    <metadata>
+		<type-mapping>PostgreSQL 8.0</type-mapping>
+	</metadata>
+  </local-tx-datasource>
+
+</datasources>

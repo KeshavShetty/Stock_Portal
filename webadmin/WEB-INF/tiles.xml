@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+        "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/tiles-config_2_0.dtd">
+
+<tiles-definitions>
+    
+     <!-- New WL based metro layout starts from here. All previous needs to be cleanedup -->
+    
+    <definition name="wlMetroDefault" template="/WEB-INF/jsp/metroWL/layout/fullScreenLayout.jsp">
+    	<put-attribute name="topHeader" value="/WEB-INF/jsp/metroWL/tile/topHeader.jsp"/>
+    	<put-attribute name="mainMenu" value="/WEB-INF/jsp/metroWL/layout/plainMainMenu.jsp"/>    	
+    	<put-attribute name="rightAdPane" value="/WEB-INF/jsp/metroWL/tile/rightPane.jsp"/>	
+    	<put-attribute name="footer" value="/WEB-INF/jsp/metroWL/tile/footer.jsp"/>
+    </definition>
+    
+    <definition name="defaultHome" extends="wlMetroDefault"/> 
+    
+    <definition name="tiles.mainMenu" template="/WEB-INF/jsp/metroWL/layout/plainMainMenu.jsp"/>
+    
+     <definition name="pageLayout" template="/WEB-INF/jsp/metroWL/layout/bodyOnlyLayout.jsp"> <!--  pageLayout applicable to individual body for each menu -->
+    	<put-attribute name="messages" value="/WEB-INF/jsp/metroWL/tile/messages.jsp"/>    	
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/dummyBody.jsp"/>
+    </definition>
+    
+    <definition name="tableLayout" template="/WEB-INF/jsp/metroWL/layout/tableOnlyLayout.jsp">    		
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/scripSearchResult.jsp"/>
+    </definition>
+    <definition name="tiles.table.scrip.search.result" extends="tableLayout"/>
+     
+    <definition name="tiles.publicHome" extends="pageLayout"/>
+    <definition name="tiles.userHome" extends="pageLayout">
+    
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/userHome.jsp"/>
+    </definition>
+    
+    <definition name="tiles.showJavaChart" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/javaChart.jsp"/>
+    </definition>
+    
+	<definition name="empltyFullScreen" extends="wlMetroDefault">   	    	
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/bodyWithEmptyPageDivs.jsp"/>
+    </definition>
+    
+    <definition name="tiles.showScripMainPage" extends="pageLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/mainScripPage.jsp"/>
+    </definition>
+    
+    <definition name="tiles.table.search.scrip.result" extends="tableLayout">
+    	<put-attribute name="table" value="/WEB-INF/jsp/metroWL/tile/mainScripPage.jsp"/>
+    </definition>
+    
+    <!-- All popup related tiles below -->
+     <definition name="floatingBodyOnlyLayout" template="/WEB-INF/jsp/metroWL/layout/bodyOnlyLayout.jsp">    	
+    	<put-attribute name="messages" value="/WEB-INF/jsp/metroWL/tile/messages.jsp"/>    	
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/dummyBody.jsp"/>
+    </definition>
+    
+    <definition name="tiles.prepareLogin" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/user/login.jsp"/> 
+    </definition>
+    
+    <definition name="tiles.loginSuccess" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/user/loginSuccess.jsp"/> 
+    </definition>
+    
+	<definition name="tiles.default.misc.home" extends="pageLayout"> 
+		<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/responseDailyJobs.jsp"/>
+   	</definition>
+   	
+   	<definition name="tiles.prepare.add.to.watchlist" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/watchlist/addToWatchlist.jsp"/> 
+    </definition>
+   	
+   	<definition name="tiles.add.watchlist.success" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/watchlist/addToWatchlistSuccess.jsp"/> 
+    </definition>
+   	
+   	<definition name="tiles.default.error" extends="pageLayout">    
+        <put-attribute name="title" value="error.unexpected"/>
+        <put-attribute name="body" value="/WEB-INF/jsp/error.jsp"/>
+    </definition> 
+    
+    <definition name="tiles.default.misc.data.page" extends="pageLayout"> 
+		<put-attribute name="body" value="/WEB-INF/jsp/metroWL/tile/data/defaultPage.jsp"/>
+   	</definition>
+</tiles-definitions>

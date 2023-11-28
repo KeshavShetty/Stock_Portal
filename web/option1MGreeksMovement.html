@@ -1,0 +1,74 @@
+<html>
+<head>
+  <title>1M Option Greeks Movements View</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/data.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+
+<div id="container1" style="min-width: 310px; height: 700px; margin: 0 auto; border-style: solid;"></div>
+
+<script type='text/javascript'>
+
+	function getQueryParameter(name){
+	  const parts = window.location.href.split('?');
+	  if (parts.length > 1) {
+	    name = encodeURIComponent(name);
+	    const params = parts[1].split('&');
+	    const found = params.filter(el => (el.split('=')[0] === name) && el);
+	    if (found.length) return decodeURIComponent(found[0].split('=')[1]);
+	  }
+	}
+	
+	var forDate = getQueryParameter("forDate");
+	var optionnames = getQueryParameter("optionnames");
+	
+	Highcharts.chart('container1', {
+	  chart: {
+	    type: 'spline'
+	  },
+	  title: {
+	    text: optionnames + ' Option Greeks Movement'
+	  },
+	  subtitle: {
+	    text: '1M Option Greeks movements' + forDate
+	  },
+	  yAxis: [{ // Primary yAxis
+          labels: {
+              format: '{value}'
+          },
+          opposite: true,
+          title: {
+              text: 'Index'
+          }
+      }, { // Secondary yAxis
+          gridLineWidth: 0,
+          
+          labels: {
+              format: '{value}'
+          },title: {
+              text: 'Greek Value'
+          }
+      }, { // Third yAxis
+          gridLineWidth: 0,
+          
+          labels: {
+              format: '{value}'
+          },title: {
+              text: 'P&L'
+          }
+      }],
+	  data: {
+	    csvURL: 'http://localhost/portal/chart/Option1MGreeksMovementChartQuote?forDate='+forDate+ '&optionnames='+optionnames,
+	    enablePolling: true,
+	    dataRefreshRate: 60
+	  },
+	  series: [
+		  { yAxis: 0},{ yAxis: 1},{ yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, { yAxis: 1},{ yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 2}
+		 ]
+	});
+  </script>
+</body>
+</html>

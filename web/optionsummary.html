@@ -1,0 +1,123 @@
+<html>
+<head>
+  <title>Option Summary View</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/data.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+
+<div id="container2" style="min-width: 310px; height: 500px; margin: 0 auto; border-style: solid;"></div>
+<br>
+<br>
+<div id="container3" style="min-width: 310px; height: 300px; margin: 0 auto; border-style: solid;"></div>
+<br>
+<br>
+<div id="container1" style="min-width: 310px; height: 300px; margin: 0 auto; border-style: solid;"></div>
+
+<script type='text/javascript'>
+
+	function getQueryParameter(name){
+	  const parts = window.location.href.split('?');
+	  if (parts.length > 1) {
+	    name = encodeURIComponent(name);
+	    const params = parts[1].split('&');
+	    const found = params.filter(el => (el.split('=')[0] === name) && el);
+	    if (found.length) return decodeURIComponent(found[0].split('=')[1]);
+	  }
+	}
+	
+	var forDate = getQueryParameter("forDate");
+	var indexName = getQueryParameter("indexName");
+	var nooftopois = getQueryParameter("nooftopois");
+	var filterOptionWorth = getQueryParameter("filterOptionWorth");
+	
+	
+Highcharts.chart('container1', {
+  chart: {
+    type: 'spline'
+  },
+  title: {
+    text: indexName + ' Live Option summary Data'
+  },
+
+  subtitle: {
+    text: 'OI data'
+  },
+
+  data: {
+    csvURL: 'http://localhost/portal/chart/OptionSummaryQuote?indexName=' + indexName + '&forDate='+forDate,
+    enablePolling: true,
+    dataRefreshRate: 60
+  }
+});
+
+Highcharts.chart('container2', {
+	  chart: {
+	    type: 'spline'
+	  },
+	  title: {
+	    text: indexName + ' Live Option summary Data'
+	  },
+
+	  subtitle: {
+	    text: 'Daily OI Change Data'
+	  },
+
+	  data: {
+	    csvURL: 'http://localhost/portal/chart/OptionOpenInterestChange?indexName=' + indexName + '&forDate='+forDate,
+	    enablePolling: true, 
+	    dataRefreshRate: 60
+	  },
+	  series: [
+		  { color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},
+		  { color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},
+		  { color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},
+		  { color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},{ color: '#c4392d'},
+		  
+		  { color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'},
+		  { color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'},
+		  { color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'},
+		  { color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'},{ color: '#00c735'}
+		  
+		]
+	});
+	
+Highcharts.chart('container3', {
+	  chart: {
+	    type: 'spline'
+	  },
+	  title: {
+	    text: indexName + ' OI Spike Chart'
+	  },
+	  subtitle: {
+	    text: 'OI data'
+	  },
+
+	  yAxis: [{ // Primary yAxis
+          labels: {
+              format: '{value}'
+          },
+          opposite: true
+      }, { // Secondary yAxis
+          gridLineWidth: 0,
+          
+          labels: {
+              format: '{value}'
+          }
+      }],
+      
+	  data: {
+	    csvURL: 'http://localhost/portal/chart/OISpikeChartQuote?indexName=' + indexName + '&forDate='+forDate+ '&nooftopois='+nooftopois+ '&filterOptionWorth='+filterOptionWorth,
+	    enablePolling: true,
+	    dataRefreshRate: 60
+	  },
+	  series: [
+		  { color: '#c4392d', yAxis: 1},{ color: '#00c735', yAxis: 1}, {color: '#ADD8E6', yAxis: 0} 
+		 ]
+	});	
+	
+  </script>
+</body>
+</html>

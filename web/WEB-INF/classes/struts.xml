@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+<!-- 
+
+    <constant name="struts.devMode" value="true"/>
+    <constant name="struts.convention.action.packages"
+              value="org.stock.portal.web.action"/>
+    <constant name="struts.convention.action.mapAllMatches" value="true"/>
+    <constant name="struts.convention.exclude.parentClassLoader" value="true" />
+	<constant name="struts.convention.action.fileProtocols" value="jar,vfsfile,vfszip" />
+    <constant name="struts.enable.SlashesInActionNames" value="true"/>
+    <constant name="struts.i18n.encoding" value="UTF-8"/>
+    <constant name="struts.enable.DynamicMethodInvocation" value="true"/>
+    
+     -->
+    <constant name="struts.enable.DynamicMethodInvocation" value="false" />
+	<constant name="struts.enable.SlashesInActionNames" value="true" />
+	<constant name="struts.ognl.allowStaticMethodAccess" value="true" />
+	
+	<constant name="struts.devMode" value="true" />
+	<constant name="struts.locale" value="en_IE" />
+	<constant name="struts.action.extension" value="do" />
+	<constant name="struts.ui.theme" value="simple" />
+	       
+    <package name="portal" namespace="/" extends="struts-default">
+	    <result-types>
+	            <result-type name="tiles"
+	                class="org.apache.struts2.views.tiles.TilesResult" />  
+	    </result-types>
+	    
+        <interceptors>
+            <interceptor name="ejb3"
+                class="org.stock.portal.web.interceptor.InjectEJBInterceptor"></interceptor>
+                
+            <interceptor name="secureInterceptor"
+                class="com.ed.wrms.web.interceptor.SecureInterceptor"></interceptor>
+                
+            <interceptor-stack name="portalStack">
+               
+                <interceptor-ref name="ejb3">
+                    <param name="appname">portal</param>
+                </interceptor-ref>
+                
+                 <interceptor-ref name="exception" />
+	            <interceptor-ref name="alias" />
+	            <interceptor-ref name="servletConfig" />
+	            <interceptor-ref name="prepare" />
+	            <interceptor-ref name="i18n">
+                    <param name="parameterName">lang</param>
+                    <param name="requestOnlyParameterName">reqLang</param>
+                    <param name="attributeName ">activeLocale</param>                            
+                </interceptor-ref>
+	            <interceptor-ref name="chain" />
+	            <interceptor-ref name="debugging" />
+	            <interceptor-ref name="profiling" />
+	            <interceptor-ref name="scopedModelDriven" />
+	            <interceptor-ref name="modelDriven" />
+	            <interceptor-ref name="fileUpload" />
+	            <interceptor-ref name="checkbox" />
+	            <interceptor-ref name="staticParams" />
+	            <interceptor-ref name="actionMappingParams" />
+	            <interceptor-ref name="params">
+	                <param name="excludeParams"> dojo\..*,^struts\..*</param>
+	            </interceptor-ref>
+	            <interceptor-ref name="store">
+                    <param name="operationMode">AUTOMATIC</param>
+                </interceptor-ref>
+	            <interceptor-ref name="conversionError" />
+	            <interceptor-ref name="validation">
+	                <param name="excludeMethods">populate</param>
+	            </interceptor-ref>
+	            <interceptor-ref name="workflow">
+                    <param name="excludeMethods">prepare*,view*,search*,input,back,cancel</param>
+                </interceptor-ref>
+                
+            </interceptor-stack>
+        </interceptors>
+        
+        <default-interceptor-ref name="portalStack"/>
+        
+        <global-results>
+           <result name="portal-home" type="chain">
+               <param name="actionName">home</param>
+           </result>        
+           <result name="error" type="tiles">tiles.default.error</result>           
+        </global-results>
+        
+        <global-exception-mappings>
+            <exception-mapping result="error" exception="java.lang.Exception"/>
+        </global-exception-mappings>         
+         
+        <action name="Home" method="viewHome" class="org.stock.portal.web.action.HomeAction">
+	        <result name="defaultHome" type="tiles">defaultHome</result>
+	        <result name="userHome" type="tiles">userHome</result>
+        </action>        
+        <action name="PublicHome" method="loadPublicHome" class="org.stock.portal.web.metroWL.action.PublicHomeAction">
+	        <result name="publicHome" type="tiles">tiles.publicHome</result>
+        </action>      
+        <action name="UserHome" method="loadUserHome" class="org.stock.portal.web.metroWL.action.UserHomeAction">
+	        <result name="userHome" type="tiles">tiles.userHome</result>
+        </action>  
+        
+         <action name="viewWatchlist" method="viewWatchlist" class="org.stock.portal.web.metroWL.action.WatchlistAction">
+	        <result name="scripwiseResultPage" type="tiles">tiles.table.watchlist.item.result.scrip</result>
+	        <result name="datewiseResultPage" type="tiles">tiles.table.watchlist.item.result.date</result>
+        </action>
+        
+        <action name="ShowJavaChart" method="loadChart" class="org.stock.portal.web.metroWL.action.ShowJavaChart">
+	        <result name="showJavaChart" type="tiles">tiles.showJavaChart</result>
+        </action>
+        
+        <action name="LoadMainMenu" method="loadMainMenu" class="org.stock.portal.web.metroWL.action.LoadMainMenuAction">
+	        <result name="showMainMenu" type="tiles">tiles.mainMenu</result>
+        </action>
+        
+        <action name="prepareLogin" method="prepareLogin" class="org.stock.portal.web.action.PrepareLoginAction">
+	        <result name="prepareLogin" type="tiles">tiles.prepareLogin</result>
+	        <result name="input">tiles.login</result>
+        </action>
+        
+        <action name="login" method="execute"
+	        	class="org.stock.portal.web.action.LoginAction">
+	        <result name="success" type="tiles">tiles.loginSuccess</result>
+	        <result name="input" type="tiles">tiles.prepareLogin</result>
+        </action>
+        
+        <action name="logout" method="execute" class="org.stock.portal.web.action.LogoutAction">
+	        <result name="success" type="redirectAction">Home</result>
+        </action>
+        
+        <action name="LoadDashboardPage" method="prepareSearch" class="org.stock.portal.web.metroWL.action.DashboardAction">
+	        <result name="success" type="tiles">tiles.dashboardMainPage</result>
+        </action>
+               
+        <action name="processBseIntradayData" method="processDailyBseData"
+	        	class="org.stock.portal.web.action.data.DailyHalfdayIntradayDataProcessorAction">		   
+	        <result name="success" type="tiles">tiles.default.misc.data.page</result>
+        </action> 
+        
+        <action name="miscDataPage" method="preparePage"
+	        	class="org.stock.portal.web.action.data.DataProcessorAction">		   
+	        <result name="success" type="tiles">tiles.default.misc.data.page</result>
+        </action>        
+        
+        <action name="prepareAddToWatchList" method="prepareAddToWatchList" class="org.stock.portal.web.metroWL.action.AddToWatchlistAction">
+	        <result name="input" type="tiles">tiles.prepare.add.to.watchlist</result>
+	        <result name="loginPage" type="redirectAction">prepareLogin</result>
+        </action>
+        
+        <action name="addToWatchList" method="addToWatchList" class="org.stock.portal.web.metroWL.action.AddToWatchlistAction">
+	        <result name="reponsePage" type="tiles">tiles.add.watchlist.success</result>
+	        <result name="input" type="tiles">tiles.prepare.add.to.watchlist</result>
+        </action>
+        
+        <action name="updateEODData" method="updateEODData" class="org.stock.portal.web.action.data.DataProcessorAction">		   
+	        <result name="success" type="tiles">tiles.default.misc.data.page</result>
+        </action>
+        
+        <action name="scripInfoPage" method="execute" class="org.stock.portal.web.action.scrips.ScripInfoAction">
+	        <result name="success" type="tiles">tiles.showScripInfoPage</result>
+        </action>
+        
+        <action name="newsSearch" method="search" class="org.stock.portal.web.metroWL.action.NewsSearchAction">
+	        <result name="resultPage" type="tiles">tiles.table.news.search.result</result>
+        </action>
+        
+        <action name="analysisSearch" method="search" class="org.stock.portal.web.metroWL.action.AnalysisSearchAction">
+	        <result name="resultPage" type="tiles">tiles.table.analysis.search.result</result>
+        </action>
+        
+        <action name="LoadAnalysisPage" method="prepareSearch" class="org.stock.portal.web.metroWL.action.AdvancedAnalysisSearchAction">
+	        <result name="success" type="tiles">tiles.showAnalysisMainPage</result>
+        </action>
+        
+        <action name="LoadNewsPage" method="prepareSearch" class="org.stock.portal.web.metroWL.action.AdvancedNewsSearchAction">
+	        <result name="success" type="tiles">tiles.showNewsMainPage</result>
+        </action>
+        
+        <action name="advancedNews" method="search" class="org.stock.portal.web.metroWL.action.AdvancedNewsSearchAction">
+	        <result name="resultPage" type="tiles">tiles.table.advanved.news.search.result</result>
+        </action>
+        
+        <action name="LoadQuickChart" method="loadChart" class="org.stock.portal.web.metroWL.action.ShowQuickChartAction">
+	        <result name="showChart" type="tiles">tiles.quick.chart</result>
+        </action>
+        
+        <action name="prepareEditMasters" method="prepareEdit" class="org.stock.portal.web.metroWL.action.EditMastersAction">
+	        <result name="input" type="tiles">tiles.prepare.edit.masters</result>
+        </action>
+        
+        <action name="saveMasters" method="save" class="org.stock.portal.web.metroWL.action.EditMastersAction">
+	        <result name="responsePage" type="tiles">tiles.edit.masters.success</result>
+	        <result name="input" type="tiles">tiles.prepare.edit.masters</result>
+        </action>
+        
+        <action name="pastAchievers" method="prepareSearch" class="org.stock.portal.web.metroWL.action.PastAchieversSearchAction">
+	        <result name="success" type="tiles">tiles.showPastAchieversMainPage</result>
+        </action>
+        
+        <action name="searchPastAchievers" method="search" class="org.stock.portal.web.metroWL.action.PastAchieversSearchAction">
+	        <result name="resultPage" type="tiles">tiles.table.past.achievers.search.result</result>
+        </action>
+        
+        <action name="preparePlaceOrder" method="preparePlaceOrder" class="org.stock.portal.web.metroWL.action.PlaceIciciOrderAction">
+	        <result name="input" type="tiles">tiles.prepare.icici.place.order</result>
+	        <result name="loginPage" type="redirectAction">prepareLogin</result>
+        </action>
+        
+        <action name="placeOrder" method="placeOrder" class="org.stock.portal.web.metroWL.action.PlaceIciciOrderAction">
+	        <result name="reponsePage" type="tiles">tiles.icici.place.order.success</result>
+	        <result name="input" type="tiles">tiles.prepare.icici.place.order</result>
+        </action>
+        
+        <action name="prepareSearchCandlePattern" method="prepareSearch" class="org.stock.portal.web.metroWL.action.CandlePatternSearchAction">
+	        <result name="success" type="tiles">tiles.showCandlePatternMainPage</result>
+        </action>
+        
+        <action name="searchCandlePattern" method="searchCandle" class="org.stock.portal.web.metroWL.action.CandlePatternSearchAction">
+	        <result name="resultPage" type="tiles">tiles.table.candle.pattern.search.result</result>
+        </action>
+        
+        <action name="LoadCandlePatternScripPage" method="prepareSearch" class="org.stock.portal.web.metroWL.action.AdvancedCandlePatternScripSearchAction">
+	        <result name="success" type="tiles">tiles.showCandlePatternScripMainPage</result>
+        </action>
+        
+        <action name="advancedCandlePatternScrip" method="search" class="org.stock.portal.web.metroWL.action.AdvancedCandlePatternScripSearchAction">
+	        <result name="resultPage" type="tiles">tiles.table.candle.pattern.scrip.search.result</result>
+        </action>
+        
+        <action name="googleCandle" method="execute" class="org.stock.portal.web.metroWL.action.GoogleCandleViewerAction">
+	        <result name="success" type="tiles">tiles.google.candle</result>
+        </action>
+        			  
+        <action name="prepareAddWLTransaction" method="prepareAddToWLTransaction" class="org.stock.portal.web.metroWL.action.AddToWLTransactionAction">
+	        <result name="input" type="tiles">tiles.prepare.add.to.watchlist.transaction</result>
+	        <result name="loginPage" type="redirectAction">prepareLogin</result>
+        </action>
+        
+        <action name="addToWLTransaction" method="addToWLTransaction" class="org.stock.portal.web.metroWL.action.AddToWLTransactionAction">
+	        <result name="reponsePage" type="tiles">tiles.add.watchlist.transaction.success</result>
+	        <result name="input" type="tiles">tiles.prepare.add.to.watchlist.transaction</result>
+        </action>
+        
+        <action name="LoadHighstockChart" method="loadHighstock" class="org.stock.portal.web.metroWL.action.ShowHighstockChartAction">
+	        <result name="showChart" type="tiles">tiles.highstock.chart</result>
+        </action>
+        
+        <action name="intradaySnapshot" method="prepareSearch" class="org.stock.portal.web.metroWL.action.IntradaySnapshotSearchAction">
+	        <result name="success" type="tiles">tiles.showIntradaySnapshotMainPage</result>
+        </action>
+        
+        <action name="searchintradaySnapshot" method="search" class="org.stock.portal.web.metroWL.action.IntradaySnapshotSearchAction">
+	        <result name="resultPage" type="tiles">tiles.table.intraday.snapshot.search.result</result>
+        </action>
+        
+        <action name="highchartsEOD" method="loadHighstock" class="org.stock.portal.web.metroWL.action.HighstockChartEODAction">
+	        <result name="showChart" type="tiles">tiles.highstock.eod.chart</result>
+        </action>
+        
+        <action name="intradayBTST" method="prepareSearch" class="org.stock.portal.web.metroWL.action.IntradayBTSTSearchAction">
+	        <result name="success" type="tiles">tiles.showIntradayBTSTMainPage</result>
+        </action>
+        
+        <action name="searchIntradayBTST" method="search" class="org.stock.portal.web.metroWL.action.IntradayBTSTSearchAction">
+	        <result name="resultPage" type="tiles">tiles.table.intraday.btst.search.result</result>
+        </action>
+        
+        <action name="indexView" method="prepareSearch" class="org.stock.portal.web.metroWL.action.IndexViewAction">
+	        <result name="success" type="tiles">tiles.showIndexViewMainPage</result>
+        </action>
+        
+        <action name="searchIndexView" method="search" class="org.stock.portal.web.metroWL.action.IndexViewAction"> <!--  This is now used for Free/Full Text company info search  -->
+	        <result name="resultPage" type="tiles">tiles.table.index.view.result</result>
+        </action>
+        
+        <action name="getIndexScrips" method="getIndexScrips" class="org.stock.portal.web.metroWL.action.IndexViewAction">
+	        <result name="scripsResultPage" type="tiles">tiles.table.index.scrips.view.result</result>
+        </action>
+        
+        <action name="treePerformanceView" method="prepareSearch" class="org.stock.portal.web.metroWL.action.TreePerformanceAction">
+	        <result name="success" type="tiles">tiles.showTreePerformanceMainPage</result>
+        </action>
+        
+        <action name="searchTreePerformanceView" method="search" class="org.stock.portal.web.metroWL.action.TreePerformanceAction">
+	        <result name="resultPage" type="tiles">tiles.table.tree.performance.result</result>
+        </action>
+        
+        <action name="searchSubTreePerformanceView" method="subSearch" class="org.stock.portal.web.metroWL.action.TreePerformanceAction">
+	        <result name="subResultPage" type="tiles">tiles.table.sub.tree.performance.result</result>
+        </action>
+        
+        <action name="financialResultView" method="prepareSearch" class="org.stock.portal.web.metroWL.action.FinancialResultAction">
+	        <result name="success" type="tiles">tiles.showFinancialResultMainPage</result>
+        </action>
+        
+        <action name="searchFinancialResult" method="search" class="org.stock.portal.web.metroWL.action.FinancialResultAction">
+	        <result name="resultPage" type="tiles">tiles.table.financial.result.result</result>
+        </action>
+        
+        <action name="latestFinancialDeclaredScripsResult" method="latestResultSearch" class="org.stock.portal.web.metroWL.action.FinancialResultAction">
+	        <result name="latestResults" type="tiles">tiles.table.latest.financial.scrip.result</result>
+        </action>
+        
+        <action name="showFinancialResultGraph" method="showGraph" class="org.stock.portal.web.metroWL.action.FinancialResultAction">
+	        <result name="showGraph" type="tiles">tiles.highcharts.graph.financial.result</result>
+        </action>
+        
+        <action name="deleteWatchlistItem" method="deleteWatchlistItem" class="org.stock.portal.web.metroWL.action.WatchlistAction">
+	        <result name="successPage" type="tiles">tiles.watchlist.genericSuccess</result>
+        </action>
+        
+        <action name="rebuildWatchlistItem" method="rebuildWatchlistItem" class="org.stock.portal.web.metroWL.action.WatchlistAction">
+	        <result name="successPage" type="tiles">tiles.watchlist.genericSuccess</result>
+        </action>
+        
+        <action name="deleteTransaction" method="deleteTransaction" class="org.stock.portal.web.metroWL.action.WatchlistAction">
+	        <result name="successPage" type="tiles">tiles.watchlist.genericSuccess</result>
+        </action>
+        
+        <action name="scripInfo" method="prepareLoad" class="org.stock.portal.web.metroWL.action.ScripInfoAction">
+	        <result name="success" type="tiles">tiles.layout.scrip.info</result>
+        </action>
+        
+		<action name="scripKeysRatios" method="getScripInfo" class="org.stock.portal.web.metroWL.action.ScripInfoAction">
+	        <result name="success" type="tiles">tiles.table.scrip.keys.ratios.info</result>
+        </action>
+        
+        <action name="twitterFeeds" method="getTwitterStatus" class="org.stock.portal.web.metroWL.action.ScripInfoAction">
+	        <result name="success" type="tiles">tiles.table.scrip.twitter.feeds</result>
+        </action>
+        
+        <action name="userWatchlists" method="getUserWatchlists" class="org.stock.portal.web.metroWL.action.ScripInfoAction">
+	        <result name="success" type="tiles">tiles.table.scrip.user.watchlists</result>
+        </action>
+        
+        <action name="scripTechnicalAnalysis" method="getScripTechnicalAnalysis" class="org.stock.portal.web.metroWL.action.ScripInfoAction">
+	        <result name="success" type="tiles">tiles.table.scrip.technical.analysis</result>
+        </action>
+        
+        <action name="scripIntradaySnapshot" method="getScripIntradaySnapshot" class="org.stock.portal.web.metroWL.action.ScripInfoAction">
+	        <result name="success" type="tiles">tiles.table.scrip.intraday.snapshot</result>
+        </action>
+        
+        <action name="scripNewsAndFeeds" method="getScripNewsAndFeeds" class="org.stock.portal.web.metroWL.action.ScripInfoAction">
+	        <result name="success" type="tiles">tiles.table.scrip.news.feeds</result>
+        </action>
+        
+        <action name="volumeAnalysis" method="loadViewPage" class="org.stock.portal.web.metroWL.action.VolumeAnalysisAction">
+	        <result name="showPage" type="tiles">tiles.volume.analysis</result>
+        </action>
+        
+        <action name="scripPeerAnalysis" method="getScripPeers" class="org.stock.portal.web.metroWL.action.ScripInfoAction">
+	        <result name="success" type="tiles">tiles.table.scrip.peers</result>
+        </action>
+        
+        <action name="calculateVolumeAnalysis" method="calculateVolumeAnalysis" class="org.stock.portal.web.metroWL.action.VolumeAnalysisAction">
+	        <result name="showAnalysis" type="tiles">tiles.volume.analysis.calculate</result>
+        </action>
+        
+        <action name="scripDailyAchivementView" method="getScripDailyAchievement" class="org.stock.portal.web.metroWL.action.ScripInfoAction">
+	        <result name="success" type="tiles">tiles.table.scrip.daily.achievement</result>
+        </action>
+        
+        <action name="optionChainView" method="getScripOptionChain" class="org.stock.portal.web.metroWL.action.ScripInfoAction">
+	        <result name="success" type="tiles">tiles.table.scrip.option.chain</result>
+        </action>
+        
+        <action name="watchlistDiffView" method="prepareSearch" class="org.stock.portal.web.metroWL.action.WatchlistDiffViewAction">
+	        <result name="success" type="tiles">tiles.showWatchlistDiffViewMainPage</result>
+        </action>
+        
+        <action name="resultWatchlistDiffView" method="search" class="org.stock.portal.web.metroWL.action.WatchlistDiffViewAction">
+	        <result name="resultPage" type="tiles">tiles.table.watchlist.diff.view.result</result>
+        </action>
+        
+        <action name="LoadScripsHistoryPage" method="prepareSearch" class="org.stock.portal.web.metroWL.action.ScripsHistoryAction">
+	        <result name="success" type="tiles">tiles.scripsHistoryMainPage</result>
+        </action>
+        
+        <action name="aScripsHistory" method="searchIndividualScripHistory" class="org.stock.portal.web.metroWL.action.ScripsHistoryAction">
+	        <result name="aScripHistory" type="tiles">tiles.aScripHistoryMainPage</result>
+        </action>
+        
+        <action name="preparePlaceNOWOrder" method="preparePlaceOrder" class="org.stock.portal.web.metroWL.action.PlaceNOWOrderAction">
+	        <result name="input" type="tiles">tiles.prepare.NOW.place.order</result>
+	        <result name="loginPage" type="redirectAction">prepareLogin</result>
+        </action>
+        
+        <action name="placeNOWOrder" method="placeOrder" class="org.stock.portal.web.metroWL.action.PlaceNOWOrderAction">
+	        <result name="reponsePage" type="tiles">tiles.NOW.place.order.success</result>
+	        <result name="input" type="tiles">tiles.prepare.NOW.place.order</result>
+        </action>
+        
+        <action name="loadWatchlistManually" method="getWatchlists" class="org.stock.portal.web.metroWL.action.ManualWatchlistLoaderAction">
+	        <result name="success" type="tiles">tiles.table.manual.watchlist.fetch</result>
+        </action>
+        
+        <action name="leanScripSummary" method="leanSummary" class="org.stock.portal.web.metroWL.action.ScripInfoAction">
+	        <result name="success" type="tiles">tiles.layout.lean.scrip.summary</result>
+        </action>
+        
+        <action name="bubbleGraph" method="prepareBubbleGraph" class="org.stock.portal.web.metroWL.action.BubbleGraphAction">
+	        <result name="success" type="tiles">tiles.showBubbleGraphMainPage</result>
+        </action>
+        
+        <action name="generateBubbleGraph" method="generateBubleGraph" class="org.stock.portal.web.metroWL.action.BubbleGraphAction">
+	        <result name="showGraph" type="tiles">tiles.highcharts.bubblegraph.result</result>
+	        <result name="showGraphSqg" type="tiles">tiles.highcharts.bubblegraph.sqg.result</result>
+	        <result name="showGraphSqgMargin" type="tiles">tiles.highcharts.bubblegraph.sqg.margin.result</result>
+	        
+        </action>
+        
+        <action name="generateScripCompareGraph" method="generateGraph" class="org.stock.portal.web.metroWL.action.ScripRatioCompareAction">
+	        <result name="showScripCompareResultChart" type="tiles">tiles.highcharts.scripsCompareChart.result</result>
+        </action>
+        
+        <action name="generateScripLevelPriceVsRatioCompareGraph" method="generateGraph" class="org.stock.portal.web.metroWL.action.ScripLevelPriceVsRatioCompareAction">
+	        <result name="showScripCompareResultChart" type="tiles">tiles.highcharts.scripsLevelPriceVsRatioCompareChart.result</result>
+        </action>
+        
+        <action name="ratioChartView" method="prepareSearch" class="org.stock.portal.web.metroWL.action.RatiochartAction">
+	        <result name="success" type="tiles">tiles.showRatiochartMainPage</result>
+        </action>
+        
+        <action name="searchRatioChartView" method="showChart" class="org.stock.portal.web.metroWL.action.RatiochartAction">
+	        <result name="showChart" type="tiles">tiles.table.Ratiochart.result</result>
+        </action>
+        
+        <action name="prepareAddNewQtrResult" method="prepareAddNewQtrResult" class="org.stock.portal.web.metroWL.action.AddNewQtrResultAction">
+	        <result name="input" type="tiles">tiles.prepare.add.new.qtrResult</result>
+        </action>
+        
+        <action name="addNewQtrResult" method="addNewQtrResult" class="org.stock.portal.web.metroWL.action.AddNewQtrResultAction">
+	        <result name="reponsePage" type="tiles">tiles.add.qtr.result.success</result>
+	        <result name="input" type="tiles">tiles.prepare.add.new.qtrResult</result>
+        </action>
+        
+        <action name="wlCriteriaMatch" method="loadViewPage" class="org.stock.portal.web.metroWL.action.WLCriteriaMatchAction">
+	        <result name="showPage" type="tiles">tiles.scrip2wl.criteria.match</result>
+        </action>
+        
+        <action name="findWlCriteriaMatch" method="findWLMatch" class="org.stock.portal.web.metroWL.action.WLCriteriaMatchAction">
+	        <result name="showAnalysis" type="tiles">tiles.scrip2wl.criteria.match.result</result>
+		</action>
+		
+		<action name="LoadIntraVolumeAnalysis" method="loadIntradayVolumeAnalysis" class="org.stock.portal.web.metroWL.action.ShowIntradayVolumeAnalysisAction">
+	        <result name="showIntraVolumeAnalysis" type="tiles">tiles.intraVolumeAnalysis.chart</result>
+        </action>
+        
+        <action name="kiteLogin" method="execute"
+	        	class="org.stock.portal.web.action.KiteAction">
+	        <result name="success" type="tiles">tiles.kiteSuccess</result>
+        </action>
+        
+        <action name="optionOrderPlacer" method="execute"
+	        	class="org.stock.portal.web.action.OptionOrderPlacerAction">
+	        <result name="success" type="tiles">tiles.optionorder.Success</result>
+        </action>
+        
+        <action name="LoadStreamingHighstockChart" method="loadHighstock" class="org.stock.portal.web.metroWL.action.ShowStreamingTickChartAction">
+	        <result name="showChart" type="tiles">tiles.streamingtick.chart</result>
+        </action>
+        
+        <action name="domAnalysisView" method="prepareDomView" class="org.stock.portal.web.metroWL.action.DomAnalysisAction">
+	        <result name="success" type="tiles">tiles.showDomMainPage</result>
+        </action>
+        
+         <action name="showDomAnalysisGraph" method="showGraph" class="org.stock.portal.web.metroWL.action.DomAnalysisAction">
+	        <result name="showGraph" type="tiles">tiles.highcharts.graph.dom</result>
+        </action>
+        
+    </package>    
+</struts>

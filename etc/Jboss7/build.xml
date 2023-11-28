@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="jboss" basedir=".">
+
+    <macrodef name="macro-install-required-modules">
+        <attribute name="targetdir" />
+    	<sequential>
+            <copy todir="@{targetdir}">
+                <fileset dir="${project.server.module}"/>
+            </copy>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="macro-install-server-config">
+        <attribute name="targetdir" />
+    	<sequential>
+    		<move file="@{targetdir}/${project.server.config.file}" tofile="@{targetdir}/${project.server.config.file}.CLEAN"/>
+        	<copy file="${project.server.config.path}/${project.server.config.file}" 
+                  todir="@{targetdir}" >
+                <filterset refid="filter.properties" />
+            </copy>	
+        </sequential>
+    </macrodef>
+
+    <target name="install-required-modules" description="Prepare modules in JBoss" 
+    	depends="check-module-exists" unless="module.exists">
+        <macro-install-required-modules targetdir="${server.modules.dir}"/>
+    </target>
+	
+	<target name="check-module-exists">
+        <available file="${server.modules.dir}/org/postgresql/main/postgresql-9.0-801.jdbc4.jar" 
+                   type="file"
+                   property="module.exists" />
+    </target>
+
+    <target name="install-server-config" description="Install the project's datasource,jms config" 
+    	depends="check-server-config-exists" unless="config.exists">
+        <macro-install-server-config targetdir="${server.configuration.dir}"/>
+    </target>
+
+    <target name="uninstall-server-config" description="Uninstall the project's server config file" 
+    		depends="check-server-config-exists" if="config.exists">
+    	<sequential>
+	    	<delete file="${server.configuration.dir}/${project.server.config.file}"/>
+    		<move file="${server.configuration.dir}/${project.server.config.file}.CLEAN" tofile="${server.configuration.dir}/${project.server.config.file}"/>
+    	</sequential>
+    </target>
+	
+	<target name="check-server-config-exists">
+        <available file="${server.configuration.dir}/${project.server.config.file}.CLEAN" 
+                   type="file"
+                   property="config.exists" />
+    </target>    		
+    		
+	<target name="deploy-ear" depends=" install-server-config, install-required-modules, dist">
+        <copy todir="${server.deploy.dir}">
+            <fileset dir="${dist.dir}" />
+        </copy>
+    </target>
+
+    <target name="deploy" description="Deploy the project in the application server"
+            depends="check-ear-exists, check-exploded-ear-exists, deploy-ear" if="exploded.ear.exists">
+    	<!--touch file="${server.deploy.dir}/${project.artifact.name}/META-INF/application.xml"/-->
+    </target>
+
+    <target name="check-ear-exists">
+        <available file="${server.deploy.dir}/${project.artifact.name}" 
+                   type="file"
+                   property="ear.exists" />
+    </target>
+
+    <target name="check-exploded-ear-exists">
+        <available file="${server.deploy.dir}/${project.artifact.name}"
+                   type="dir"
+                   property="exploded.ear.exists" />
+    </target>
+
+    <target name="undeploy-ear" if="ear.exists">
+        <delete file="${server.deploy.dir}/${project.artifact.name}" />
+    	<delete file="${server.deploy.dir}/${project.artifact.name}.failed" />
+    	<delete file="${server.deploy.dir}/${project.artifact.name}.deployed" />
+    </target>
+
+    <target name="undeploy-exploded-ear" if="exploded.ear.exists">
+        <delete dir="${server.deploy.dir}/${project.artifact.name}" />
+        <delete file="${server.deploy.dir}/${project.artifact.name}.failed" />
+        <delete dir="${server.deploy.dir}/${project.artifact.name}.dodeploy" />
+    </target>
+
+    <target name="undeploy" description="Undeploy the project from the application server"
+        depends="check-ear-exists, check-exploded-ear-exists, undeploy-ear, undeploy-exploded-ear" />
+
+</project>

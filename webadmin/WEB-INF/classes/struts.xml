@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+<!-- 
+
+    <constant name="struts.devMode" value="true"/>
+    <constant name="struts.convention.action.packages"
+              value="org.stock.portal.web.action"/>
+    <constant name="struts.convention.action.mapAllMatches" value="true"/>
+    <constant name="struts.convention.exclude.parentClassLoader" value="true" />
+	<constant name="struts.convention.action.fileProtocols" value="jar,vfsfile,vfszip" />
+    <constant name="struts.enable.SlashesInActionNames" value="true"/>
+    <constant name="struts.i18n.encoding" value="UTF-8"/>
+    <constant name="struts.enable.DynamicMethodInvocation" value="true"/>
+    
+     -->
+    <constant name="struts.enable.DynamicMethodInvocation" value="false" />
+	<constant name="struts.enable.SlashesInActionNames" value="true" />
+	<constant name="struts.ognl.allowStaticMethodAccess" value="true" />
+	
+	<constant name="struts.devMode" value="true" />
+	<constant name="struts.locale" value="en_IE" />
+	<constant name="struts.action.extension" value="do" />
+	<constant name="struts.ui.theme" value="simple" />
+	       
+    <package name="portal" namespace="/" extends="struts-default">
+	    <result-types>
+	            <result-type name="tiles"
+	                class="org.apache.struts2.views.tiles.TilesResult" />  
+	    </result-types>
+	    
+        <interceptors>
+            <interceptor name="ejb3"
+                class="org.stock.portal.web.interceptor.InjectEJBInterceptor"></interceptor>
+                
+            <interceptor name="secureInterceptor"
+                class="com.ed.wrms.web.interceptor.SecureInterceptor"></interceptor>
+                
+            <interceptor-stack name="portalStack">
+               
+                <interceptor-ref name="ejb3">
+                    <param name="appname">portal</param>
+                </interceptor-ref>
+                
+                 <interceptor-ref name="exception" />
+	            <interceptor-ref name="alias" />
+	            <interceptor-ref name="servletConfig" />
+	            <interceptor-ref name="prepare" />
+	            <interceptor-ref name="i18n">
+                    <param name="parameterName">lang</param>
+                    <param name="requestOnlyParameterName">reqLang</param>
+                    <param name="attributeName ">activeLocale</param>                            
+                </interceptor-ref>
+	            <interceptor-ref name="chain" />
+	            <interceptor-ref name="debugging" />
+	            <interceptor-ref name="profiling" />
+	            <interceptor-ref name="scopedModelDriven" />
+	            <interceptor-ref name="modelDriven" />
+	            <interceptor-ref name="fileUpload" />
+	            <interceptor-ref name="checkbox" />
+	            <interceptor-ref name="staticParams" />
+	            <interceptor-ref name="actionMappingParams" />
+	            <interceptor-ref name="params">
+	                <param name="excludeParams"> dojo\..*,^struts\..*</param>
+	            </interceptor-ref>
+	            <interceptor-ref name="store">
+                    <param name="operationMode">AUTOMATIC</param>
+                </interceptor-ref>
+	            <interceptor-ref name="conversionError" />
+	            <interceptor-ref name="validation">
+	                <param name="excludeMethods">populate</param>
+	            </interceptor-ref>
+	            <interceptor-ref name="workflow">
+                    <param name="excludeMethods">prepare*,view*,search*,input,back,cancel</param>
+                </interceptor-ref>
+                
+            </interceptor-stack>
+        </interceptors>
+        
+        <default-interceptor-ref name="portalStack"/>
+        
+        <global-results>
+           <result name="portal-home" type="chain">
+               <param name="actionName">home</param>
+           </result>        
+           <result name="error" type="tiles">tiles.default.error</result>           
+        </global-results>
+        
+        <global-exception-mappings>
+            <exception-mapping result="error" exception="java.lang.Exception"/>
+        </global-exception-mappings>         
+         
+        <action name="Home" method="viewHome" class="org.stock.admin.web.action.HomeAction">
+	        <result name="defaultHome" type="tiles">defaultHome</result>
+	        <result name="userHome" type="tiles">userHome</result>
+        </action>        
+        
+        
+    </package>    
+</struts>

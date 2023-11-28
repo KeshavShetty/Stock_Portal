@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="portal" basedir="." default="dist" >
+
+	<!-- Section: Profile Properties -->
+    <property file="target.properties" />
+	<property file="build.properties" />
+    <!-- override any properties for specific environment here -->
+    <!-- otherwise use default proeprties from dev_build.properties -->
+    <property file="${basedir}/etc/environments/${target}.properties" />
+	    <!--<property file="dev_build.properties" />-->
+   
+    <!-- Section: Ant-Contrib Configuration -->
+   	<!-- <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>-->
+
+    <!-- Section: Properties -->
+    <property name="src.dir" location="${basedir}/src" />
+    <property name="java.src.dir" location="${src.dir}/java" />
+    <property name="test.src.dir" location="${src.dir}/test" />
+    <property name="build.dir" location="${basedir}/build" />
+    <property name="classes.dir" location="${build.dir}/classes" />
+    <property name="dist.dir" location="${basedir}/dist" />
+    <property name="lib.dir" location="${basedir}/lib" />
+    <property name="etc.dir" location="${basedir}/etc" />
+    <property name="web.dir" location="${basedir}/web" />
+	<property name="web.admin.dir" location="${basedir}/webadmin" />
+	<property name="setup.portal.dir" location="${basedir}/setup" />
+    <property name="build.lib.dir" location="${lib.dir}/build" />
+    <property name="web.lib.dir" location="${lib.dir}/webruntime" />
+    <property name="ear.lib.dir" location="${lib.dir}/earruntime" />
+    <property name="etc.server.dir" location="${etc.dir}/Jboss7" />
+    <property name="etc.jasper.dir" location="${etc.dir}/jasper_reports" />
+    <property name="filtered.dir" location="${build.dir}/filtered" />
+    <property name="filtered.ear.dir" location="${filtered.dir}/ear" />
+    <property name="filtered.web.dir" location="${filtered.dir}/web" />
+	<property name="filtered.web.admin.dir" location="${filtered.dir}/webadmin" />
+    <property name="filtered.service.dir" location="${filtered.dir}/service" />
+    <property name="filtered.dao.dir" location="${filtered.dir}/dao" />
+    <property name="filtered.domain.dir" location="${filtered.dir}/domain" />
+    <property name="filtered.common.dir" location="${filtered.dir}/common" />
+    <!--<property name="project.server.config.path" location="${etc.dir}/jboss" />-->
+    <property name="exploded.ear.dir" location="${dist.dir}/exploded" />
+    <property name="ear.prepare.dir" location="${build.dir}/ear" />
+    <property name="javadocs.dir" location="${basedir}/docs" />
+    <property name="project.datasource.file" value="portal-ds.xml" />
+    <property name="project.jms.file" value="portal-jms-service.xml" />
+	
+	<!-- Section: Server Config -->
+	<property name="project.server.config.file" value="standalone.xml" />
+	<property name="project.server.module" value="${etc.server.dir}/modules" />
+	<property name="project.server.config.path" location="${etc.dir}/Jboss7/standalone" />
+	
+    <property name="filter.file" value="${basedir}/build.properties" />
+	<property name="filter.file.dev" value="${basedir}/dev_build.properties" />
+
+    <property name="java.source.version" value="1.7" />
+    <property name="java.target.version" value="1.7" />
+    <property name="java.debug" value="true" />
+    <property name="java.debug.level" value="lines,vars,source" />
+
+    <property name="common.artifact.name" value="${ant.project.name}-common.jar" />
+	<property name="dao.artifact.name" value="${ant.project.name}-dao.jar" />
+    <property name="domain.artifact.name" value="${ant.project.name}-domain.jar" />
+    <property name="service.artifact.name" value="${ant.project.name}-service.jar" />
+    <property name="web.artifact.name" value="${ant.project.name}-web.war" />
+	<property name="web.admin.artifact.name" value="${ant.project.name}admin-web.war" />
+    <property name="project.artifact.name" value="${ant.project.name}.ear" />
+	<property name="portal-war.resources.dir" location="${setup.portal.dir}/resources"/>
+	<property name="portal-war.properties.dir" location="${portal-war.resources.dir}/properties"/>
+	<property name="portal-war.admin.properties.dir" location="${portal-war.resources.dir}/adminproperties"/>
+
+	<!-- Section: Imports -->
+	<import file="${etc.server.dir}/build.xml" />
+   
+    <!-- Section: Patternsets -->
+    <patternset id="common.src.pattern">
+        <include name="org/stock/portal/common/**" />
+    </patternset>
+
+    <patternset id="common.classes.pattern">
+        <include name="org/stock/portal/common/**" />
+        <exclude name="**/*Test.class" />
+        <exclude name="**/*TestRunner.class" />
+    </patternset>
+	
+    <patternset id="dao.src.pattern">
+        <include name="org/stock/portal/dao/**" />
+    </patternset>
+
+    <patternset id="dao.classes.pattern">
+        <include name="org/stock/portal/dao/**" />
+        <exclude name="**/*Test.class" />
+        <exclude name="**/*TestRunner.class" />
+    </patternset>	
+
+    <patternset id="domain.src.pattern">
+        <include name="org/stock/portal/domain/**" />
+    </patternset>
+
+    <patternset id="domain.classes.pattern">
+        <include name="org/stock/portal/domain/**" />
+        <exclude name="**/*Test.class" />
+        <exclude name="**/*TestRunner.class" />
+    </patternset>
+
+    <patternset id="service.src.pattern">
+        <include name="org/stock/portal/service/**" />
+    </patternset>
+
+    <patternset id="service.classes.pattern">
+        <include name="org/stock/portal/service/**" />
+        <exclude name="**/*Test.class" />
+        <exclude name="**/*TestRunner.class" />
+    </patternset>
+
+    <patternset id="web.src.pattern">
+        <include name="org/stock/portal/web/**" />
+    </patternset>
+	
+	<patternset id="admin.web.src.pattern">
+        <include name="org/stock/admin/web/**" />
+    </patternset>
+
+    <patternset id="web.classes.pattern">
+        <include name="org/stock/portal/web/**" />
+        <exclude name="**/*Test.class" />
+        <exclude name="**/*TestRunner.class" />
+    </patternset>
+	
+	<patternset id="web.admin.classes.pattern">
+		<include name="org/stock/admin/web/**" />
+        <include name="org/stock/portal/web/**" />
+		<exclude name="org/stock/portal/web/action/**" />
+        <exclude name="**/*Test.class" />
+        <exclude name="**/*TestRunner.class" />
+    </patternset>
+
+    <!-- Section: Classpaths -->
+    <path id="build.classpath">
+        <fileset dir="${lib.dir}/build" includes="*.jar" />
+    	<fileset dir="${lib.dir}/earruntime" includes="*.jar" />
+    </path>
+
+    <path id="test.classpath">
+        <path refid="build.classpath" />
+        <fileset dir="${lib.dir}/test" includes="*.jar" />
+        <pathelement path="${classes.dir}" />
+    </path>
+
+	<filterset id="filter.properties">	    
+	    <filtersfile file="build.properties"/>
+		<filtersfile file="${filter.file.dev}" />
+		<filtersfile file="${basedir}/etc/environments/${target}.properties" />
+    </filterset>
+	
+    <!-- Section: Preset Definitions -->
+    <presetdef name="src.javac">
+        <javac srcdir="${java.src.dir}"
+               destdir="${classes.dir}"
+               debug="${java.debug}"
+               debuglevel="${java.debug.level}"
+               source="${java.source.version}"
+               target="${java.target.version}" 
+               classpathref="build.classpath"
+               includeantruntime="false" />
+    </presetdef>
+
+    <presetdef name="test.javac">
+        <javac srcdir="${test.src.dir}"
+               destdir="${classes.dir}"
+               debug="${java.debug}"
+               debuglevel="${java.debug.level}"
+               source="${java.source.version}"
+               target="${java.target.version}" 
+               classpathref="test.classpath"
+               includeantruntime="false" />
+    </presetdef>
+
+    <!-- Section: Targets -->
+    <target name="init" description="Create initial directory structure">
+        <tstamp />
+        <mkdir dir="${classes.dir}" />
+        <mkdir dir="${filtered.dir}" />
+        <mkdir dir="${dist.dir}" />
+        <mkdir dir="${javadocs.dir}" />
+        <!--<mkdir dir="${dist.dir}/${domain.artifact.name}" />-->
+        <!--<mkdir dir="${dist.dir}/${dao.artifact.name}" />-->
+        <!--<mkdir dir="${dist.dir}/${service.artifact.name}" />-->
+        <!--<mkdir dir="${dist.dir}/${web.artifact.name}" />-->
+    </target>
+
+    <target name="clean" description="Clean created directories">
+        <delete dir="${build.dir}" />
+        <delete dir="${dist.dir}" />
+        <delete dir="${javadocs.dir}" />
+    </target>
+
+   
+    <target name="common-build" depends="init" description="Build the common classes">
+        <src.javac>
+            <patternset refid="common.src.pattern" />
+        </src.javac>
+    </target>
+
+    <target name="common-test-build" description="Build the common test classes"
+            depends="common-build" if="tests.enabled">
+        <test.javac>
+            <patternset refid="common.src.pattern" />
+        </test.javac>
+    </target>
+
+    <target name="common-test" description="Test the common classes"
+            depends="common-test-build" if="tests.enabled">
+        <junit fork="yes" haltonfailure="yes">
+            <test name="org.stock.portal.common.CommonTestRunner" />
+            <formatter type="plain" usefile="false" />
+            <classpath refid="test.classpath" />
+        </junit>        
+    </target>
+
+    <target name="common-filter" description="Copy required files for filtering"
+            depends="common-test">
+        <copy todir="${filtered.common.dir}">
+            <fileset dir="${etc.dir}/common"/>
+        	<filterset refid="filter.properties" />
+        </copy>    	
+    </target>
+
+    <target name="common-dist" description="Build the distribution jar"
+            depends="common-filter">
+        <copy todir="${ear.prepare.dir}/${project.artifact.name}/${common.artifact.name}">
+            <fileset dir="${classes.dir}">
+                <patternset refid="common.classes.pattern" />
+            </fileset>
+            <fileset dir="${filtered.common.dir}" />      	
+        </copy>
+    	<zip destfile="${ear.prepare.dir}/${project.artifact.name}/lib/${common.artifact.name}"
+             basedir="${ear.prepare.dir}/${project.artifact.name}/${common.artifact.name}" />
+        <delete dir="${ear.prepare.dir}/${project.artifact.name}/${common.artifact.name}"/>
+    </target>
+	
+    <target name="domain-build" description="Build the domain classes"
+            depends="common-dist">
+        <src.javac>
+            <patternset refid="domain.src.pattern" />
+        </src.javac>
+    </target>
+
+    <target name="domain-test-build" description="Build the domain test classes"
+            depends="domain-build" if="tests.enabled">
+        <test.javac>
+            <patternset refid="domain.src.pattern" />
+        </test.javac>
+    </target>
+
+    <target name="domain-test" description="Test the domain classes"
+            depends="domain-test-build" if="tests.enabled">
+        <junit fork="yes" haltonfailure="yes">
+            <test name="org.stock.portal.domain.DomainTestRunner" />
+            <formatter type="plain" usefile="false" />
+            <classpath refid="test.classpath" />
+        </junit>        
+    </target>
+
+    <target name="domain-filter" description="Copy required files for filtering"
+            depends="domain-test">
+        <copy todir="${filtered.domain.dir}">
+            <fileset dir="${etc.dir}/domain" />
+        	<filterset refid="filter.properties" />
+        </copy>
+    </target>
+
+    <target name="domain-dist" description="Build the distribution jar"
+            depends="domain-filter">
+        <copy todir="${ear.prepare.dir}/${project.artifact.name}/${domain.artifact.name}">
+            <fileset dir="${classes.dir}">
+                <patternset refid="domain.classes.pattern" />
+            </fileset>
+            <fileset dir="${filtered.domain.dir}" />      	
+        </copy>
+    	<zip destfile="${ear.prepare.dir}/${project.artifact.name}/lib/${domain.artifact.name}"
+             basedir="${ear.prepare.dir}/${project.artifact.name}/${domain.artifact.name}" />
+     	<delete dir="${ear.prepare.dir}/${project.artifact.name}/${domain.artifact.name}"/>
+    </target>	
+
+    <target name="dao-build" description="Build the dao classes"
+            depends="domain-dist">
+        <src.javac>
+            <patternset refid="dao.src.pattern" />
+        </src.javac>
+    </target>
+
+    <target name="dao-test-build" description="Build the dao test classes"
+            depends="dao-build" if="tests.enabled">
+        <test.javac>
+            <patternset refid="dao.src.pattern" />
+        </test.javac>
+    </target>
+
+    <target name="dao-test" description="Test the dao classes"
+            depends="dao-test-build" if="tests.enabled">
+        <junit fork="yes" haltonfailure="yes">
+            <test name="org.stock.portal.dao.CommonTestRunner" />
+            <formatter type="plain" usefile="false" />
+            <classpath refid="test.classpath" />
+        </junit>        
+    </target>
+
+    <target name="dao-filter" description="Copy required files for filtering"
+            depends="dao-test">
+        <copy todir="${filtered.dao.dir}">
+            <fileset dir="${etc.dir}/dao"/>
+        	<filterset refid="filter.properties" />
+        </copy>    	
+    </target>
+
+    <target name="dao-dist" description="Build the distribution jar"
+            depends="dao-filter">
+        <copy todir="${ear.prepare.dir}/${project.artifact.name}/${dao.artifact.name}">
+            <fileset dir="${classes.dir}">
+                <patternset refid="dao.classes.pattern" />
+            </fileset>
+            <fileset dir="${filtered.dao.dir}" />      	
+        </copy>
+    	<zip destfile="${ear.prepare.dir}/${project.artifact.name}/lib/${dao.artifact.name}"
+             basedir="${ear.prepare.dir}/${project.artifact.name}/${dao.artifact.name}" />
+        <delete dir="${ear.prepare.dir}/${project.artifact.name}/${dao.artifact.name}"/>
+    </target>	
+
+    <target name="service-build" description="Build the service classes"
+            depends="dao-dist">
+        <src.javac>
+            <patternset refid="service.src.pattern" />
+        </src.javac>
+    </target>
+
+    <target name="service-test-build" description="Build the service test classes"
+            depends="service-build" if="tests.enabled">
+        <test.javac>
+            <patternset refid="service.src.pattern" />
+        </test.javac>
+    </target>
+
+    <target name="service-test" description="Test the service classes"
+            depends="service-test-build" if="tests.enabled">
+        <junit fork="yes" haltonfailure="yes">
+            <test name="org.stock.portal.service.ServiceTestRunner" />
+            <formatter type="plain" usefile="false" />
+            <classpath refid="test.classpath" />
+        </junit>        
+    </target>
+
+    <target name="service-filter" description="Copy required files for filtering"
+            depends="service-test">
+        <copy todir="${filtered.service.dir}">
+            <fileset dir="${etc.dir}/service" />
+        	<filterset refid="filter.properties" />
+        </copy>
+    </target>
+
+    <target name="service-dist" description="Build the distribution jar"
+            depends="service-filter">
+        <copy todir="${ear.prepare.dir}/${project.artifact.name}/${service.artifact.name}">
+            <fileset dir="${classes.dir}">
+                <patternset refid="service.classes.pattern" />
+            </fileset>
+            <fileset dir="${filtered.service.dir}" />      	
+        </copy>
+    </target>
+
+    <target name="web-build" description="Build the web classes"
+            depends="service-dist">
+        <src.javac>
+            <patternset refid="web.src.pattern" />
+        </src.javac>
+        <copy todir="${classes.dir}">
+            <fileset dir="${java.src.dir}">
+                <include name="**/*.xml" />
+            </fileset>
+        </copy>
+    </target>
+	
+	<target name="web-admin-build" description="Build the web classes">
+	        <src.javac>
+	            <patternset refid="admin.web.src.pattern" />
+	        </src.javac>
+	    </target>
+
+    <target name="web-test-build" description="Build the web test classes"
+            depends="web-build" if="tests.enabled">
+        <test.javac>
+            <patternset refid="web.src.pattern" />
+        </test.javac>
+    </target>
+	
+	<target name="web-admin-test-build" description="Build the web test classes"
+            depends="web-admin-build" if="tests.enabled">
+        <test.javac>
+            <patternset refid="admin.web.src.pattern" />
+        </test.javac>
+    </target>
+
+    <target name="web-test" description="Test the web classes"
+            depends="web-test-build" if="tests.enabled">
+        <junit fork="yes" haltonfailure="yes">
+            <test name="org.stock.portal.web.WebTestRunner" />
+            <formatter type="plain" usefile="false" />
+            <classpath refid="test.classpath" />
+        </junit>        
+    </target>
+	
+	<target name="web-admin-test" description="Test the web classes"
+            depends="web-admin-test-build" if="tests.enabled">
+        <junit fork="yes" haltonfailure="yes">
+            <test name="org.stock.portal.web.WebTestRunner" />
+            <formatter type="plain" usefile="false" />
+            <classpath refid="test.classpath" />
+        </junit>        
+    </target>
+
+    <target name="web-filter" description="Copy required files for filtering"
+            depends="web-test">
+        <copy todir="${filtered.web.dir}">
+            <fileset dir="${etc.dir}/web"/>
+        	<filterset refid="filter.properties" />
+        </copy>    	
+    </target>
+	
+	 <target name="web-admin-filter" description="Copy required files for filtering"
+	            depends="web-admin-test">
+	        <copy todir="${filtered.web.admin.dir}">
+	            <fileset dir="${etc.dir}/webadmin"/>
+	        	<filterset refid="filter.properties" />
+	        </copy>    	
+	    </target>
+
+    <target name="web-dist" description="Build the distribution jar"
+            depends="web-filter,war.properties-copy">
+        
+        <copy todir="${ear.prepare.dir}/${project.artifact.name}/${web.artifact.name}">
+            <fileset dir="${filtered.web.dir}" />
+            <fileset dir="${web.dir}" />
+        </copy>
+        <copy todir="${ear.prepare.dir}/${project.artifact.name}/${web.artifact.name}/WEB-INF/classes">
+            <fileset dir="${classes.dir}">
+                <patternset refid="web.classes.pattern" />
+            </fileset>
+        </copy>
+        <copy todir="${ear.prepare.dir}/${project.artifact.name}/${web.artifact.name}/WEB-INF/lib">
+            <fileset dir="${web.lib.dir}" />
+        </copy>
+    </target>
+	
+	<target name="web-admin-dist" description="Build the distribution jar"
+	        depends="web-admin-filter,war-admin.properties-copy">
+	    
+	    <copy todir="${ear.prepare.dir}/${project.artifact.name}/${web.admin.artifact.name}">
+	        <fileset dir="${filtered.web.admin.dir}" />
+	        <fileset dir="${web.admin.dir}" />
+	    </copy>
+	    <copy todir="${ear.prepare.dir}/${project.artifact.name}/${web.admin.artifact.name}/WEB-INF/classes">
+	        <fileset dir="${classes.dir}">
+	            <patternset refid="web.admin.classes.pattern" />
+	        </fileset>
+	    </copy>
+	    <copy todir="${ear.prepare.dir}/${project.artifact.name}/${web.admin.artifact.name}/WEB-INF/lib">
+	        <fileset dir="${web.lib.dir}" />
+	    </copy>
+	</target>
+
+	<target name="war.properties-copy" description="Copies .property (language) files to /WEB-INF/classes">
+		<native2ascii encoding="UTF-8" src="${portal-war.properties.dir}" 
+			dest="${ear.prepare.dir}/${project.artifact.name}/${web.artifact.name}/WEB-INF/classes"
+		    includes="**/*.properties"/>
+    </target>
+	
+	<target name="war-admin.properties-copy" description="Copies .property (language) files to /WEB-INF/classes">
+			<native2ascii encoding="UTF-8" src="${portal-war.admin.properties.dir}" 
+				dest="${ear.prepare.dir}/${project.artifact.name}/${web.admin.artifact.name}/WEB-INF/classes"
+			    includes="**/*.properties"/>
+	    </target>
+
+    <target name="ear-filter" description="Copy required files for filtering"
+            depends="web-dist, web-admin-dist">
+        <copy todir="${filtered.ear.dir}">
+            <fileset dir="${etc.dir}/ear" />
+        	<filterset refid="filter.properties" />
+        </copy>
+    </target>
+
+	<target name="prepare-ear" description="Prepare the required libraries for the ear"
+            depends="ear-filter">
+        <copy todir="${ear.prepare.dir}/${project.artifact.name}">
+            <fileset dir="${filtered.ear.dir}" />
+        	<filterset refid="filter.properties" />
+        </copy>
+        <copy todir="${ear.prepare.dir}/${project.artifact.name}/lib">
+            <fileset dir="${ear.lib.dir}" />
+        </copy>
+    </target>
+
+    <target name="dist-exploded-ear" if="packaged.ear">
+        <copy todir="${dist.dir}">
+            <fileset dir="${ear.prepare.dir}" />
+        </copy>
+    </target>
+
+    <target name="dist-ear" unless="packaged.ear">
+        <zip destfile="${ear.prepare.dir}/${service.artifact.name}"
+             basedir="${ear.prepare.dir}/${project.artifact.name}/${service.artifact.name}" />
+        <zip destfile="${ear.prepare.dir}/${web.artifact.name}"
+             basedir="${ear.prepare.dir}/${project.artifact.name}/${web.artifact.name}" />
+    	 <zip destfile="${ear.prepare.dir}/${web.admin.artifact.name}"
+    	             basedir="${ear.prepare.dir}/${project.artifact.name}/${web.admin.artifact.name}" />
+    	<!--!!!!ATTENTION Work around to make log4j configure at application level-->
+    	<zip destfile="${ear.prepare.dir}/${project.artifact.name}/lib/log4j-custom.jar">
+    		<fileset dir="${ear.prepare.dir}/${project.artifact.name}">	
+				<include name="*.properties" />
+			</fileset>	
+    	</zip>
+    	
+        <zip destfile="${dist.dir}/${project.artifact.name}">
+             <fileset dir="${ear.prepare.dir}">
+                 <include name="${service.artifact.name}" />
+                 <include name="${web.artifact.name}" />
+             	<include name="${web.admin.artifact.name}" />
+             </fileset>
+             <fileset dir="${ear.prepare.dir}/${project.artifact.name}">
+                 <include name="lib/**" />
+                 <include name="META-INF/**" />
+             </fileset>
+        </zip>
+    </target>
+
+    <target name="dist" description="Create the enterprise application (ear file)"
+            depends="prepare-ear, dist-ear, dist-exploded-ear">
+    </target>
+
+    <target name="jsp-deploy" description="Copy web resources (html, jsp, javascript, css) to an exploded directory"
+            depends="check-exploded-ear-exists" if="exploded.ear.exists">
+        <echo>Exploded ear exists. Re-deploying web resources</echo>
+        <copy todir="${server.deploy.dir}/${project.artifact.name}/${web.artifact.name}">
+            <fileset dir="${web.dir}" />
+        </copy>
+    </target>
+
+    <target name="javadoc" description="Create the javadocs">
+        <javadoc packagenames="org.stock.portal.*"
+                 destdir="${javadocs.dir}"
+                 sourcepath="${java.src.dir}"
+                 windowtitle="PORTAL API Javadoc"
+                 author="true"
+                 version="true"
+                 use="true"
+                 defaultexcludes="yes"
+                 classpathref="test.classpath">
+             <doctitle><![CDATA[<h1>PORTAL API</h1>]]></doctitle>
+             <bottom><![CDATA[<i>Copyright &#169; 2010 European Dynamics. All Rights Reserved.</i>]]></bottom>
+        </javadoc>
+    </target>
+	
+	<target name="properties-copy" description="Copies .property files to portal-common">
+			<copy todir="${common.artifact.name}/">
+			    <fileset dir="${setup.portal.dir}">
+					<include name="*.properties" />
+				</fileset>
+				<filterset refid="filter.properties"/>
+		    </copy>		
+	    </target>
+</project>

@@ -1,0 +1,11 @@
+<!-- 
+	No direct JSP access, go through action instead.
+	This will forward any request from 
+	/<contextRoot>/page/<pageName>.do
+	to
+	/<contextRoot>/jsp/<pageName>.jsp
+-->
+<action
+	path="/page/**"
+	forward="/WEB-INF/{1}.jsp"
+/>

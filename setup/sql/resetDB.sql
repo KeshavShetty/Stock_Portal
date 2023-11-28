@@ -1,0 +1,75 @@
+delete from bse_eq_eod_data;
+delete from nse_eq_eod_data;
+SELECT setval('bse_eq_eod_data_id_seq', 1);
+SELECT setval('nse_eq_eod_data_id_seq', 1);
+
+delete from scrips where id>100;
+SELECT setval('scrips_id_seq', 999);
+
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (1,'900010','BSE-Sensex','BSE30','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (2,'900011','BSE-100  National Ind','BSE100','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (3,'900012','BSE-200','BSE200','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (4,'900014','BSE-500','BSE500','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (5,'900018','BSE-IT','BSEIT','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (6,'900019','BSE-FMCG','BSEFMCG','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (7,'900021','BSE-Consumer durables','BSECD','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (8,'900020','BSE-Capital goods','BSECG','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (9,'900022','BSE-Healthcare','BSEHC','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (10,'900023','BSE-PSU','BSEPSU','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (11,'900024','BSE-Teck','TECK','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (12,'900026','BSE-Bankex','BANKEX','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (13,'900027','BSE-Auto','AUTO','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (14,'900028','BSE-Metal','METAL','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (15,'900029','BSE-Oil & Gas','OILGAS','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (16,'900015','BSE-Midcap','MIDCAP','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (17,'900016','BSE-Smallcap','SMLCAP','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (18,'900025','Dollex-30','DOL30','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (19,'900030','Dollex-100','DOL100','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (20,'900013','Dollex-200','DOL200','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (21,'900017','BSE-Realty','REALTY','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (22,'900031','BSE-Power','POWER','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (23,'900032','BSE-IPO','BSEIPO','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (24,'900033','BSE-Shariah 50','SHA50','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,bse_code,name,bse_name,symbol_type,date_added,status) VALUES (25,'900034','BSE-Greenx','GREENX','IN',now(), 'Active');
+
+
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (26,'S&P CNX Nifty','S&P CNX Nifty','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (27,'CNX Nifty Junior','CNX Nifty Junior','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (28,'CNX 100','CNX 100','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (29,'CNX 200','CNX 200','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (30,'S&P CNX 500','S&P CNX 500','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (31,'NIFTY Midcap 50','NIFTY Midcap 50','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (32,'CNX Midcap','CNX Midcap','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (33,'CNX Smallcap','CNX Smallcap','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (34,'S&P CNX Nifty Dividend','S&P CNX Nifty Dividend','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (35,'CNX Auto','CNX Auto','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (36,'CNX Bank','CNX Bank','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (37,'CNX Energy','CNX Energy','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (38,'CNX Finance','CNX Finance','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (39,'CNX FMCG','CNX FMCG','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (40,'CNX IT','CNX IT','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (41,'CNX Media','CNX Media','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (42,'CNX Metal','CNX Metal','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (43,'CNX MNC','CNX MNC','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (44,'CNX Pharma','CNX Pharma','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (45,'CNX PSU Bank','CNX PSU Bank','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (46,'CNX Realty','CNX Realty','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (47,'CNX Consumption','CNX Consumption','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (48,'CNX Commodities','CNX Commodities','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (49,'CNX Dividend Opportunities','CNX Dividend Opportunities','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (51,'CNX Infrastructure','CNX Infrastructure','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (52,'CNX PSE','CNX PSE','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (53,'CNX Service Sector','CNX Service Sector','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (54,'S&P CNX Nifty Shariah','S&P CNX Nifty Shariah','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (55,'S&P CNX 500 Shariah','S&P CNX 500 Shariah','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (56,'S&P ESG India','S&P ESG India','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (57,'CNX Low Volatility','CNX Low Volatility','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (58,'CNX Alpha Index','CNX Alpha Index','IN',now(), 'Active');
+INSERT INTO SCRIPS (id,nse_code,name,symbol_type,date_added,status) VALUES (59,'CNX High Beta','CNX High Beta','IN',now(), 'Active');
+
+update scrips set nse_code = 'CNX DIVIDEND OPPT' where id=49;
+update scrips set nse_code = 'NIFTY DIVIDEND' where id=34;
+update scrips set nse_code = 'CNX INFRA' where id=51;
+update scrips set nse_code = 'CNX SERVICE' where id=53;
+update scrips set nse_code = 'S&P ESG INDIA INDEX' where id=56;
+

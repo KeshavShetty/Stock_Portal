@@ -1,0 +1,25 @@
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.1">
+	<deployment>
+		<exclusions>
+			<module name="org.apache.log4j" />
+		</exclusions>
+		<dependencies>
+	    	<module name="org.postgresql" />
+	    </dependencies>
+	</deployment>
+	<sub-deployment name="portal-web.war">
+		<exclusions>
+			<module name="org.apache.log4j" />
+		</exclusions>
+	</sub-deployment> 
+	<sub-deployment name="portaladmin-web.war">
+		<exclusions>
+			<module name="org.apache.log4j" />
+		</exclusions>
+	</sub-deployment> 
+	<sub-deployment name="portal-service.jar">
+		<exclusions>
+			<module name="org.apache.log4j" />
+		</exclusions>
+	</sub-deployment>
+</jboss-deployment-structure>

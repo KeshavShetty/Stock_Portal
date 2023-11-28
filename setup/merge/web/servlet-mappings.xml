@@ -1,0 +1,16 @@
+<servlet-mapping>
+    <servlet-name>UserConfigServlet</servlet-name>
+    <url-pattern>/UserConfigServlet</url-pattern>
+</servlet-mapping>  
+<servlet-mapping>
+    <servlet-name>QuoteDataServlet</servlet-name>
+    <url-pattern>/QuoteDataServlet</url-pattern>
+</servlet-mapping>  
+<servlet-mapping>
+    <servlet-name>action</servlet-name>
+    <url-pattern>*.do</url-pattern>
+</servlet-mapping>
+
+
+
+

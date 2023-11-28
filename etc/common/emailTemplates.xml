@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EMAIL>
+<ACTION attr="registerUser">
+<SUBJECT><![CDATA[Portal  Platform Automated Notification - User Registartion]]></SUBJECT>
+<CONTENT><![CDATA[Welcome to the Portal Platform.
+The Registration process has been succesfully completed.
+
+Your username is: {USERNAME}
+Your password is: {PASSWORD}
+
+Your account will be activated as soon as your registration details have been reviewed.
+You will be notified via email for any change in the status of your registration.
+
+
+
+Please do not reply to this mail.
+*************************************************************************
+]]></CONTENT><COMMENT><![CDATA[This notification will be sent whenever a user has undergone the registration process]]></COMMENT></ACTION>
+
+<ACTION attr="forgotPassword">
+<SUBJECT><![CDATA[Portal  Platform Automated Notification - User Registartion]]></SUBJECT>
+<CONTENT><![CDATA[Welcome to the Portal Platform.
+Your password has been reset.
+
+Your username is: {USERNAME}
+Your password is: {PASSWORD}
+
+
+Please do not reply to this mail.
+*************************************************************************
+]]></CONTENT><COMMENT><![CDATA[This notification will be sent whenever a user has requested a password change]]></COMMENT></ACTION>
+</EMAIL>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/java"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="lib/build/ejb-api-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/build/jdom-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/build/jms-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/build/jsp-api-2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/build/mail-1.4.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/build/persistence-api-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/build/servlet-api-2.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/build/struts2-convention-plugin-2.1.8.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/build/struts2-core-2.1.8.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/test/ejb-api-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/test/jdom-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/test/jms-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/test/jsp-api-2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/test/junit-4.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/test/mail-1.4.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/test/persistence-api-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/webruntime/commons-beanutils-1.7.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/webruntime/commons-digester-2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/webruntime/commons-fileupload-1.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/webruntime/commons-io-1.3.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/webruntime/freemarker-2.3.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/webruntime/ognl-2.7.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/webruntime/struts2-config-browser-plugin-2.1.8.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/webruntime/struts2-tiles-plugin-2.1.8.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/webruntime/tiles-api-2.0.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/webruntime/tiles-core-2.0.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/webruntime/tiles-jsp-2.0.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/build/hibernate3.jar"/>
+	<classpathentry kind="lib" path="lib/build/cglib-nodep-2.1_3.jar"/>
+	<classpathentry kind="lib" path="lib/build/hibernate-annotations.jar"/>
+	<classpathentry kind="lib" path="lib/build/hibernate-commons-annotations.jar"/>
+	<classpathentry kind="lib" path="lib/build/hibernate-core.jar"/>
+	<classpathentry kind="lib" path="lib/build/hibernate-entitymanager.jar"/>
+	<classpathentry kind="lib" path="lib/build/javassist-3.7.ga.jar"/>
+	<classpathentry kind="lib" path="lib/build/jta.jar"/>
+	<classpathentry kind="lib" path="lib/build/ognl-2.7.3.jar"/>
+	<classpathentry kind="lib" path="lib/build/ojdl.jar"/>
+	<classpathentry kind="lib" path="lib/build/xwork-core-2.1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/earruntime/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/test/servlet-api-2.5.jar"/>
+	<classpathentry kind="lib" path="lib/test/struts2-convention-plugin-2.1.8.1.jar"/>
+	<classpathentry kind="lib" path="lib/test/struts2-core-2.1.8.1.jar"/>
+	<classpathentry kind="lib" path="lib/test/xwork-core-2.1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/webruntime/struts2-convention-plugin-2.1.8.1.jar"/>
+	<classpathentry kind="lib" path="lib/webruntime/struts2-core-2.1.8.1.jar"/>
+	<classpathentry kind="lib" path="lib/webruntime/xwork-core-2.1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/build/javax.annotation-3.0.1-b19.jar"/>
+	<classpathentry kind="lib" path="lib/earruntime/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/webruntime/ChartDirector.jar"/>
+	<classpathentry kind="lib" path="lib/webruntime/jfreechart-1.0.19.jar"/>
+	<classpathentry kind="lib" path="lib/webruntime/jcommon-1.0.23.jar"/>
+	<classpathentry kind="lib" path="lib/earruntime/httpclient-4.3.5.jar"/>
+	<classpathentry kind="lib" path="lib/earruntime/httpcore-4.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/build/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/webruntime/twitter4j-core-4.0.4-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/webruntime/jsoup-1.7.3.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

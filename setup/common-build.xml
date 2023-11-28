@@ -1,0 +1,19 @@
+<project name="common-ant" default="info">
+
+	<target name="info">
+		<echo message="Generic macros..."/>
+	</target>
+	
+	<!-- ==================== MACROS ======================= -->
+
+	<macrodef name="projectinfo">
+		<sequential>
+			<!-- Removed to inprove speed, use it only for debugging
+			<echoproperties/> -->
+			<java classname="org.apache.tools.ant.launch.Launcher">
+				<arg value="-projecthelp" />
+			</java>
+		</sequential>
+	</macrodef>
+
+</project>

@@ -1,0 +1,61 @@
+<html>
+<head>
+  <title>Option OI Max Worth Reversion View</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/data.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+
+<div id="container1" style="min-width: 310px; height: 700px; margin: 0 auto; border-style: solid;"></div>
+
+<script type='text/javascript'>
+
+	function getQueryParameter(name){
+	  const parts = window.location.href.split('?');
+	  if (parts.length > 1) {
+	    name = encodeURIComponent(name);
+	    const params = parts[1].split('&');
+	    const found = params.filter(el => (el.split('=')[0] === name) && el);
+	    if (found.length) return decodeURIComponent(found[0].split('=')[1]);
+	  }
+	}
+	
+	var forDate = getQueryParameter("forDate");
+	var indexName = getQueryParameter("indexName");
+	
+	Highcharts.chart('container1', {
+	  chart: {
+	    type: 'spline'
+	  },
+	  title: {
+	    text: indexName + ' Option MAX OI Worth'
+	  },
+	  subtitle: {
+	    text: 'Price changes'
+	  },
+	  yAxis: [{ // Primary yAxis
+          labels: {
+              format: '{value}'
+          },
+          opposite: true
+      }, { // Secondary yAxis
+          gridLineWidth: 0,
+          
+          labels: {
+              format: '{value}'
+          }
+      }],
+	  data: {
+	    csvURL: 'http://localhost/portal/chart/OptionMaxOIWorthReversionChartQuote?indexName=' + indexName + '&forDate='+forDate,
+	    enablePolling: true,
+	    dataRefreshRate: 60
+	  },
+	  series: [
+		  { yAxis: 0},{ yAxis: 0},{ yAxis: 1}
+		 ]
+	});
+  </script>
+</body>
+</html>

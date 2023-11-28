@@ -1,0 +1,197 @@
+<project name="jboss-generic" default="info" basedir=".">
+
+	<description>
+		Generic JBoss macros for ant.
+	</description>
+
+	<property environment="env" />
+
+	<dirname property="jboss-generic.dir" file="${ant.file.jboss-generic}"/>
+
+	<!-- jboss environment -->
+	<!--  
+	<property name="jboss.server" value="default" />
+	<property name="jboss.home" location="${env.JBOSS_HOME}" />
+	<property name="jboss.lib.dir" location="${env.JBOSS_HOME}/server/${jboss.server}/lib" />
+	<property name="jboss.deploy.dir" location="${env.JBOSS_HOME}/server/default/deploy" />
+	-->
+	
+	<property name="jboss.server" value="default" />
+	<property name="jboss.lib.dir" value="server/${jboss.server}/lib" />
+	<property name="jboss.deploy.dir" value="server/${jboss.server}/deploy" />
+		
+    <target name="info">
+            <echo message="This file contains macros for JBoss AS. To use these macros"/>
+			<echo message="define ant targets in another build.xml file."/>
+    </target>
+
+
+    <macrodef name="jboss.install-lib" description="Install a jar file as a library on JBoss server.">
+        <attribute name="jar" />
+        <attribute name="jboss-home"/>
+        <sequential>
+			<echo message="Installing library @{jar} at ${jboss.lib.dir}"/>
+			<echo message="Please not that for the server to see the new library you will have to todo a restart."/>
+        	<copy todir="@{jboss-home}/${jboss.lib.dir}" file="@{jar}"/>
+        </sequential>
+    </macrodef>
+
+
+	<macrodef name="jboss.create-datasource" description="Generate the JBoss datasource config file (*-ds.xml).">
+		<attribute name="name"/>
+		<attribute name="jndi-name"/>
+		<attribute name="url"/>
+		<attribute name="driver"/>
+		<attribute name="jar"/>
+		<attribute name="username"/>
+		<attribute name="password"/>
+		<attribute name="jboss-home"/>
+		<sequential>
+			<filter token="jboss.datasource.jndi" value="@{jndi-name}"/>
+			<filter token="connection.url" value="@{url}"/>
+			<filter token="connection.driver" value="@{driver}"/>
+			<filter token="connection.username" value="@{username}"/>
+			<filter token="connection.password" value="@{password}"/>
+			<echo message="Creating datasource @{name}-ds.xml on JBoss ${jboss.deploy.dir}"/>
+			<copy todir="@{jboss-home}/${jboss.deploy.dir}" overwrite="true" filtering="true" preservelastmodified="true">
+				<fileset dir="${jboss-generic.dir}" includes="datasource-ds.xml"/>
+				<mapper type="glob" from="datasource-ds.xml" to="@{name}-ds.xml"/>
+			</copy>
+			<loadfile property="message" srcFile="@{jboss-home}/${jboss.deploy.dir}/@{name}-ds.xml"/>
+			<echo message="${message}"/>
+			<jboss.install-lib jar="@{jar}" jboss-home="@{jboss-home}"/>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="jboss.deploy-app" description="Deploy an application, packaged in an ear, to the jboss AS">
+		<attribute name="ear"/>
+		<attribute name="jboss-home"/>
+		<sequential>
+			<echo message="Deploing @{ear} on JBoss server: @{jboss-home}/${jboss.deploy.dir}"/>
+			<copy todir="@{jboss-home}/${jboss.deploy.dir}" file="@{ear}"/>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="jboss.deploy-dir" description="Deploy an application, packaged in exploded format, to the jboss AS">
+		<attribute name="parent" default=""/>
+		<attribute name="dir"/>
+		<attribute name="jboss-home"/>
+		<sequential>
+			<echo message="Deploing @{dir} on JBoss server: ${jboss.deploy.dir}/@{parent}"/>
+			<mkdir dir="@{jboss-home}/${jboss.deploy.dir}/@{parent}"/>
+			<copy todir="@{jboss-home}/${jboss.deploy.dir}/@{parent}" preservelastmodified="true">
+				<fileset dir="@{dir}/">
+					<include name="**/*"/>
+				</fileset>
+			</copy>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="jboss.deploy-jsps" description="Update web pages in a given (exploded) WAR application in the jboss AS">
+			<attribute name="parent" default=""/>
+			<attribute name="basedir"/>
+			<attribute name="jboss-home"/>
+			<sequential>
+				<copy todir="@{jboss-home}/${jboss.deploy.dir}/@{parent}" preservelastmodified="true">
+					<fileset dir="@{basedir}/">
+						<include name="**/*.jsp"/>
+						<include name="**/*.xml"/>
+						<include name="**/*.xsl"/>
+						<include name="**/*.xslt"/>
+						<include name="**/*.js"/>
+						<include name="**/*.css"/>
+						<include name="**/*.gif"/>
+						<include name="**/*.jpg"/>
+					</fileset>
+				</copy>
+			</sequential>
+		</macrodef>
+	
+	<macrodef name="jboss.deploy-file" description="Deploy an application, packaged in exploded format, to the jboss AS">
+		<attribute name="parent" default=""/>
+		<attribute name="file"/>
+		<attribute name="jboss-home"/>
+		<sequential>
+			<echo message="Deploing @{file} on JBoss server: @{jboss-home}/${jboss.deploy.dir}/@{parent}"/>
+			<mkdir dir="@{jboss-home}/${jboss.deploy.dir}/@{parent}"/>
+			<copy file="@{file}" todir="@{jboss-home}/${jboss.deploy.dir}/@{parent}"
+			preservelastmodified="true"/>
+		
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="jboss.remote.deploy">
+		<attribute name="server"/>
+		<attribute name="appname"/>
+		<attribute name="username"/>
+		<attribute name="password"/>
+		<element name="files" optional="no"/>
+		<sequential>
+			<ftp server="@{server}"
+			       userid="@{username}"
+			       password="@{password}"
+				   remotedir="@{server}/default/deploy/@{appname}.ear">
+			    <files />
+			</ftp>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="jboss.redeploy-current"
+		description="Redeploy an exploded ear by updating the modification time of the application.xml file.">
+		<attribute name="ear"/>
+		<attribute name="jboss-home"/>
+		<sequential>
+			<echo message="Using JBoss server: @{jboss-home}/${jboss.deploy.dir}/"/>
+			<echo message="Hot deploying the files found at @{jboss-home}/${jboss.deploy.dir}/@{ear}"/>
+			<touch file="@{jboss-home}/${jboss.deploy.dir}/@{ear}/META-INF/application.xml"/>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="jboss.undeploy-ear" description="Undeploy an application from the jboss AS (delete the ear from the deploy dir)">
+		<attribute name="ear"/>
+		<attribute name="jboss-home"/>
+		<sequential>
+			<echo message="Undeploing @{ear} at JBoss server: @{jboss-home}/${jboss.deploy.dir}"/>
+			<delete file="@{jboss-home}/${jboss.deploy.dir}/@{ear}"/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="jboss.undeploy-dir" description="Undeploy an application from the jboss AS (delete the ear from the deploy dir)">
+		<attribute name="dir"/>
+		<attribute name="jboss-home"/>
+		<sequential>
+			<echo message="Undeploing @{dir} at JBoss server: @{jboss-home}/${jboss.deploy.dir}"/>
+			<delete dir="@{jboss-home}/${jboss.deploy.dir}/@{dir}"/>
+		</sequential>
+	</macrodef>
+
+
+	<!-- 
+
+	<target name="jboss.shutdown"
+		description="Shutdown default server instance under JBOSS_HOME.">
+		<attribute name="jboss-home"/>
+		<sequential>
+			<exec executable="@{jboss-home}/bin/shutdown.bat" spawn="false"
+				failonerror="false">
+				<arg line="-S" />
+			</exec>
+		</sequential>
+	</target>
+
+
+	<target name="jboss.startup"
+		description="Starts up the default server under JBOSS_HOME">
+		<attribute name="jboss-home"/>
+		<sequential>
+			<exec executable="@{jboss-home}/bin/run.bat" spawn="false"
+				failonerror="true" />
+		</sequential>
+	</target>
+
+	-->
+
+</project>

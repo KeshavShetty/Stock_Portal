@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="jboss" basedir=".">
+
+    <target name="install-required-libs" description="Put required jars in JBoss">
+        <copy todir="${server.lib.dir}">
+            <fileset dir="${build.lib.dir}">
+                <include name="jdbc-11.2.0.1.0.jar" />
+                <include name="jdbc-nls-11.2.0.1.0.jar" />
+                <include name="jdom-1.1.jar" />
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="install-ds" description="Install the project's datasource">
+        <copy file="${project.server.config.path}/${project.datasource.file}" 
+              todir="${server.deploy.dir}" >
+	        <filterset>
+	            <filtersfile file="${filter.file}" />
+	        	<filtersfile file="${filter.file.dev}" />
+	        </filterset>        	
+        </copy>	
+    </target>
+
+    <target name="uninstall-ds" description="Uninstall the project's datasource">
+        <delete file="${server.deploy.dir}/${project.datasource.file}" />
+    </target>
+
+    <target name="install-jms" description="Install the project's datasource">
+        <copy file="${project.server.config.path}/${project.jms.file}" 
+              todir="${server.deploy.dir}" />
+    </target>
+
+    <target name="uninstall-jms" description="Uninstall the project's datasource">
+        <delete file="${server.deploy.dir}/${project.jms.file}" />
+    </target>
+
+    <target name="deploy-ear" depends="install-jms, install-ds, install-required-libs, dist">
+        <copy todir="${server.deploy.dir}">
+            <fileset dir="${dist.dir}" />
+        </copy>
+    </target>
+
+    <target name="deploy" description="Deploy the project in the application server"
+            depends="check-ear-exists, check-exploded-ear-exists, deploy-ear" if="exploded.ear.exists">
+    	<touch file="${server.deploy.dir}/${project.artifact.name}/META-INF/application.xml"/>
+    </target>
+
+    <target name="check-ear-exists">
+        <available file="${server.deploy.dir}/${project.artifact.name}" 
+                   type="file"
+                   property="ear.exists" />
+    </target>
+
+    <target name="check-exploded-ear-exists">
+        <available file="${server.deploy.dir}/${project.artifact.name}"
+                   type="dir"
+                   property="exploded.ear.exists" />
+    </target>
+
+    <target name="undeploy-ear" if="ear.exists">
+        <delete file="${server.deploy.dir}/${project.artifact.name}" />
+    </target>
+
+    <target name="undeploy-exploded-ear" if="exploded.ear.exists">
+        <delete dir="${server.deploy.dir}/${project.artifact.name}" />
+    </target>
+
+    <target name="undeploy" description="Undeploy the project from the application server"
+        depends="check-ear-exists, check-exploded-ear-exists, undeploy-ear, undeploy-exploded-ear" />
+</project>

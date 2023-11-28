@@ -1,0 +1,1 @@
+Todo: Global snapshot
