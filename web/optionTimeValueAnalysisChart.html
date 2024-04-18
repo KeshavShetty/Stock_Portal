@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>Option Price Spikes View</title>
+  <title>Time Value Analysis chart</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -23,50 +23,54 @@
 	}
 	
 	var forDate = getQueryParameter("forDate");
-	var indexName = getQueryParameter("indexName");
+	var indexname = getQueryParameter("indexname");
 	
 	Highcharts.chart('container1', {
 	  chart: {
 	    type: 'spline'
 	  },
 	  title: {
-	    text: indexName + ' ATM/OTM Option Open Interest Rate of Change'
+	    text: ' Option Time Value Analysis'
 	  },
 	  subtitle: {
-	    text: 'Option OI ROC ' + forDate
+	    text: 'Option Time Value Analysis ' + indexname
 	  },
+	  xAxis: {
+        crosshair: true
+      },
 	  yAxis: [{ // Primary yAxis
           labels: {
               format: '{value}'
           },
+          crosshair: true,
           opposite: true,
           title: {
               text: 'Index'
           }
       }, { // Secondary yAxis
           gridLineWidth: 0,
-          
+          crosshair: true,
           labels: {
               format: '{value}'
           },title: {
-              text: 'Price Difference'
+              text: 'Time Value'
           }
       }, { // Third yAxis
           gridLineWidth: 0,
-          
+          crosshair: true,
           labels: {
               format: '{value}'
           },title: {
-              text: 'Strength'
+              text: 'Percent Diff'
           }
       }],
 	  data: {
-	    csvURL: 'http://localhost/portal/chart/OptionATMOTMOIRateOfChangeChartQuote?indexName=' + indexName + '&forDate=' + forDate,
+	    csvURL: 'http://localhost/portal/chart/OptionTimeValueAnalysisChartQuote?indexname='+ indexname + '&forDate='+forDate,
 	    enablePolling: true,
 	    dataRefreshRate: 60
 	  },
 	  series: [
-		  { yAxis: 0},{ yAxis: 1},{ yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 2}, {yAxis: 2}
+		  { yAxis: 0},{ yAxis: 1},{ yAxis: 1}, {yAxis: 2}, {yAxis: 1}, {yAxis: 1}, { yAxis: 2}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}
 		 ]
 	});
   </script>

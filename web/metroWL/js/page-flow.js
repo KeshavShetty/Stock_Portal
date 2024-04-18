@@ -157,7 +157,7 @@ function loadPublicHomePage() {
 	if (Is_PublicHomePageLoaded==false) {
 		populateBodyDivThruAjax('/PublicHome.do', 'PublicHomePageDiv', true);
 		// Need to start timer/thread etc		
-		//Is_PublicHomePageLoaded = true;
+		Is_PublicHomePageLoaded = true;
 	} else {
 		//Resume timer/threads
 	}

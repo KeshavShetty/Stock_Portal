@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>Option Price Spikes View</title>
+  <title>CE Pe Iv Ratio chart</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -23,17 +23,19 @@
 	}
 	
 	var forDate = getQueryParameter("forDate");
-	var indexName = getQueryParameter("indexName");
+	var forDelta = getQueryParameter("forDelta");
+	var indexname = getQueryParameter("indexname");
+	var expiryStr = getQueryParameter("expiryStr");
 	
 	Highcharts.chart('container1', {
 	  chart: {
 	    type: 'spline'
 	  },
 	  title: {
-	    text: indexName + ' ATM/OTM Option Open Interest Rate of Change'
+	    text: ' Option CE PE IV Ratio'
 	  },
 	  subtitle: {
-	    text: 'Option OI ROC ' + forDate
+	    text: 'Option CE PE IV Ratio' + indexname
 	  },
 	  yAxis: [{ // Primary yAxis
           labels: {
@@ -49,7 +51,7 @@
           labels: {
               format: '{value}'
           },title: {
-              text: 'Price Difference'
+              text: 'Total Premium'
           }
       }, { // Third yAxis
           gridLineWidth: 0,
@@ -57,16 +59,16 @@
           labels: {
               format: '{value}'
           },title: {
-              text: 'Strength'
+              text: 'P&L'
           }
       }],
 	  data: {
-	    csvURL: 'http://localhost/portal/chart/OptionATMOTMOIRateOfChangeChartQuote?indexName=' + indexName + '&forDate=' + forDate,
+	    csvURL: 'http://localhost/portal/chart/OptionCePeIVRatioChartQuote?indexname='+ indexname + '&forDelta='+ forDelta+'&expiryStr='+expiryStr+'&forDate='+forDate,
 	    enablePolling: true,
 	    dataRefreshRate: 60
 	  },
 	  series: [
-		  { yAxis: 0},{ yAxis: 1},{ yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 2}, {yAxis: 2}
+		  { yAxis: 0},{ yAxis: 1},{ yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, { yAxis: 1},{ yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1},{ yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}
 		 ]
 	});
   </script>

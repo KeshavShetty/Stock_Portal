@@ -36,7 +36,7 @@
 													<div class="spui-window-content">
 														<div class="contenttable">
 															<div id="analysisSearchFormTable">
-																<JqGridTable:addTable tableIdentifier="ScreenerPage_AnalysisTable" formRequired="true"/>
+																<JqGridTable:addTable tableIdentifier="ScreenerPage_AnalysisTable" formRequired="true"/> 
 															</div>
 														</div>
 													</div>

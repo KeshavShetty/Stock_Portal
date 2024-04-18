@@ -52,8 +52,8 @@
     <property name="filter.file" value="${basedir}/build.properties" />
 	<property name="filter.file.dev" value="${basedir}/dev_build.properties" />
 
-    <property name="java.source.version" value="1.7" />
-    <property name="java.target.version" value="1.7" />
+    <property name="java.source.version" value="1.8" />
+    <property name="java.target.version" value="1.8" />
     <property name="java.debug" value="true" />
     <property name="java.debug.level" value="lines,vars,source" />
 

@@ -141,6 +141,16 @@
 											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
 												<a href="<%=request.getContextPath()%>/domsummary.html?scripName=ICICIBANK&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>" target="_blank">ICICI BANK DOM Summary</a>
 											</li>
+											
+											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
+												<a href="<%=request.getContextPath()%>/optionCePeIVRatioChart.html?forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&indexname=NIFTY 50&forDelta=0.5&expiryStr=" target="_blank">Option CE PE IV Ratio</a>
+											</li>
+											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
+												<a href="<%=request.getContextPath()%>/optionTimeValueAnalysisChart.html?forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&indexname=NIFTY 50" target="_blank">Option Time Value Analysis</a>
+											</li>
+											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
+												<a href="<%=request.getContextPath()%>/optionVegaValueAnalysisChart.html?forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&indexname=NIFTY 50&noOfTopOis=5" target="_blank">Option Vega Value Analysis</a>
+											</li>
 										</ul>
 									</div>
 								</div>

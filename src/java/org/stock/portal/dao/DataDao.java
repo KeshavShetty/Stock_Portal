@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -1826,7 +1827,227 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 		}
 		return csvFilename;
 	}
+	
+	public String getOptionCePeIVRatio(String indexname, String forDate, String forDelta, String expiryStr)  throws BusinessException {
+		log.info("In getOptionGreeksData forDate="+forDate);
+		Map<String, List<OptionOI>> oiDataMap = new HashMap<String, List<OptionOI>>();
+		String csvFilename = "D:\\temp\\junk\\OptionCePeIvRatio" + indexname +forDelta+ ".csv";
+		try {
+			FileWriter writer = new FileWriter(csvFilename);
+            writer.write("QuoteTime,IndexAt,CePeIvRatio,CeDelta,PeDelta, ThetaDiff"
+            		+ ",Delta abs. Diff, Gamma abs. Diff, Vega abs. Diff, Theta abs. Diff, IV abs. Diff, Price abs. Diff"
+            		+ "\r\n");
+            
+            SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			SimpleDateFormat stdFormat = new SimpleDateFormat("dd/MM/yyyy");
+			
+			String dateStrEnd = "";
+			String dateStrBegin = "";
+			Calendar cal = Calendar.getInstance();
+			if (forDate.length()>12) {
+				cal.setTime(longFormat.parse(forDate));
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.add(Calendar.MINUTE, 15);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			} else  {
+				cal.setTime(stdFormat.parse(forDate));
+				cal.set(Calendar.HOUR_OF_DAY, 9);
+				cal.set(Calendar.MINUTE, 14);
+				
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.set(Calendar.MINUTE, 30);
+				cal.set(Calendar.HOUR_OF_DAY, 16);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			}
 
+			if (expiryStr==null || expiryStr.trim().length()==0) {
+				String shortIndexName = "NIFTY";
+				if (indexname.contains("BANK")) shortIndexName = "BANKNIFTY";
+				if (indexname.contains("FIN")) shortIndexName = "FINNIFTY";
+				expiryStr = shortIndexName+getNextExpiryDateForOptionnameStr(shortIndexName, cal.getTime()); 
+			}
+			
+			float forDeltaLow = Float.parseFloat(forDelta) - 0.01f;
+			float forDeltaUp  = Float.parseFloat(forDelta) + 0.01f;
+			
+			String fetchSql = "select record_time, ce_pe_iv_ratio, ce_delta, pe_delta, indexltp, theta_percent_diff"
+					+ ", delta_absolute_diff, gamma_absolute_diff, vega_absolute_diff, theta_absolute_diff, iv_absolute_diff, price_absolute_diff"
+					+ " from option_cepe_ivratio"
+					+ " where for_delta > " + forDeltaLow
+					+ " and for_delta < " + forDeltaUp
+					+ " and expiry_str_prefix = '" + expiryStr + "'"
+					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
+			
+			log.info("fetchSql "+fetchSql);
+			Query q = entityManager.createNativeQuery(fetchSql);	
+			List<Object[]> listResults = q.getResultList();
+			Iterator<Object[]> iter = listResults.iterator();
+			while (iter.hasNext()) {
+				Object[] rowdata = iter.next();
+				Date quoteTime = (Timestamp) rowdata[0];				
+				float ce_pe_iv_ratio = (Float) rowdata[1];
+				float ce_delta = (Float) rowdata[2];
+				float pe_delta = (Float) rowdata[3];
+				float indexltp = (Float) rowdata[4];
+				
+				writer.write(postgresFormat.format(quoteTime)+","+indexltp+"," +ce_pe_iv_ratio+","+ce_delta+","+pe_delta+","+ (Float) rowdata[5]
+						+","+ (Float) rowdata[6]+","+ (Float) rowdata[7]+","+ (Float) rowdata[8]+","+ (Float) rowdata[9]+","+ (Float) rowdata[10]+","+ (Float) rowdata[11]+"\r\n");
+			}
+			writer.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return csvFilename;
+	}
+
+	public String getOptionTimeValueAnalysis(String indexname, String forDate)  throws BusinessException {
+		log.info("In getOptionTimeValueAnalysis forDate="+forDate);
+		Map<String, List<OptionOI>> oiDataMap = new HashMap<String, List<OptionOI>>();
+		String csvFilename = "D:\\temp\\junk\\OptionTimeValue" + indexname + ".csv";
+		try {
+			FileWriter writer = new FileWriter(csvFilename);
+            writer.write("QuoteTime,IndexAt,ThisWeekCETimeValue,ThisWeekPETimeValue,ThisWeekPercentDiff,NextWeekCETimeValue,NextWeekPETimeValue,NextWeekPercentDiff,ThisWeekCEThetaValue,ThisWeekPEThetaValue,ThisWeekCEVolume,ThisWeekPEVolume"
+            		+ "\r\n");
+            
+            SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			SimpleDateFormat stdFormat = new SimpleDateFormat("dd/MM/yyyy");
+			
+			String dateStrEnd = "";
+			String dateStrBegin = "";
+			Calendar cal = Calendar.getInstance();
+			if (forDate.length()>12) {
+				cal.setTime(longFormat.parse(forDate));
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.add(Calendar.MINUTE, 15);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			} else  {
+				cal.setTime(stdFormat.parse(forDate));
+				cal.set(Calendar.HOUR_OF_DAY, 9);
+				cal.set(Calendar.MINUTE, 19);
+				
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.set(Calendar.MINUTE, 30);
+				cal.set(Calendar.HOUR_OF_DAY, 15);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			}
+			
+			String fetchSql = "select record_time, indexltp, thisweektotalcetimevalue, thisweektotalpetimevalue, nextweektotalcetimevalue, nextweektotalpetimevalue, thisweektotalcethetavalue, thisweektotalpethetavalue"
+					+ ", thisweektotalcevolumevalue,thisweektotalpevolumevalue"
+					+ " from option_timevalue_analysis"
+					+ " where indexname = '" + indexname + "'"
+					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
+			
+			log.info("fetchSql "+fetchSql);
+			Query q = entityManager.createNativeQuery(fetchSql);	
+			List<Object[]> listResults = q.getResultList();
+			Iterator<Object[]> iter = listResults.iterator();
+			while (iter.hasNext()) {
+				Object[] rowdata = iter.next();
+				Date quoteTime = (Timestamp) rowdata[0];
+				float indexltp = (Float) rowdata[1];
+				float thisweektotalcetimevalue = (Float) rowdata[2];
+				float thisweektotalpetimevalue = (Float) rowdata[3];
+				float nextweektotalcetimevalue = (Float) rowdata[4];
+				float nextweektotalpetimevalue = (Float) rowdata[5];
+				
+				float thisweektotalcethetavalue = (Float) rowdata[6];
+				float thisweektotalpethetavalue = (Float) rowdata[7];
+				
+				float thisweektotalcevolumevalue = (Float) rowdata[8];
+				float thisweektotalpevolumevalue = (Float) rowdata[9];
+				
+				float thisWeekPercentDiff = getPercentDiff(thisweektotalcetimevalue, thisweektotalpetimevalue);
+				float nextWeekPercentDiff = getPercentDiff(nextweektotalcetimevalue, nextweektotalpetimevalue);
+				
+				writer.write(postgresFormat.format(quoteTime)+","+indexltp
+						+"," +thisweektotalcetimevalue+","+thisweektotalpetimevalue+","+thisWeekPercentDiff
+						+"," +nextweektotalcetimevalue+","+nextweektotalpetimevalue+","+nextWeekPercentDiff
+						+"," +thisweektotalcethetavalue + "," + thisweektotalpethetavalue
+						+"," + thisweektotalcevolumevalue +"," + thisweektotalpevolumevalue
+						+"\r\n");
+			}
+			writer.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return csvFilename;
+	}
+	
+	public String getOptionVegaValueAnalysis(String indexname, String forDate, int noOfTopOis) throws BusinessException {
+		log.info("In getOptionTimeValueAnalysis forDate="+forDate);
+		Map<String, List<OptionOI>> oiDataMap = new HashMap<String, List<OptionOI>>();
+		String csvFilename = "D:\\temp\\junk\\OptionVegaValue" + indexname + ".csv";
+		try {
+			FileWriter writer = new FileWriter(csvFilename);
+            writer.write("QuoteTime,IndexAt,cetotalvegathen,cetotalveganow,petotalvegathen,petotalveganow,changeincevega ,changeinpevega" + "\r\n");
+            
+            SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			SimpleDateFormat stdFormat = new SimpleDateFormat("dd/MM/yyyy");
+			
+			String dateStrEnd = "";
+			String dateStrBegin = "";
+			Calendar cal = Calendar.getInstance();
+			if (forDate.length()>12) {
+				cal.setTime(longFormat.parse(forDate));
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.add(Calendar.MINUTE, 15);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			} else  {
+				cal.setTime(stdFormat.parse(forDate));
+				cal.set(Calendar.HOUR_OF_DAY, 9);
+				cal.set(Calendar.MINUTE, 20);
+				
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.set(Calendar.MINUTE, 30);
+				cal.set(Calendar.HOUR_OF_DAY, 15);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			}
+			
+			String fetchSql = "select record_time, indexltp, cetotalvegathen,cetotalveganow,petotalvegathen,petotalveganow,changeincevega ,changeinpevega"
+					+ " from option_vega_movement_analysis"
+					+ " where indexname = '" + indexname + "'"
+					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
+			
+			log.info("fetchSql "+fetchSql);
+			Query q = entityManager.createNativeQuery(fetchSql);	
+			List<Object[]> listResults = q.getResultList();
+			Iterator<Object[]> iter = listResults.iterator();
+			while (iter.hasNext()) {
+				Object[] rowdata = iter.next();
+				Date quoteTime = (Timestamp) rowdata[0];
+				float indexltp = (Float) rowdata[1];
+				float cetotalvegathen = (Float) rowdata[2];
+				float cetotalveganow = (Float) rowdata[3];
+				float petotalvegathen = (Float) rowdata[4];
+				float petotalveganow = (Float) rowdata[5];
+				
+				float changeincevega = (Float) rowdata[6];
+				float changeinpevega = (Float) rowdata[7];
+				
+				writer.write(postgresFormat.format(quoteTime)+","+indexltp
+						+"," +cetotalvegathen+","+cetotalveganow+","+petotalvegathen +"," +petotalveganow
+						+","+changeincevega+","+changeinpevega
+						+"\r\n");
+			}
+			writer.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return csvFilename;
+	}
+	
+	private float getPercentDiff(float firstValue, float secondValue) {
+		float retVal = 0f;
+		if(firstValue<secondValue) {
+			retVal = (secondValue-firstValue)*100f/firstValue;
+		} else {
+			retVal = (firstValue-secondValue)*100f/secondValue;
+		}
+		return retVal;
+	}
 	public String getOption1MGreeksMovements(String forDate, String optionnames) throws BusinessException {
 		String csvFilename = "D:\\temp\\junk\\Option1MGreeksMovement" ;
 		try {
@@ -2461,7 +2682,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 		String csvFilename = "D:\\temp\\junk\\OptionPriceRateOfChange" + indexName +basedelta+ ".csv";
 		try {
 			FileWriter writer = new FileWriter(csvFilename);
-            writer.write("QuoteTime,IndexAt,Index Price Diff, CE ATM Price Diff 1M, PE ATM Price Diff 1M\r\n"); 
+            writer.write("QuoteTime,IndexAt,Index Price Diff, CE ATM Price Diff 1M, PE ATM Price Diff 1M, CE Avg, PE Avg\r\n"); 
                         
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -2491,7 +2712,11 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ " and basedelta > " + (basedelta-0.01) +" and basedelta < " + (basedelta+0.01)
 					+ " order by record_time";
 			log.info("fetchSql "+fetchSql);
-			Query q = entityManager.createNativeQuery(fetchSql);	
+			Query q = entityManager.createNativeQuery(fetchSql);
+			
+			List<Float> cePastData = new ArrayList<Float>();
+			List<Float> pePastData = new ArrayList<Float>();
+			
 			List<Object[]> listResults = q.getResultList();
 			Iterator<Object[]> iter = listResults.iterator();
 			Date lastQuoteTime = null; 
@@ -2500,7 +2725,19 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				Date quoteTime = (Timestamp) rowdata[0];				
 				float indexltp = (Float) rowdata[1];
 				
-				writer.write(postgresFormat.format(quoteTime)+","+indexltp+"," +(Float) rowdata[2]+","+(Float) rowdata[3]+","+(Float) rowdata[4]+"\r\n");
+				float ceatmpricediff1m = (Float) rowdata[3];
+				cePastData.add(ceatmpricediff1m);
+				
+				float peatmpricediff1m = (Float) rowdata[4];
+				pePastData.add(peatmpricediff1m);
+				
+				if (cePastData.size()>20) cePastData.remove(0);
+				if (pePastData.size()>20) pePastData.remove(0);
+				
+				OptionalDouble ceAverage = cePastData.stream().mapToDouble(a -> a).average();
+				OptionalDouble peAverage = pePastData.stream().mapToDouble(a -> a).average();
+				
+				writer.write(postgresFormat.format(quoteTime)+","+indexltp+"," +(Float) rowdata[2]+","+ceatmpricediff1m+","+peatmpricediff1m+"," + ceAverage.getAsDouble() +"," + peAverage.getAsDouble()+"\r\n");
 				lastQuoteTime = quoteTime;
 			}
 			writer.close();
@@ -2515,7 +2752,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 		String csvFilename = "D:\\temp\\junk\\OptionATMOTMOIRateOfChange" + indexName + ".csv";
 		try {
 			FileWriter writer = new FileWriter(csvFilename);
-            writer.write("QuoteTime,IndexAt,CE Avg, PE Avg, Net, CE Vega, PE Vega, CE Gamma, PE Gamma\r\n"); 
+            writer.write("QuoteTime,IndexAt,CE Avg, PE Avg, Net, CE Vega, PE Vega, CE Gamma, PE Gamma, CE TimeValue, PE TimeValue\r\n"); 
                         
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -2532,7 +2769,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			} else  {
 				cal.setTime(stdFormat.parse(forDate));
 				cal.set(Calendar.HOUR_OF_DAY, 9);
-				cal.set(Calendar.MINUTE, 14);
+				cal.set(Calendar.MINUTE, 18);
 				
 				dateStrBegin = postgresFormat.format(cal.getTime());
 				cal.set(Calendar.MINUTE, 30);
@@ -2540,7 +2777,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				dateStrEnd = postgresFormat.format(cal.getTime());
 			}
 			
-			String fetchSql = "select record_time, indexltp, ceavg, peavg, ceavgvega, peavgvega, ceavggamma, peavggamma from option_atmotm_oi_rate_of_change where "
+			String fetchSql = "select record_time, indexltp, ceavg, peavg, ceavgvega, peavgvega, ceavggamma, peavggamma, cetotaltimevalue, petotaltimevalue from option_atmotm_oi_rate_of_change where "
 					+ " indexname = '" + indexName + "'  and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' "					
 					+ " order by record_time";
 			log.info("fetchSql "+fetchSql);
@@ -2555,7 +2792,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				
 				float ceavg = (Float) rowdata[2];
 				float peavg = (Float) rowdata[3];
-				writer.write(postgresFormat.format(quoteTime)+","+indexltp+"," +ceavg+","+peavg+"," + (peavg-ceavg) +","+(Float) rowdata[4]+","+(Float) rowdata[5]+","+(Float) rowdata[6]+"," + (Float) rowdata[7]+"\r\n");
+				writer.write(postgresFormat.format(quoteTime)+","+indexltp+"," +ceavg+","+peavg+"," + (peavg-ceavg) +","+(Float) rowdata[4]+","+(Float) rowdata[5]+","+(Float) rowdata[6]
+						+"," + (Float) rowdata[7]+"," + (Float) rowdata[8]+"," + (Float) rowdata[9]+"\r\n");
 				lastQuoteTime = quoteTime;
 			}
 			writer.close();
@@ -2635,6 +2873,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 		
 		Connection conn = null;
 		try {
+			
 			String fetchSql = "SELECT expiry_date from option_expiry_dates where index_short_name = '" + indexname + "' order by expiry_date";
 			Query q = entityManager.createNativeQuery(fetchSql);
 			

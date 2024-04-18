@@ -96,5 +96,10 @@ public interface DataManager {
 	public String getOptionOIDescrepancy(String indexName, String forDate, Integer noOfTopOis, boolean filterOptionWorth) throws BusinessException;
 	
 	public String getDOMSummary(String forDate, String scripName) throws BusinessException;
+	
+	public String getOptionCePeIVRatio(String indexname, String forDate, String forDelta, String expiryStr) throws BusinessException;
+	
+	public String getOptionTimeValueAnalysis(String indexname, String forDate) throws BusinessException;
+	public String getOptionVegaValueAnalysis(String indexname, String forDate, int noOfTopOis) throws BusinessException;
 }
   

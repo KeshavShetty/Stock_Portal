@@ -103,6 +103,25 @@
 	    <servlet-class>org.stock.portal.web.servlet.Option1MGreeksMovementChartQuoteServlet</servlet-class>
 	    <load-on-startup>1</load-on-startup>
 	</servlet>
+	
+	<servlet>
+	    <servlet-name>OptionCePeIVRatioChartQuoteServlet</servlet-name>
+	    <servlet-class>org.stock.portal.web.servlet.OptionCePeIVRatioChartQuoteServlet</servlet-class>
+	    <load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+	    <servlet-name>OptionTimeValueAnalysisChartQuoteServlet</servlet-name>
+	    <servlet-class>org.stock.portal.web.servlet.OptionTimeValueAnalysisChartQuoteServlet</servlet-class>
+	    <load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+	    <servlet-name>OptionVegaValueAnalysisChartQuoteServlet</servlet-name>
+	    <servlet-class>org.stock.portal.web.servlet.OptionVegaValueAnalysisChartQuoteServlet</servlet-class>
+	    <load-on-startup>1</load-on-startup>
+	</servlet>
+	
 	<servlet>
 	    <servlet-name>Option1MPremiumDecayChartQuoteServlet</servlet-name>
 	    <servlet-class>org.stock.portal.web.servlet.Option1MPremiumDecayChartQuoteServlet</servlet-class>
@@ -264,6 +283,22 @@
 	    <servlet-name>Option1MGreeksMovementChartQuoteServlet</servlet-name>
 	    <url-pattern>/chart/Option1MGreeksMovementChartQuote</url-pattern>
 	</servlet-mapping>
+	
+	<servlet-mapping>
+	    <servlet-name>OptionCePeIVRatioChartQuoteServlet</servlet-name>
+	    <url-pattern>/chart/OptionCePeIVRatioChartQuote</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+	    <servlet-name>OptionTimeValueAnalysisChartQuoteServlet</servlet-name>
+	    <url-pattern>/chart/OptionTimeValueAnalysisChartQuote</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+	    <servlet-name>OptionVegaValueAnalysisChartQuoteServlet</servlet-name>
+	    <url-pattern>/chart/OptionVegaValueAnalysisChartQuote</url-pattern>
+	</servlet-mapping>
+	
 	<servlet-mapping>
 	    <servlet-name>Option1MPremiumDecayChartQuoteServlet</servlet-name>
 	    <url-pattern>/chart/Option1MPremiumDecayChartQuote</url-pattern>

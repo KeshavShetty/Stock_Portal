@@ -409,7 +409,7 @@ public class DataManagerBean implements DataManager {
     @TransactionAttribute( TransactionAttributeType.REQUIRED )
     public void saveKiteRequestToken(String clientId, String requestToken) throws BusinessException {
     	try {
-    		Query q = entityManager.createNativeQuery("INSERT INTO misc_table (client_id, kite_service_token) VALUES ('" + clientId + "','" + requestToken + "')");
+    		Query q = entityManager.createNativeQuery("UPDATE nap_users set zerodha_service_token='" + requestToken +"' WHERE zerodha_user_id='" + clientId + "'");
     		int effCount = q.executeUpdate();
     	} catch(Exception ex) {
     		ex.printStackTrace();
@@ -474,6 +474,11 @@ public class DataManagerBean implements DataManager {
     }
     
     @TransactionAttribute( TransactionAttributeType.SUPPORTS )
+    public String getOptionCePeIVRatio(String indexname, String forDate, String forDelta, String expiryStr) throws BusinessException {
+    	return (new DataDao(entityManager)).getOptionCePeIVRatio(indexname, forDate, forDelta, expiryStr);    	
+    } 
+    
+    @TransactionAttribute( TransactionAttributeType.SUPPORTS )
     public String getDOMSummary(String forDate, String scripName) throws BusinessException {
     	return (new DataDao(entityManager)).getDOMSummary(forDate, scripName);    	
     }
@@ -532,5 +537,15 @@ public class DataManagerBean implements DataManager {
     public String getOptionATMOTMOIRateOfChange(String indexName, String forDate) throws BusinessException {
     	return (new DataDao(entityManager)).getOptionATMOTMOIRateOfChange(indexName, forDate);    	
     }
+    
+    @TransactionAttribute( TransactionAttributeType.SUPPORTS )
+    public String getOptionTimeValueAnalysis(String indexname, String forDate) throws BusinessException {
+    	return (new DataDao(entityManager)).getOptionTimeValueAnalysis(indexname, forDate);    	
+    } 
+    
+    @TransactionAttribute( TransactionAttributeType.SUPPORTS )
+    public String getOptionVegaValueAnalysis(String indexname, String forDate, int noOfTopOis) throws BusinessException {
+    	return (new DataDao(entityManager)).getOptionVegaValueAnalysis(indexname, forDate, noOfTopOis);    	
+    } 
 }
   
