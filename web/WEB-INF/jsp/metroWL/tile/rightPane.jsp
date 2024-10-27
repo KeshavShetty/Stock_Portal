@@ -129,10 +129,10 @@
 												</a>
 											</li>
 											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
-												<a href="<%=request.getContextPath()%>/optionsummary.html?indexName=NIFTY&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&nooftopois=5" target="_blank">NIFTY 50 Live Option Summary</a>
+												<a href="<%=request.getContextPath()%>/optionsummary.html?indexName=NIFTY&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&nooftopois=10&filterOptionWorth=true" target="_blank">NIFTY 50 Live Option Summary</a>
 											</li>
 											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
-												<a href="<%=request.getContextPath()%>/optionsummary.html?indexName=BANKNIFTY&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&nooftopois=5&filterOptionWorth=false" target="_blank">BANK NIFTY Live Option Summary</a>
+												<a href="<%=request.getContextPath()%>/optionsummary.html?indexName=BANKNIFTY&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&nooftopois=10&filterOptionWorth=true" target="_blank">BANK NIFTY Live Option Summary</a>
 											</li>
 											
 											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
@@ -149,7 +149,7 @@
 												<a href="<%=request.getContextPath()%>/optionTimeValueAnalysisChart.html?forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&indexname=NIFTY 50" target="_blank">Option Time Value Analysis</a>
 											</li>
 											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
-												<a href="<%=request.getContextPath()%>/optionVegaValueAnalysisChart.html?forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&indexname=NIFTY 50&noOfTopOis=5" target="_blank">Option Vega Value Analysis</a>
+												<a href="<%=request.getContextPath()%>/optionVegaValueAnalysisChart.html?forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&indexname=NIFTY 50&noOfTopOis=10" target="_blank">Option Vega Value Analysis</a>
 											</li>
 										</ul>
 									</div>

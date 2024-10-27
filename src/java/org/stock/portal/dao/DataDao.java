@@ -1981,7 +1981,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 		String csvFilename = "D:\\temp\\junk\\OptionVegaValue" + indexname + ".csv";
 		try {
 			FileWriter writer = new FileWriter(csvFilename);
-            writer.write("QuoteTime,IndexAt,cetotalvegathen,cetotalveganow,petotalvegathen,petotalveganow,changeincevega ,changeinpevega" + "\r\n");
+            writer.write("QuoteTime,IndexAt,changeincevega ,changeinpevega,changeincevega5minBack,changeinpevega5minBack,CEWorth,PEWorth" + "\r\n");
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -2006,9 +2006,10 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				dateStrEnd = postgresFormat.format(cal.getTime());
 			}
 			
-			String fetchSql = "select record_time, indexltp, cetotalvegathen,cetotalveganow,petotalvegathen,petotalveganow,changeincevega ,changeinpevega"
+			String fetchSql = "select record_time, indexltp, cetotalvegathen,cetotalveganow,petotalvegathen,petotalveganow,changeincevega ,changeinpevega,changeincevega5min,changeinpevega5min,ceworthincr,peworthincr"
 					+ " from option_vega_movement_analysis"
 					+ " where indexname = '" + indexname + "'"
+					+ " and nooftopois="+noOfTopOis
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
 			
 			log.info("fetchSql "+fetchSql);
@@ -2019,17 +2020,25 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				Object[] rowdata = iter.next();
 				Date quoteTime = (Timestamp) rowdata[0];
 				float indexltp = (Float) rowdata[1];
-				float cetotalvegathen = (Float) rowdata[2];
-				float cetotalveganow = (Float) rowdata[3];
-				float petotalvegathen = (Float) rowdata[4];
-				float petotalveganow = (Float) rowdata[5];
+//				float cetotalvegathen = (Float) rowdata[2];
+//				float cetotalveganow = (Float) rowdata[3];
+//				float petotalvegathen = (Float) rowdata[4];
+//				float petotalveganow = (Float) rowdata[5];
 				
 				float changeincevega = (Float) rowdata[6];
 				float changeinpevega = (Float) rowdata[7];
 				
+				float changeincevega5minback = (Float) rowdata[8];
+				float changeinpevega5minback = (Float) rowdata[9];
+				
+				float ceworthincr = (Float) rowdata[10];
+				float peworthincr = (Float) rowdata[11];
+				
 				writer.write(postgresFormat.format(quoteTime)+","+indexltp
-						+"," +cetotalvegathen+","+cetotalveganow+","+petotalvegathen +"," +petotalveganow
+						
 						+","+changeincevega+","+changeinpevega
+						+","+changeincevega5minback+"," +changeinpevega5minback
+						+","+ceworthincr+","+peworthincr
 						+"\r\n");
 			}
 			writer.close();
