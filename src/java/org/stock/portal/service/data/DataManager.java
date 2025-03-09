@@ -101,5 +101,9 @@ public interface DataManager {
 	
 	public String getOptionTimeValueAnalysis(String indexname, String forDate) throws BusinessException;
 	public String getOptionVegaValueAnalysis(String indexname, String forDate, int noOfTopOis) throws BusinessException;
+	
+	public String getOptionATMMovmentAnalysis(String indexname, String forDate) throws BusinessException;
+	
+	public String getOptionGreeksMovmentAnalysis(String indexname, String forDate) throws BusinessException;
 }
   

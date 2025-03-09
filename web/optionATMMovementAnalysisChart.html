@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>Time Value Analysis chart</title>
+  <title>ATM Movement Analysis chart</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -24,17 +24,19 @@
 	
 	var forDate = getQueryParameter("forDate");
 	var indexname = getQueryParameter("indexname");
-	var noOfTopOis = getQueryParameter("noOfTopOis");
 	
 	Highcharts.chart('container1', {
 	  chart: {
-	    type: 'spline'
+	    type: 'spline',
+	    zooming: {
+            type: 'x'
+        }
 	  },
 	  title: {
-	    text: ' Option Vega Analysis'
+	    text: ' ATM Option Movement Analysis'
 	  },
 	  subtitle: {
-	    text: 'Option Vega Analysis ' + indexname
+	    text: 'ATM Option Analysis ' + indexname
 	  },
 	  xAxis: {
         crosshair: true
@@ -55,7 +57,12 @@
               format: '{value}'
           },title: {
               text: 'Time Value'
-          }
+          },
+          plotLines: [{
+              color: 'red',
+              width: 2,
+              value: 0,
+              dashStyle: 'longdashdot'}]
       }, { // Third yAxis
           gridLineWidth: 0,
           crosshair: true,
@@ -66,12 +73,19 @@
           }
       }],
 	  data: {
-	    csvURL: '/chart/OptionVegaValueAnalysisChartQuote?indexname='+ indexname + '&forDate='+forDate + '&noOfTopOis='+noOfTopOis,
+	    csvURL: '/chart/OptionATMMovementAnalysisChartQuote?indexname='+ indexname + '&forDate='+forDate,
 	    enablePolling: true,
 	    dataRefreshRate: 60
 	  },
 	  series: [
-		  { yAxis: 0},{ yAxis: 1, visible: false},{ yAxis: 1, visible: false}, {yAxis: 1, visible: false}, {yAxis: 1, visible: false}, {yAxis: 1, visible: false}, {yAxis: 1, visible: false}, {yAxis: 1, visible: false}, {yAxis: 1, visible: false}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}, {yAxis: 1}
+		  { yAxis: 0},
+		  { yAxis: 1, visible: false}, { yAxis: 1}, {yAxis: 1, visible: false}, {yAxis: 1, visible: false}, {yAxis: 1, visible: false}, 
+		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, 
+		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, 
+		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, 
+		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false},
+		  { yAxis: 0, visible: false}, { yAxis: 0, visible: false},
+		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false}
 		 ]
 	});
   </script>

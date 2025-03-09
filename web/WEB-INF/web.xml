@@ -113,14 +113,28 @@
 	<servlet>
 	    <servlet-name>OptionTimeValueAnalysisChartQuoteServlet</servlet-name>
 	    <servlet-class>org.stock.portal.web.servlet.OptionTimeValueAnalysisChartQuoteServlet</servlet-class>
-	    <load-on-startup>1</load-on-startup>
+	    <load-on-startup>0</load-on-startup>
 	</servlet>
 	
 	<servlet>
 	    <servlet-name>OptionVegaValueAnalysisChartQuoteServlet</servlet-name>
 	    <servlet-class>org.stock.portal.web.servlet.OptionVegaValueAnalysisChartQuoteServlet</servlet-class>
-	    <load-on-startup>1</load-on-startup>
+	    <load-on-startup>0</load-on-startup>
 	</servlet>
+	
+	<servlet>
+	    <servlet-name>OptionATMMovementAnalysisChartQuoteServlet</servlet-name>
+	    <servlet-class>org.stock.portal.web.servlet.OptionATMMovementAnalysisChartQuoteServlet</servlet-class>
+	    <load-on-startup>0</load-on-startup>
+	</servlet>
+	
+	<servlet>
+	    <servlet-name>OptionGreeksMovementAnalysisChartQuoteServlet</servlet-name>
+	    <servlet-class>org.stock.portal.web.servlet.OptionGreeksMovementAnalysisChartQuoteServlet</servlet-class>
+	    <load-on-startup>0</load-on-startup>
+	</servlet>
+	
+	
 	
 	<servlet>
 	    <servlet-name>Option1MPremiumDecayChartQuoteServlet</servlet-name>
@@ -297,6 +311,16 @@
 	<servlet-mapping>
 	    <servlet-name>OptionVegaValueAnalysisChartQuoteServlet</servlet-name>
 	    <url-pattern>/chart/OptionVegaValueAnalysisChartQuote</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+	    <servlet-name>OptionATMMovementAnalysisChartQuoteServlet</servlet-name>
+	    <url-pattern>/chart/OptionATMMovementAnalysisChartQuote</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+	    <servlet-name>OptionGreeksMovementAnalysisChartQuoteServlet</servlet-name>
+	    <url-pattern>/chart/OptionGreeksMovementAnalysisChartQuote</url-pattern>
 	</servlet-mapping>
 	
 	<servlet-mapping>

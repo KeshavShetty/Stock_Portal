@@ -547,5 +547,15 @@ public class DataManagerBean implements DataManager {
     public String getOptionVegaValueAnalysis(String indexname, String forDate, int noOfTopOis) throws BusinessException {
     	return (new DataDao(entityManager)).getOptionVegaValueAnalysis(indexname, forDate, noOfTopOis);    	
     } 
+    
+    @TransactionAttribute( TransactionAttributeType.SUPPORTS )
+    public String getOptionATMMovmentAnalysis(String indexname, String forDate) throws BusinessException {
+    	return (new DataDao(entityManager)).getOptionATMMovmentAnalysis(indexname, forDate);    	
+    }
+    
+    @TransactionAttribute( TransactionAttributeType.SUPPORTS )
+    public String getOptionGreeksMovmentAnalysis(String indexname, String forDate) throws BusinessException {
+    	return (new DataDao(entityManager)).getOptionGreeksMovmentAnalysis(indexname, forDate);    	
+    }
 }
   

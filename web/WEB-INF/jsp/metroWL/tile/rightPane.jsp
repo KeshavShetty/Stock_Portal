@@ -151,6 +151,18 @@
 											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
 												<a href="<%=request.getContextPath()%>/optionVegaValueAnalysisChart.html?forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&indexname=NIFTY 50&noOfTopOis=10" target="_blank">Option Vega Value Analysis</a>
 											</li>
+											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
+												ATM Option movement Analysis
+												<a href="<%=request.getContextPath()%>/optionATMMovementAnalysisChart.html?forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&indexname=NIFTY 50" target="_blank">[Nifty]</a>&nbsp;
+												<a href="<%=request.getContextPath()%>/optionATMMovementAnalysisChart.html?forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&indexname=NIFTY BANK" target="_blank">[BN]</a>
+											</li>
+											
+											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
+												Option Greek movement Analysis
+												<a href="<%=request.getContextPath()%>/optionGreeksMovementAnalysisChart.html?forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&indexname=NIFTY 50" target="_blank">[Nifty]</a>&nbsp;
+												<a href="<%=request.getContextPath()%>/optionGreeksMovementAnalysisChart.html?forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&indexname=NIFTY BANK" target="_blank">[BN]</a>
+											</li>
+											
 										</ul>
 									</div>
 								</div>
