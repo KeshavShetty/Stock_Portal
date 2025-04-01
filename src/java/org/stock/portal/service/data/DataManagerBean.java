@@ -554,6 +554,11 @@ public class DataManagerBean implements DataManager {
     }
     
     @TransactionAttribute( TransactionAttributeType.SUPPORTS )
+    public String getOptionATMMovmentRawDataAnalysis(String indexname, String forDate, float baseDelta) throws BusinessException {
+    	return (new DataDao(entityManager)).getOptionATMMovmentRawDataAnalysis(indexname, forDate, baseDelta);    	
+    }
+    
+    @TransactionAttribute( TransactionAttributeType.SUPPORTS )
     public String getOptionGreeksMovmentAnalysis(String indexname, String forDate) throws BusinessException {
     	return (new DataDao(entityManager)).getOptionGreeksMovmentAnalysis(indexname, forDate);    	
     }

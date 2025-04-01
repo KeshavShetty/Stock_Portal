@@ -2064,7 +2064,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
             		+ "ATMStradlePremium, ATMStradleDiffpercent, OTMStradlePremium, OTMStradleDiffpercent, ITMStradlePremium, ITMStradleDiffpercent, "
             		+ "AdjustedATMStradlePremium, AdjustedATMStradleDiffpercent, AdjustedOTMStradlePremium, AdjustedOTMStradleDiffpercent, AdjustedITMStradlePremium, AdjustedITMStradleDiffpercent,"
             		+ "atmstrength, otmstrength, itmstrength, atmivdiffpercent, otmivdiffpercent, itmivdiffpercent, atmdeltadiffpercent, otmdeltadiffpercent, itmdeltadiffpercent,"
-            		+ "atmoptimumivdiff, otmoptimumivdiff, itmoptimumivdiff, bestindexat, minindexat, Multi Strike PriceDiff, Vega based Pricediff" + "\r\n");
+            		+ "atmoptimumivdiff, otmoptimumivdiff, itmoptimumivdiff, bestindexat, minindexat, Multi Strike PriceDiff, Vega based Pricediff, Multi Strike IVDiff" + "\r\n");
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -2091,7 +2091,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			
 			String fetchSql = "select record_time, indexltp, atmprice_point5_premium, atmprice_point5_diffpercent, otmprice_point4_premium, otmprice_point4_diffpercent, itmprice_point6_premium, itmprice_point6_diffpercent, adjusted_atmprice_point5_premium, adjusted_atmprice_point5_diffpercent, adjusted_otmprice_point4_premium, adjusted_otmprice_point4_diffpercent, adjusted_itmprice_point6_premium, adjusted_itmprice_point6_diffpercent,"
 					+ " atmstrength, otmstrength, itmstrength, atmivdiffpercent, otmivdiffpercent, itmivdiffpercent, atmdeltadiffpercent, otmdeltadiffpercent, itmdeltadiffpercent,"
-					+ " atmoptimumivdiff, otmoptimumivdiff, itmoptimumivdiff, bestindexat, minindexat, multiStrikePriceDiff, vegabasedpricediff"
+					+ " atmoptimumivdiff, otmoptimumivdiff, itmoptimumivdiff, bestindexat, minindexat, multiStrikePriceDiff, vegabasedpricediff, multiStrikeIVDiff"
 					+ " from option_atm_movement_analysis"
 					+ " where indexname = '" + indexname + "'"
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
@@ -2120,7 +2120,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+"," + (Float) rowdata[20] +"," + (Float) rowdata[21] +"," + (Float) rowdata[22]
 						+"," + (Float) rowdata[23] +"," + (Float) rowdata[24] +"," + (Float) rowdata[25]
 						+"," + (Float) rowdata[26] +"," + (Float) rowdata[27] +"," + (Float) rowdata[28]
-						+"," + (Float) rowdata[29]
+						+"," + (Float) rowdata[29] +"," + (Float) rowdata[30]
 						+"\r\n");
 			}
 			writer.close();
@@ -2128,6 +2128,115 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			ex.printStackTrace();
 		}
 		return csvFilename;
+	}
+	
+	public String getOptionATMMovmentRawDataAnalysis(String indexname, String forDate, float baseDelta) throws BusinessException {
+		log.info("In getOptionTimeValueAnalysis forDate="+forDate);
+		Map<String, List<OptionOI>> oiDataMap = new HashMap<String, List<OptionOI>>();
+		String csvFilename = "D:\\temp\\junk\\OptionATMMovementRawDataAnalysis" + indexname +"_"+ baseDelta+ ".csv";
+		try {
+			FileWriter writer = new FileWriter(csvFilename);
+            writer.write("QuoteTime,IndexAt,"
+            		+ "CE Delta, PE Delta,"
+            		+ "Delta diff,"
+            		+ "CE Gamma, PE Gamma,"
+            		+ "Adjusted Gamma Diff,"
+            		+ "CE Vega, PE Vega,"
+            		+ "CE Theta, PE Theta,"
+            		+ "CE IV, PE IV,"
+            		+ "Adjusted IV Diff,"
+            		+ "CE Ltp, PE Ltp," 
+            		+ "Straddle Premium, Adjusted Straddle Premium, Adjusted Premium Diff"+ "\r\n");
+            
+            SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			SimpleDateFormat stdFormat = new SimpleDateFormat("dd/MM/yyyy");
+			
+			String dateStrEnd = "";
+			String dateStrBegin = "";
+			Calendar cal = Calendar.getInstance();
+			if (forDate.length()>12) {
+				cal.setTime(longFormat.parse(forDate));
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.add(Calendar.MINUTE, 15);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			} else  {
+				cal.setTime(stdFormat.parse(forDate));
+				cal.set(Calendar.HOUR_OF_DAY, 9);
+				cal.set(Calendar.MINUTE, 15);
+				
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.set(Calendar.MINUTE, 30);
+				cal.set(Calendar.HOUR_OF_DAY, 15);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			}
+			
+			String fetchSql = "select record_time, indexltp, "
+					+ " cedelta, pedelta, cegamma, pegamma, cevega, pevega, cetheta, petheta, ceiv, peiv, celtp, peltp"
+					+ " from option_atm_movement_raw_data"
+					+ " where indexname = '" + indexname + "'"
+					+ " and base_delta = " + baseDelta
+					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
+			
+			log.info("fetchSql "+fetchSql);
+			Query q = entityManager.createNativeQuery(fetchSql);	
+			List<Object[]> listResults = q.getResultList();
+			Iterator<Object[]> iter = listResults.iterator();
+			while (iter.hasNext()) {
+				Object[] rowdata = iter.next();
+				Date quoteTime = (Timestamp) rowdata[0];
+				float indexltp = (Float) rowdata[1];
+				float cedelta = (Float) rowdata[2];
+				float pedelta = (Float) rowdata[3];
+				float cegamma = (Float) rowdata[4];
+				float pegamma = (Float) rowdata[5];
+				float cevega = (Float) rowdata[6];
+				float pevega = (Float) rowdata[7];
+				float cetheta = (Float) rowdata[8];
+				float petheta = (Float) rowdata[9];
+				float ceiv = (Float) rowdata[10];
+				float peiv = (Float) rowdata[11];
+				float celtp = (Float) rowdata[12];
+				float peltp = (Float) rowdata[13];
+				
+				
+				writer.write(postgresFormat.format(quoteTime)+","+indexltp
+						+ "," + cedelta + "," +  pedelta
+						+ "," + Math.abs(cedelta + pedelta)
+						
+						+ "," + cegamma + "," + pegamma
+						+ "," + getLinearAdjustedDifference(baseDelta, cedelta, cegamma, pedelta, pegamma)
+						
+						+ "," + cevega + "," + pevega
+						+ "," + cetheta + "," + petheta
+						+ "," + ceiv + "," + peiv
+						+ "," + getLinearAdjustedDifference(baseDelta, cedelta, ceiv, pedelta, peiv)
+						
+						+ "," + celtp + "," + peltp
+						+ "," + (celtp +  peltp)
+						+ "," + getLinearAdjustedSum(baseDelta, cedelta, celtp, pedelta, peltp)
+						+ "," + getLinearAdjustedDifference(baseDelta, cedelta, celtp, pedelta, peltp)
+						+"\r\n");
+			}
+			writer.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return csvFilename;
+	}
+	
+	private float getLinearAdjustedSum(float baseDelta, float cedelta,float ceValue,float pedelta,float peValue) {
+		float retVal = 0f;
+		retVal = retVal + baseDelta*ceValue/Math.abs(cedelta);
+		retVal = retVal + baseDelta*peValue/Math.abs(pedelta);
+		return retVal;
+	}
+	
+	private float getLinearAdjustedDifference(float baseDelta, float cedelta,float ceValue,float pedelta,float peValue) {
+		float retVal = 0f;
+		retVal = retVal + baseDelta*ceValue/cedelta;
+		retVal = retVal - baseDelta*peValue/Math.abs(pedelta);
+		return retVal;
 	}
 	
 	public String getOptionGreeksMovmentAnalysis(String indexname, String forDate) throws BusinessException {

@@ -104,6 +104,8 @@ public interface DataManager {
 	
 	public String getOptionATMMovmentAnalysis(String indexname, String forDate) throws BusinessException;
 	
+	public String getOptionATMMovmentRawDataAnalysis(String indexname, String forDate, float baseDelta) throws BusinessException;
+	
 	public String getOptionGreeksMovmentAnalysis(String indexname, String forDate) throws BusinessException;
 }
   

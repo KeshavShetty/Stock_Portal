@@ -163,6 +163,11 @@
 												<a href="<%=request.getContextPath()%>/optionGreeksMovementAnalysisChart.html?forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&indexname=NIFTY BANK" target="_blank">[BN]</a>
 											</li>
 											
+											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
+												ATM Movement Raw Data Analysis
+												<a href="<%=request.getContextPath()%>/optionATMMovementRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&indexname=NIFTY 50" target="_blank">[Nifty]</a>&nbsp;
+												<a href="<%=request.getContextPath()%>/optionATMMovementRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&indexname=NIFTY BANK" target="_blank">[BN]</a>
+											</li>
 										</ul>
 									</div>
 								</div>

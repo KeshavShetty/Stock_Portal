@@ -127,6 +127,11 @@
 	    <servlet-class>org.stock.portal.web.servlet.OptionATMMovementAnalysisChartQuoteServlet</servlet-class>
 	    <load-on-startup>0</load-on-startup>
 	</servlet>
+	<servlet>
+	    <servlet-name>OptionATMMovementRawDataAnalysisChartQuoteServlet</servlet-name>
+	    <servlet-class>org.stock.portal.web.servlet.OptionATMMovementRawDataAnalysisChartQuoteServlet</servlet-class>
+	    <load-on-startup>0</load-on-startup>
+	</servlet>
 	
 	<servlet>
 	    <servlet-name>OptionGreeksMovementAnalysisChartQuoteServlet</servlet-name>
@@ -316,6 +321,10 @@
 	<servlet-mapping>
 	    <servlet-name>OptionATMMovementAnalysisChartQuoteServlet</servlet-name>
 	    <url-pattern>/chart/OptionATMMovementAnalysisChartQuote</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+	    <servlet-name>OptionATMMovementRawDataAnalysisChartQuoteServlet</servlet-name>
+	    <url-pattern>/chart/OptionATMMovementRawDataAnalysisChartQuote</url-pattern>
 	</servlet-mapping>
 	
 	<servlet-mapping>

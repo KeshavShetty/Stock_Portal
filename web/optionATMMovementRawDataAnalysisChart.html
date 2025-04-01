@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>ATM Movement Analysis chart</title>
+  <title>ATM Movement Raw Data Analysis chart</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -24,6 +24,7 @@
 	
 	var forDate = getQueryParameter("forDate");
 	var indexname = getQueryParameter("indexname");
+	var baseDelta = getQueryParameter("baseDelta");
 	
 	Highcharts.chart('container1', {
 	  chart: {
@@ -33,10 +34,10 @@
         }
 	  },
 	  title: {
-	    text: ' ATM Option Movement Analysis'
+	    text: ' ATM Option Raw Data Movement Analysis'
 	  },
 	  subtitle: {
-	    text: 'ATM Option Analysis ' + indexname
+	    text: 'ATM Option Raw Data Analysis ' + indexname + ' (Delta '+ baseDelta + ')' 
 	  },
 	  xAxis: {
         crosshair: true
@@ -70,22 +71,37 @@
               format: '{value}'
           },title: {
               text: 'Percent Diff'
-          }
+          },
+          plotLines: [{
+              color: 'red',
+              width: 2,
+              value: 0,
+              dashStyle: 'longdashdot'}]
       }],
 	  data: {
-	    csvURL: '/chart/OptionATMMovementAnalysisChartQuote?indexname='+ indexname + '&forDate='+forDate,
+	    csvURL: '/chart/OptionATMMovementRawDataAnalysisChartQuote?baseDelta=0.5&indexname='+ indexname + '&forDate='+forDate,
 	    enablePolling: true,
 	    dataRefreshRate: 60
 	  },
 	  series: [
-		  { yAxis: 0},
-		  { yAxis: 1, visible: false}, { yAxis: 1}, {yAxis: 1, visible: false}, {yAxis: 1, visible: false}, {yAxis: 1, visible: false}, 
-		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, 
-		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, 
-		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, 
-		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false},
-		  { yAxis: 0, visible: false}, { yAxis: 0, visible: false},
-		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false}, { yAxis: 1, visible: false}
+		  { yAxis: 0, color: '#2a52be'},
+		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false},
+		  { yAxis: 2, visible: false},
+		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false},
+		  { yAxis: 2, visible: false},
+		  
+		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false},
+		  
+		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false},
+		  
+		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false},
+		  { yAxis: 2, visible: false},
+		  
+		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false},
+		  
+		  { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: true},
+		  { yAxis: 2, visible: false} 
 		 ]
 	});
   </script>
