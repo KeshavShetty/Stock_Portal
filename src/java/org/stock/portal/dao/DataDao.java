@@ -2175,7 +2175,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ " cedelta, pedelta, cegamma, pegamma, cevega, pevega, cetheta, petheta, ceiv, peiv, celtp, peltp"
 					+ " from option_atm_movement_raw_data"
 					+ " where indexname = '" + indexname + "'"
-					+ " and base_delta = " + baseDelta
+					+ " and base_delta >= " + (baseDelta - 0.01) + " and base_delta <= " + (baseDelta + 0.01)
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
 			
 			log.info("fetchSql "+fetchSql);
