@@ -2,12 +2,10 @@ package org.stock.portal.web.action;
 
 import org.apache.log4j.Logger;
 import org.apache.struts2.interceptor.SessionAware;
-import org.stock.portal.common.StringUtil;
 import org.stock.portal.common.exception.BusinessException;
 import org.stock.portal.domain.User;
 import org.stock.portal.service.data.DataManager;
 import org.stock.portal.web.annotation.InjectEJB;
-import org.stock.portal.web.util.Constants;
 
 
 public class KiteAction extends BaseAction implements SessionAware {
@@ -18,6 +16,7 @@ public class KiteAction extends BaseAction implements SessionAware {
     
     private String request_token = "";
     private String clientId = "";
+    private String zerodha_user_pin;
    
     /** The user accessor bean. */
     @InjectEJB (name ="DataManager")
@@ -36,7 +35,13 @@ public class KiteAction extends BaseAction implements SessionAware {
         try {
         	log.debug("request_token : "+getRequest_token()); 
         	log.debug("ClientId : "+ getClientId());
-        	dataManager.saveKiteRequestToken(getClientId(), getRequest_token());
+        	log.debug("zerodha_user_pin : "+ getZerodha_user_pin());
+        	
+        	if (getZerodha_user_pin()!=null && getZerodha_user_pin().length()>0){ 
+        		dataManager.saveKiteRequestToken(getClientId(), getRequest_token(), getZerodha_user_pin());
+        	} else {
+        		dataManager.saveKiteRequestToken(getClientId(), getRequest_token());
+        	}
         	retVal = SUCCESS;
             
         } catch(BusinessException e){
@@ -62,6 +67,14 @@ public class KiteAction extends BaseAction implements SessionAware {
 
 	public void setClientId(String clientId) {
 		this.clientId = clientId;
+	}
+
+	public String getZerodha_user_pin() {
+		return zerodha_user_pin;
+	}
+
+	public void setZerodha_user_pin(String zerodha_user_pin) {
+		this.zerodha_user_pin = zerodha_user_pin;
 	}
 
 }

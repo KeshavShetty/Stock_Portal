@@ -42,10 +42,9 @@ public class OptionAlgoOrderMovementChartQuoteServlet extends HttpServlet
 	        
 	        DataManager dataManager = (DataManager)ServiceLocator.getInstance().getServiceFacade(DataManager.class);
 	        String forDate = request.getParameter("forDate");
-	        String indexName = request.getParameter("indexName");
-	        String algonames = request.getParameter("algonames");
+	        String algoIds = request.getParameter("algoIds");
 	        
-	        String csvFilename = dataManager.getPandLOfOrder(indexName, algonames, forDate);	   // getIndividualOptionOIData
+	        String csvFilename = dataManager.getPandLOfOrder(algoIds, forDate);	   // getIndividualOptionOIData
 	        
 	        InputStream is = null;
 	        is = new FileInputStream(csvFilename);

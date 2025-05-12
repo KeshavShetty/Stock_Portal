@@ -84,7 +84,7 @@ body {
     
     min-height: 1px;
     margin: 2px 5px 4px 0px;
-    background-color: rgb(45, 137, 239) !important;
+    background-color: rgb(45, 37, 39) !important;
 	-moz-box-sizing: border-box;
 	border: 1px solid rgb(191, 198, 201);
 	width:auto;	
@@ -169,7 +169,7 @@ body {
 }
 
 .spui-titlebar {
-	padding: 0px 4px 0px 2px;
+	padding: 6px 4px 6px 2px;
     background-color: #E7EFFC;
     margin: 0px;
     font-weight: bold;
@@ -437,7 +437,7 @@ span.nobr {
     width: 100%;
     padding: 0px;
 	#border: 1px solid rgb(191, 198, 201);
-	background-color: rgb(45, 137, 239) !important;
+	background-color: rgb(45, 37, 39) !important;
 	margin: 2px 4px 0px 2px;
 	
 }

@@ -23,15 +23,14 @@
 	}
 	
 	var forDate = getQueryParameter("forDate");
-	var indexName = getQueryParameter("indexName");
-	var algonames = getQueryParameter("algonames");
+	var algoIds = getQueryParameter("algoIds");;
 	
 	Highcharts.chart('container1', {
 	  chart: {
 	    type: 'spline'
 	  },
 	  title: {
-	    text: indexName + ' Option Order Movement'
+	    text: ' Option Order Movement'
 	  },
 	  subtitle: {
 	    text: 'M2M Profit of Shorting Algo orders ' + forDate
@@ -62,7 +61,7 @@
           }
       }],
 	  data: {
-	    csvURL: 'http://localhost/portal/chart/OptionAlgoOrderMovementChartQuote?indexName=' + indexName + '&forDate='+forDate+ '&algonames='+algonames,
+	    csvURL: 'http://localhost/portal/chart/OptionAlgoOrderMovementChartQuote?algoIds=' + algoIds + '&forDate='+forDate,
 	    enablePolling: true,
 	    dataRefreshRate: 60
 	  },

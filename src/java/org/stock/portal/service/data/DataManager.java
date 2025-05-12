@@ -59,6 +59,8 @@ public interface DataManager {
 	public List<NSEEodData> getNSEEodData(String nseCode, String uptoDateStr) throws BusinessException;
 	
 	public void saveKiteRequestToken(String clientId, String requestToken) throws BusinessException;
+	public void saveKiteRequestToken(String clientId, String requestToken, String zerodha_user_pin) throws BusinessException;
+	
 	public List<ScripEOD> getTickData(String symbol, Date startTime, Date endTime) throws BusinessException;
 	
 	public List<ZeordhaDomVO> getDomData(Long scripId, Date fromTime, Date toTime) throws BusinessException;
@@ -83,7 +85,7 @@ public interface DataManager {
 	public String getOptionMaxOIWorthReversionData(String indexName, String forDate) throws BusinessException;
 	public String getOptionOptimalStrikeData(String indexName, String forDate, Integer noOfTopOis) throws BusinessException;
 	
-	public String getPandLOfOrder(String indexName, String algonames, String forDate) throws BusinessException;
+	public String getPandLOfOrder(String algoIds, String forDate) throws BusinessException;
 	
 	public String getOptionGreeksRateOfChange(String indexName, String forDate, Integer noOfTopOis, String method, boolean filterOptionWorth) throws BusinessException;
 	public String getTrendDecidingOptionGreeksROC(String indexName, String forDate, Integer noOfTopOis, String method) throws BusinessException;

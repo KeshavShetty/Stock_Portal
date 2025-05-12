@@ -2146,7 +2146,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
             		+ "CE IV, PE IV,"
             		+ "Adjusted IV Diff,"
             		+ "CE Ltp, PE Ltp," 
-            		+ "Straddle Premium, Adjusted Straddle Premium, Adjusted Premium Diff"+ "\r\n");
+            		+ "CE OI, PE OI,"
+            		+ "Straddle Premium, Adjusted Straddle Premium, Adjusted Premium Diff,"
+            		+ "PriceDiffPercent, IVDiffPercent, GammaDiffPercent, Futures Bullish Point, Futures Bearish Point"+ "\r\n");
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -2171,11 +2173,11 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				dateStrEnd = postgresFormat.format(cal.getTime());
 			}
 			
-			String fetchSql = "select record_time, indexltp, "
-					+ " cedelta, pedelta, cegamma, pegamma, cevega, pevega, cetheta, petheta, ceiv, peiv, celtp, peltp"
-					+ " from option_atm_movement_raw_data"
-					+ " where indexname = '" + indexname + "'"
-					+ " and base_delta = " + baseDelta
+			String fetchSql = "select record_time, instrumentLtp, "
+					+ " cedelta, pedelta, cegamma, pegamma, cevega, pevega, cetheta, petheta, ceiv, peiv, celtp, peltp, ceoi, peoi, totalfuturepoints, bullishfuturepoints"
+					+ " from db_link_option_atm_movement_data oamd"
+					+ " where short_name = '" + indexname + "'"
+					+ " and base_delta >= " + (baseDelta - 0.01) + " and base_delta <= " + (baseDelta + 0.01)
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
 			
 			log.info("fetchSql "+fetchSql);
@@ -2199,6 +2201,28 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				float celtp = (Float) rowdata[12];
 				float peltp = (Float) rowdata[13];
 				
+				float ceOi = (Float) rowdata[14];
+				float peOi = (Float) rowdata[15];
+				
+				
+				Object rawData = rowdata[16];
+				int totalfuturepoints = rawData!=null? (Integer) rawData:0;
+				
+				rawData = rowdata[17];
+				int bullishfuturepoints =  rawData!=null? (Integer) rawData:0;
+				
+				float bullishDecimal =  totalfuturepoints>0?(float)bullishfuturepoints/(float)totalfuturepoints:0;
+				
+				float bearishDecimal =  totalfuturepoints>0?(float)(totalfuturepoints-bullishfuturepoints)/(float)totalfuturepoints:0;
+				
+				float priceDiffPercent = getPercentDiff(celtp, peltp);
+				if (celtp < peltp) priceDiffPercent = -priceDiffPercent;
+				
+				float ivDiffPercent = getPercentDiff(ceiv, peiv);
+				if (ceiv > peiv) ivDiffPercent = -ivDiffPercent;
+				
+				float gammaDiffPercent = getPercentDiff(cegamma, pegamma);
+				if (cegamma < pegamma) gammaDiffPercent = -gammaDiffPercent;
 				
 				writer.write(postgresFormat.format(quoteTime)+","+indexltp
 						+ "," + cedelta + "," +  pedelta
@@ -2213,9 +2237,15 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + getLinearAdjustedDifference(baseDelta, cedelta, ceiv, pedelta, peiv)
 						
 						+ "," + celtp + "," + peltp
+						+ "," + ceOi + "," + peOi
 						+ "," + (celtp +  peltp)
 						+ "," + getLinearAdjustedSum(baseDelta, cedelta, celtp, pedelta, peltp)
 						+ "," + getLinearAdjustedDifference(baseDelta, cedelta, celtp, pedelta, peltp)
+						+ "," + priceDiffPercent
+						+ "," + ivDiffPercent
+						+ "," + gammaDiffPercent
+						+ "," + bullishDecimal
+						+ "," + bearishDecimal
 						+"\r\n");
 			}
 			writer.close();
@@ -2430,32 +2460,30 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 		return csvFilename;
 	}
 	
-	public String getPandLOfOrder(String indexname, String algonames, String forDate)  throws BusinessException {
+	public String getPandLOfOrder(String algoIds, String forDate)  throws BusinessException {
 		log.info("In getPandLOfOrder forDate="+forDate);
 		Map<String, List<OptionOI>> oiDataMap = new HashMap<String, List<OptionOI>>();
-		String csvFilename = "D:\\temp\\junk\\getPandLOfOrder" + indexname ;
+		String csvFilename = "D:\\temp\\junk\\getPandLOfOrder" ;
 		try {
 			SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			SimpleDateFormat stdFormat = new SimpleDateFormat("dd/MM/yyyy");
 			SimpleDateFormat postgresShortFormat = new SimpleDateFormat("yyyy-MM-dd");
 			
 			csvFilename = csvFilename + postgresShortFormat.format(stdFormat.parse(forDate)) + ".csv";
-			String[] allAlgonames = algonames.split(",");
+			String[] allAlgoIds = algoIds.split(",");
 				
 			String algonameInQuotesForQuery = "";
 			FileWriter writer = new FileWriter(csvFilename);
             writer.write("QuoteTime,IndexLtp");
-            for(String algoname : allAlgonames) {
-            	writer.write(","+algoname);
+            for(String aLgoId : allAlgoIds) {
+            	writer.write(","+aLgoId);
             	if (algonameInQuotesForQuery.length()!=0) algonameInQuotesForQuery = algonameInQuotesForQuery + ",";
-            	algonameInQuotesForQuery = algonameInQuotesForQuery + "'" + algoname +"'";
+            	algonameInQuotesForQuery = algonameInQuotesForQuery + "'" + aLgoId +"'";
             }
             writer.write(",Total");
             writer.write("\r\n");
             
-            String shortIndexName = indexname.startsWith("NIFTY")?"NIFTY 50":indexname.startsWith("BANKNIFTY")?"NIFTY BANK":"NIFTY FIN SERVICE";
-            
-            String orderFetchSql = "select id, option_name, algoname, sell_price, entry_time, exit_time from option_algo_orders where indexname = '" + shortIndexName + "' and algoname in(" + algonameInQuotesForQuery+") and short_date = '" + postgresShortFormat.format(stdFormat.parse(forDate)) +"' ";
+            String orderFetchSql = "select id, option_name, algoname, sell_price, entry_time, exit_time from db_link_nexcorio_options_algo_orders where f_strategy in(" + algoIds+") and short_date = '" + postgresShortFormat.format(stdFormat.parse(forDate)) +"' ";
             
 			log.info("orderFetchSql "+orderFetchSql);
 			List<OptionAlgoOrderDto> runningOrders = new ArrayList<OptionAlgoOrderDto>();
@@ -2466,7 +2494,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				Object[] rowdata = iter.next();
 				Long id= ((BigInteger) rowdata[0]).longValue();
 				String optionName = (String) rowdata[1];
-				String algoname = (String) rowdata[2];
+				String algoname= (String) rowdata[2];
 				float sellPrice = (Float) rowdata[3];
 				Date entryTime = (Timestamp) rowdata[4];
 				Date exitTime = (Timestamp) rowdata[5];
@@ -2487,7 +2515,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			Map<String, Float> allOrderPrice = new HashMap<String, Float>();
 			
             do {            	
-            	String fetchIndexPriceQuery = "select last_traded_price, quote_time from zerodha_intraday_streaming_data where trading_symbol = '" + shortIndexName +"' and quote_time < '" + postgresFormat.format(cal.getTime())+ "' order by quote_time desc limit 1"; 
+            	String fetchIndexPriceQuery = "select last_traded_price, quote_time from db_link_nexcorio_tick_data where trading_symbol = 'NIFTY' and quote_time < '" + postgresFormat.format(cal.getTime())+ "' order by quote_time desc limit 1"; 
             	q = entityManager.createNativeQuery(fetchIndexPriceQuery);
             	listResults = q.getResultList();
     			iter = listResults.iterator();
@@ -2502,7 +2530,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
     				OptionAlgoOrderDto aOrder = runningOrders.get(i);
     				if (aOrder.getEntryTime().before(cal.getTime()) && aOrder.getExitTime().after(cal.getTime()) ) {
     					
-    					String optionPriceQuery = "select last_traded_price, quote_time from zerodha_intraday_streaming_data where trading_symbol = '" + aOrder.getOptionName()+ "' and quote_time<'" + postgresFormat.format(cal.getTime()) + "' order by quote_time desc limit 1";
+    					String optionPriceQuery = "select last_traded_price, quote_time from db_link_nexcorio_tick_data where trading_symbol = '" + aOrder.getOptionName()+ "' and quote_time<'" + postgresFormat.format(cal.getTime()) + "' order by quote_time desc limit 1";
     					q = entityManager.createNativeQuery(optionPriceQuery);
     	            	listResults = q.getResultList();
     	    			iter = listResults.iterator();
@@ -2519,7 +2547,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
     				}
     			}
     			float totalProfit = 0f;
-    			for(String algoname : allAlgonames) {
+    			for(String algoname : allAlgoIds) {
     				
     				Iterator mapKeys = allOrderPrice.keySet().iterator();
     				Float profitFromAlgo = 0f;

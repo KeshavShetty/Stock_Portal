@@ -3,6 +3,10 @@ package org.stock.portal.service.data;
 
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -417,6 +421,21 @@ public class DataManagerBean implements DataManager {
     }
     
     @TransactionAttribute( TransactionAttributeType.REQUIRED )
+    public void saveKiteRequestToken(String clientId, String requestToken, String zerodha_user_pin) throws BusinessException {
+    	try {
+    		String insertSql = "select * from dblink('dbname=nexcorio_db port=5432 host=localhost user=postgres password=jijikos', "
+    				+ " 'UPDATE nexcorio_users set zerodha_service_token=''" + requestToken +"'' WHERE zerodha_user_id=''" + clientId + "'' and zerodha_user_id_pin=''" + zerodha_user_pin + "''" + " '"
+    				+ ") AS tblProducts(record text)";
+    		
+    		Query q = entityManager.createNativeQuery(insertSql);
+    		q.getSingleResult();
+    		System.out.println("Done");
+    	} catch(Exception ex) {
+    		ex.printStackTrace();
+    	}
+    }
+    
+    @TransactionAttribute( TransactionAttributeType.REQUIRED )
     public void saveOptionOrder(String indexName, String optiontype) throws BusinessException {
     	try {
     		String sql2Execute = "INSERT INTO option_orders (id, nse_code, option_type, status, order_execution_method, target_percent, stoploss, exit_By_Time_In_Second ) VALUES " 
@@ -464,8 +483,8 @@ public class DataManagerBean implements DataManager {
     }
     
     @TransactionAttribute( TransactionAttributeType.SUPPORTS )
-    public String getPandLOfOrder(String indexName, String algonames, String forDate) throws BusinessException {
-    	return (new DataDao(entityManager)).getPandLOfOrder(indexName, algonames, forDate);    	
+    public String getPandLOfOrder(String algoIds, String forDate) throws BusinessException {
+    	return (new DataDao(entityManager)).getPandLOfOrder(algoIds, forDate);    	
     }
     
     @TransactionAttribute( TransactionAttributeType.SUPPORTS )
