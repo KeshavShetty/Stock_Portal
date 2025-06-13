@@ -77,6 +77,19 @@
               width: 2,
               value: 0,
               dashStyle: 'longdashdot'}]
+      },{ // fourth yAxis
+          gridLineWidth: 0,
+          crosshair: true,
+          labels: {
+              format: '{value}'
+          },title: {
+              text: 'Gamma'
+          },
+          plotLines: [{
+              color: 'red',
+              width: 2,
+              value: 0,
+              dashStyle: 'longdashdot'}]
       }],
 	  data: {
 	    csvURL: '/chart/OptionATMMovementRawDataAnalysisChartQuote?baseDelta=' + baseDelta+ '&indexname='+ indexname + '&forDate='+forDate,
@@ -85,30 +98,40 @@
 	  },
 	  series: [
 		  { yAxis: 0, color: '#2a52be'},
-		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false},
-		  { yAxis: 2, visible: false},
-		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false},
-		  { yAxis: 2, visible: false},
-		  
-		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false},
-		  
-		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false},
-		  
-		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false},
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false}, { yAxis: 2, visible: false},
+		  { yAxis: 3, visible: true}, { yAxis: 3, visible: true},
 		  { yAxis: 2, visible: false},
 		  
-		  { yAxis: 1, visible: false}, { yAxis: 1, visible: false},
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false},
+		  
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false},
+		  
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false},
+		  
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false},
 		  
 		  { yAxis: 2, visible: false},
 		  { yAxis: 2, visible: false},
 		  { yAxis: 2, visible: false},
-		  { yAxis: 2, visible: true},
+		  { yAxis: 1, visible: true},
 		  { yAxis: 2, visible: false},
 		  { yAxis: 2, visible: false},
 		  { yAxis: 2, visible: false},
 		  { yAxis: 2, visible: false},
 		  { yAxis: 2, visible: false},
-		  { yAxis: 2, visible: false}
+		  { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false}
 		 ]
 	});
   </script>

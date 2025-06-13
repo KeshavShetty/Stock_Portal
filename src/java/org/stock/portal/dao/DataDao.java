@@ -2133,7 +2133,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 	public String getOptionATMMovmentRawDataAnalysis(String indexname, String forDate, float baseDelta) throws BusinessException {
 		log.info("In getOptionTimeValueAnalysis forDate="+forDate);
 		Map<String, List<OptionOI>> oiDataMap = new HashMap<String, List<OptionOI>>();
-		String csvFilename = "D:\\temp\\junk\\OptionATMMovementRawDataAnalysis" + indexname +"_"+ baseDelta+ ".csv";
+		String csvFilename = "D:\\temp\\junk\\OptionATMMovementRawDataAnalysis" + indexname +forDate.replace("/", "-")+"_"+ baseDelta+ ".csv";
 		try {
 			FileWriter writer = new FileWriter(csvFilename);
             writer.write("QuoteTime,IndexAt,"
@@ -2148,7 +2148,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
             		+ "CE Ltp, PE Ltp," 
             		+ "CE OI, PE OI,"
             		+ "Straddle Premium, Adjusted Straddle Premium, Adjusted Premium Diff,"
-            		+ "PriceDiffPercent, IVDiffPercent, GammaDiffPercent, Futures Bullish Point, Futures Bearish Point"+ "\r\n");
+            		+ "PriceDiffPercent, IVDiffPercent, GammaDiffPercent, Futures Bullish Point, Futures Bearish Point, Total CE OI, Total PE OI, CEIVByDelta, PEIVByDelta,"
+            		+ "Avg CEIV, Avg PE IV, Total CE Gamma, Total PE Gamma, Total CE Vega, Total PE Vega, Total CE OI by ATM Ltp, Total PE OI by ATM Ltp, Total CEOIbyPEOI Ratio, AvgCEIVByAvgPEIV Ratio,"
+            		+ "AvgCeGamma, AvgPeGamma"+ "\r\n");
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -2174,7 +2176,11 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			}
 			
 			String fetchSql = "select record_time, instrumentLtp, "
-					+ " cedelta, pedelta, cegamma, pegamma, cevega, pevega, cetheta, petheta, ceiv, peiv, celtp, peltp, ceoi, peoi, totalfuturepoints, bullishfuturepoints"
+					+ " cedelta, pedelta, cegamma, pegamma, cevega, pevega, cetheta, petheta, ceiv, peiv, celtp, peltp, ceoi, peoi, totalfuturepoints, bullishfuturepoints, totalceoi, totalpeoi,"
+					+ " totalceiv, totalpeiv,"
+					+ " totalcegamma, totalpegamma,"
+					+ " totalcevega, totalpevega,"
+					+ " avgcegamma, avgpegamma"
 					+ " from db_link_option_atm_movement_data oamd"
 					+ " where short_name = '" + indexname + "'"
 					+ " and base_delta >= " + (baseDelta - 0.01) + " and base_delta <= " + (baseDelta + 0.01)
@@ -2215,6 +2221,21 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				
 				float bearishDecimal =  totalfuturepoints>0?(float)(totalfuturepoints-bullishfuturepoints)/(float)totalfuturepoints:0;
 				
+				float totalCeOi = (Float) rowdata[18];
+				float totalPeOi = (Float) rowdata[19];
+				
+				float totalCeIV = (Float) rowdata[20];
+				float totalPeIV = (Float) rowdata[21];
+				
+				float totalCeGamma = (Float) rowdata[22];
+				float totalPeGamma = (Float) rowdata[23];
+				
+				float totalCeVega = (Float) rowdata[24];
+				float totalPeVega = (Float) rowdata[25];
+				
+				float avgCeGamma = (Float) rowdata[26];
+				float avgPeGamma = (Float) rowdata[27];
+				
 				float priceDiffPercent = getPercentDiff(celtp, peltp);
 				if (celtp < peltp) priceDiffPercent = -priceDiffPercent;
 				
@@ -2223,6 +2244,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				
 				float gammaDiffPercent = getPercentDiff(cegamma, pegamma);
 				if (cegamma < pegamma) gammaDiffPercent = -gammaDiffPercent;
+				
+				float totalCeoiByAtmLtp = totalCeOi/celtp;
+				float totalPeoiByAtmLtp = totalPeOi/peltp;
 				
 				writer.write(postgresFormat.format(quoteTime)+","+indexltp
 						+ "," + cedelta + "," +  pedelta
@@ -2246,6 +2270,22 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + gammaDiffPercent
 						+ "," + bullishDecimal
 						+ "," + bearishDecimal
+						+ "," + totalCeOi
+						+ "," + totalPeOi
+						+ "," + Math.abs(ceiv/cedelta)
+						+ "," + Math.abs(peiv/pedelta)
+						+ "," + totalCeIV
+						+ "," + totalPeIV
+						+ "," + totalCeGamma
+						+ "," + totalPeGamma
+						+ "," + totalCeVega
+						+ "," + totalPeVega
+						+ "," + totalCeoiByAtmLtp
+						+ "," + totalPeoiByAtmLtp
+						+ "," + totalCeOi/totalPeOi
+						+ "," + totalCeIV/totalPeIV
+						+ "," + avgCeGamma
+						+ "," + avgPeGamma
 						+"\r\n");
 			}
 			writer.close();
