@@ -42,11 +42,11 @@ public class OptionATMMovementRawDataAnalysisChartQuoteServlet extends HttpServl
 	        
 	        DataManager dataManager = (DataManager)ServiceLocator.getInstance().getServiceFacade(DataManager.class);
 	        
-	        String indexname = request.getParameter("indexname");
+	        Long mainInstrumentId = Long.parseLong(request.getParameter("mainInstrumentId"));
 	        String forDate = request.getParameter("forDate"); 
 	        float baseDelta = Float.parseFloat(request.getParameter("baseDelta"));
 	        
-	        String csvFilename = dataManager.getOptionATMMovmentRawDataAnalysis(indexname, forDate, baseDelta);	
+	        String csvFilename = dataManager.getOptionATMMovmentRawDataAnalysis(mainInstrumentId, forDate, baseDelta);	
 	        
 	        InputStream is = null;
 	        is = new FileInputStream(csvFilename);

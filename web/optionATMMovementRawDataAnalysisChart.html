@@ -23,7 +23,7 @@
 	}
 	
 	var forDate = getQueryParameter("forDate");
-	var indexname = getQueryParameter("indexname");
+	var mainInstrumentId = getQueryParameter("mainInstrumentId");
 	var baseDelta = getQueryParameter("baseDelta");
 	
 	Highcharts.chart('container1', {
@@ -37,7 +37,7 @@
 	    text: ' ATM Option Raw Data Movement Analysis'
 	  },
 	  subtitle: {
-	    text: 'ATM Option Raw Data Analysis ' + indexname + ' (Delta '+ baseDelta + ')' 
+	    text: 'ATM Option Raw Data Analysis ' + mainInstrumentId + ' (Delta '+ baseDelta + ')' 
 	  },
 	  xAxis: {
         crosshair: true
@@ -92,7 +92,7 @@
               dashStyle: 'longdashdot'}]
       }],
 	  data: {
-	    csvURL: '/chart/OptionATMMovementRawDataAnalysisChartQuote?baseDelta=' + baseDelta+ '&indexname='+ indexname + '&forDate='+forDate,
+	    csvURL: '/chart/OptionATMMovementRawDataAnalysisChartQuote?baseDelta=' + baseDelta+ '&mainInstrumentId='+ mainInstrumentId + '&forDate='+forDate,
 	    enablePolling: true,
 	    dataRefreshRate: 60
 	  },

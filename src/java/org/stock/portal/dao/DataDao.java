@@ -2130,10 +2130,10 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 		return csvFilename;
 	}
 	
-	public String getOptionATMMovmentRawDataAnalysis(String indexname, String forDate, float baseDelta) throws BusinessException {
+	public String getOptionATMMovmentRawDataAnalysis(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException {
 		log.info("In getOptionTimeValueAnalysis forDate="+forDate);
 		Map<String, List<OptionOI>> oiDataMap = new HashMap<String, List<OptionOI>>();
-		String csvFilename = "D:\\temp\\junk\\OptionATMMovementRawDataAnalysis" + indexname +forDate.replace("/", "-")+"_"+ baseDelta+ ".csv";
+		String csvFilename = "D:\\temp\\junk\\OptionATMMovementRawDataAnalysis" + mainInstrumentId +forDate.replace("/", "-")+"_"+ baseDelta+ ".csv";
 		try {
 			FileWriter writer = new FileWriter(csvFilename);
             writer.write("QuoteTime,IndexAt,"
@@ -2182,7 +2182,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ " totalcevega, totalpevega,"
 					+ " avgcegamma, avgpegamma"
 					+ " from db_link_option_atm_movement_data oamd"
-					+ " where short_name = '" + indexname + "'"
+					+ " where f_main_instrument = '" + mainInstrumentId + "'"
 					+ " and base_delta >= " + (baseDelta - 0.01) + " and base_delta <= " + (baseDelta + 0.01)
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
 			
