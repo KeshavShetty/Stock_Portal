@@ -2185,7 +2185,6 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ " futures_Ltp"
 					+ " from db_link_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
-					+ " and base_delta >= " + (baseDelta - 0.01) + " and base_delta <= " + (baseDelta + 0.01)
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
 			
 			log.info("fetchSql "+fetchSql);
