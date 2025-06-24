@@ -2150,7 +2150,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
             		+ "Straddle Premium, Adjusted Straddle Premium, Adjusted Premium Diff,"
             		+ "PriceDiffPercent, IVDiffPercent, GammaDiffPercent, Futures Bullish Point, Futures Bearish Point, Total CE OI, Total PE OI, CEIVByDelta, PEIVByDelta,"
             		+ "Avg CEIV, Avg PE IV, Total CE Gamma, Total PE Gamma, Total CE Vega, Total PE Vega, Total CE OI by ATM Ltp, Total PE OI by ATM Ltp, Total CEOIbyPEOI Ratio, AvgCEIVByAvgPEIV Ratio,"
-            		+ "AvgCeGamma, AvgPeGamma, SelectiveStrike_AvgCeGamma, SelectiveStrike_AvgPeGamma, Futures Ltp"+ "\r\n");
+            		+ "AvgCeGamma, AvgPeGamma, SelectiveStrike_AvgCeGamma, SelectiveStrike_AvgPeGamma, Futures Ltp, SelectiveStrike_AvgCeIV, SelectiveStrike_AvgPeIV"+ "\r\n");
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -2182,7 +2182,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ " totalcevega, totalpevega,"
 					+ " avgcegamma, avgpegamma,"
 					+ " selectiveStrike_AvgCeGamma, selectiveStrike_AvgPeGamma,"
-					+ " futures_Ltp"
+					+ " futures_Ltp,"
+					+ " selectiveStrike_AvgCeIv, selectiveStrike_AvgPeIv"
 					+ " from db_link_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
@@ -2242,6 +2243,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				
 				float futuresLtp = (Float) rowdata[30];
 				
+				float selectiveStrikeAvgCeIv = (Float) rowdata[31];
+				float selectiveStrikeAvgPeIv = (Float) rowdata[32];
+				
 				float priceDiffPercent = getPercentDiff(celtp, peltp);
 				if (celtp < peltp) priceDiffPercent = -priceDiffPercent;
 				
@@ -2295,6 +2299,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + selectiveStrikeAvgCeGamma
 						+ "," + selectiveStrikeAvgPeGamma
 						+ "," + futuresLtp
+						+ "," + selectiveStrikeAvgCeIv
+						+ "," + selectiveStrikeAvgPeIv
 						+"\r\n");
 			}
 			writer.close();
