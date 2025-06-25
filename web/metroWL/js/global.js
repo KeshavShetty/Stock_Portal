@@ -274,12 +274,15 @@ function getFormToJsonFilter(formName) {
 	    		retJson = retJson + ',';
 	    	}
 	    	retJson = retJson + '{"field":"'; 
+			//alert(this.type)
 	    	if (fieldName.substring(0,3)=='min') {
 	    		retJson = retJson + fieldName.substring(3) + '","op":"ge","data":"' + fieldValue + '"}';    		
 	    	} else if (fieldName.substring(0,3)=='max') {	    		
 	    		retJson = retJson + fieldName.substring(3) + '","op":"le","data":"' + fieldValue + '"}';
 	    	} else if (this.type=='select-one' || this.type=='select-multiple'){
 	    		retJson = retJson + fieldName + '","op":"eq","data":"' + fieldValue + '"}';
+			} else if (fieldName.startsWith('Unique')) {
+				retJson = retJson + fieldName.substring(6) + '","op":"eq","data":"' + fieldValue + '"}';
 	    	} else {
 	    		retJson = retJson + fieldName + '","op":"bw","data":"' + fieldValue + '"}';
 	    	}

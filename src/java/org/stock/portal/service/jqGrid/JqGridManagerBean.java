@@ -104,7 +104,7 @@ public class JqGridManagerBean implements JqGridManager {
     	
     	//NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
     	DecimalFormat decimalFormat = new DecimalFormat("###,##0.00");
-    	
+    	DecimalFormat decimalLongFormat = new DecimalFormat("###,##0.0000");
     	String tableIdentifier = allRequestQueryParams.get("viewTableIdentifier");
     	
     	StringBuffer retJsonString = new StringBuffer();
@@ -220,6 +220,12 @@ public class JqGridManagerBean implements JqGridManager {
 	    		if (dataToAppend.length()>0 && aColumn.getColumnType().equalsIgnoreCase("number")) {
 	    			dataToAppend = decimalFormat.format(Double.valueOf(dataToAppend));
 	    		}
+	    		if (dataToAppend.length()>0 && aColumn.getColumnType().equalsIgnoreCase("decimal")) {
+	    			dataToAppend = decimalLongFormat.format(Double.valueOf(dataToAppend));
+	    		}
+//	    		if (dataToAppend.length()>0 && aColumn.getColumnType().equalsIgnoreCase("Unique")) { // Show as it is
+//	    			dataToAppend = decimalFormat.format(Double.valueOf(dataToAppend));
+//	    		}
 	    		retJsonString.append(dataToAppend.replaceAll("\"", "'"));
 	    		retJsonString.append("\"");	    		
 			}
@@ -331,7 +337,7 @@ public class JqGridManagerBean implements JqGridManager {
     	String quoteToUse = "'";
     	String like=" = ";
     	String not = " ! ";
-    	if (columnToUse.getColumnType().equals("Integer") || columnToUse.getColumnType().equals("number")) quoteToUse = "";
+    	if (columnToUse.getColumnType().equals("Integer") || columnToUse.getColumnType().equals("number") || columnToUse.getColumnType().equals("Unique")) quoteToUse = "";
     	else if (columnToUse.getColumnType().equals("String") || columnToUse.getColumnType().equals("Select")){
     		like=" LIKE ";
         	not = " NOT ";

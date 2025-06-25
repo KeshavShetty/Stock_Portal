@@ -152,6 +152,8 @@ public class JqGridTableBuilder extends SimpleTagSupport {
 		    			} else if (aColumn.getColumnType().equalsIgnoreCase("Number") || aColumn.getColumnType().equalsIgnoreCase("Integer")){
 		    				out.write("		<input name=\"min" + aColumn.getViewToDbIdentifier()+ "\" value=\"" + minValueToUse + "\" id=\"min" + jqGridTable.getTableIdentifier() + "_" + aColumn.getViewToDbIdentifier() +"\" class=\"textinput\" type=\"text\">");
 		    				out.write("		<input name=\"max" + aColumn.getViewToDbIdentifier()+ "\" value=\"" + maxValueToUse + "\" id=\"max" + jqGridTable.getTableIdentifier() + "_" + aColumn.getViewToDbIdentifier() +"\" class=\"textinput\" type=\"text\">");
+		    			} else if (aColumn.getColumnType().equalsIgnoreCase("Unique")) {
+		    				out.write("		<input name=\"Unique" + aColumn.getViewToDbIdentifier()+ "\" value=\"" + minValueToUse + "\" id=\"Unique" + jqGridTable.getTableIdentifier() + "_" + aColumn.getViewToDbIdentifier() +"\" class=\"textinput\" type=\"text\">");
 		    			}
 		    			out.write("	</div>");
 	    				out.write("</td>");	
@@ -329,7 +331,7 @@ public class JqGridTableBuilder extends SimpleTagSupport {
 	        				out.write(" }");
 	        			} else if ( aColumn.getColumnType().equalsIgnoreCase("Index")) {
 	        				out.write(", hidden: true,key: true,searchhidden:false");
-	        			} else if (aColumn.getColumnType().equalsIgnoreCase("Number") || aColumn.getColumnType().equalsIgnoreCase("Integer")){
+	        			} else if (aColumn.getColumnType().equalsIgnoreCase("Number") || aColumn.getColumnType().equalsIgnoreCase("Integer") || aColumn.getColumnType().equalsIgnoreCase("Decimal")  || aColumn.getColumnType().equalsIgnoreCase("Unique")){
 	        				out.write(", sorttype: '" + aColumn.getColumnType()+"'");
 	        				out.write(", align: \"right\"");
 	        			} else {
