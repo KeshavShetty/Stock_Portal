@@ -581,5 +581,10 @@ public class DataManagerBean implements DataManager {
     public String getOptionGreeksMovmentAnalysis(String indexname, String forDate) throws BusinessException {
     	return (new DataDao(entityManager)).getOptionGreeksMovmentAnalysis(indexname, forDate);    	
     }
+    
+    @TransactionAttribute( TransactionAttributeType.SUPPORTS )
+    public String getOptionDeltaRangeRawDataAnalysis(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException {
+    	return (new DataDao(entityManager)).getOptionDeltaRangeRawDataAnalysis(mainInstrumentId, forDate, baseDelta);    	
+    }
 }
   

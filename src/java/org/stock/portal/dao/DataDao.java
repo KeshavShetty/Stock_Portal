@@ -3571,4 +3571,102 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 		}
 		return retList;
 	}
+	
+	public String getOptionDeltaRangeRawDataAnalysis(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException {
+		log.info("In getOptionTimeValueAnalysis forDate="+forDate);
+		Map<String, List<OptionOI>> oiDataMap = new HashMap<String, List<OptionOI>>();
+		String csvFilename = "D:\\temp\\junk\\OptionDeltaRangeRawDataAnalysis" + mainInstrumentId +forDate.replace("/", "-")+"_"+ baseDelta+ ".csv";
+		try {
+			FileWriter writer = new FileWriter(csvFilename);
+            writer.write("QuoteTime,IndexAt,Futures Ltp,"
+            		+ "Straddle Premium,"
+            		+ "CE Gamma, PE Gamma,"
+            		+ "Avg CE IV, Avg PE IV,"
+            		+ "D-R CE Avg-Ltp,"
+            		+ "D-R PE Avg-Ltp," 
+            		+ "D-R CE Avg-IV," 
+            		+ "D-R PE Avg-IV," 
+            		+ "D-R CE Avg-Delta," 
+            		+ "D-R PE Avg-Delta," 
+            		+ "D-R CE Avg-Gamma," 
+            		+ "D-R PE Avg-Gamma," 
+            		+ "D-R CE Avg-Vega,"
+            		+ "D-R PE Avg-Vega"
+            		+ "\r\n");
+            
+            SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			SimpleDateFormat stdFormat = new SimpleDateFormat("dd/MM/yyyy");
+			
+			String dateStrEnd = "";
+			String dateStrBegin = "";
+			Calendar cal = Calendar.getInstance();
+			if (forDate.length()>12) {
+				cal.setTime(longFormat.parse(forDate));
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.add(Calendar.MINUTE, 15);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			} else  {
+				cal.setTime(stdFormat.parse(forDate));
+				cal.set(Calendar.HOUR_OF_DAY, 9);
+				cal.set(Calendar.MINUTE, 15);
+				
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.set(Calendar.MINUTE, 30);
+				cal.set(Calendar.HOUR_OF_DAY, 15);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			}
+			
+			String fetchSql = "select record_time, instrumentLtp, futures_Ltp, celtp, peltp, cegamma, pegamma, totalceiv, totalpeiv,"
+					+ " deltaRangeCEAvgLtp, deltaRangePEAvgLtp, deltaRangeCEAvgIv, deltaRangePEAvgIv, deltaRangeCEAvgDelta, deltaRangePEAvgDelta, deltaRangeCEAvgGamma, deltaRangePEAvgGamma, deltaRangeCEAvgVega, deltaRangePEAvgVega"
+					+ " from db_link_option_atm_movement_data oamd"
+					+ " where f_main_instrument = '" + mainInstrumentId + "'"
+					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
+			
+			log.info("fetchSql "+fetchSql);
+			Query q = entityManager.createNativeQuery(fetchSql);	
+			List<Object[]> listResults = q.getResultList();
+			Iterator<Object[]> iter = listResults.iterator();
+			while (iter.hasNext()) {
+				Object[] rowdata = iter.next();
+				Date quoteTime = (Timestamp) rowdata[0];
+				float indexltp = (Float) rowdata[1];
+				float futuresLtp = (Float) rowdata[2];
+				
+				float ceLtp = (Float) rowdata[3];
+				float peLtp = (Float) rowdata[4];
+				
+				float cegamma = (Float) rowdata[5];
+				float pegamma = (Float) rowdata[6];
+				float totalCeOi = (Float) rowdata[7];
+				float totalPeOi = (Float) rowdata[8];
+				
+				float drCELtp = (Float) rowdata[9];
+				float drPELtp = (Float) rowdata[10];
+				float drCEIV = (Float) rowdata[11];
+				float drPEIV = (Float) rowdata[12];
+				float drCEDelta = (Float) rowdata[13];
+				float drPEDelta = (Float) rowdata[14];
+				
+				float drCEGamma = (Float) rowdata[15];
+				float drPEGamma = (Float) rowdata[16];
+				
+				float drCEVega = (Float) rowdata[17];
+				float drPEVega = (Float) rowdata[18];
+				
+				writer.write(postgresFormat.format(quoteTime)+","+indexltp + "," + futuresLtp + "," +  (ceLtp+peLtp)
+						+ "," + cegamma + "," + pegamma + "," + totalCeOi+ "," + totalPeOi
+						+ "," + drCELtp + "," + drPELtp
+						+ "," + drCEIV + "," + drPEIV
+						+ "," + drCEDelta + "," + drPEDelta
+						+ "," + drCEGamma + "," + drPEGamma
+						+ "," + drCEVega + "," + drPEVega
+						+"\r\n");
+			}
+			writer.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return csvFilename;
+	}
 }

@@ -134,6 +134,12 @@
 	</servlet>
 	
 	<servlet>
+	    <servlet-name>OptionDeltaRangeRawDataAnalysisChartQuoteServlet</servlet-name>
+	    <servlet-class>org.stock.portal.web.servlet.OptionDeltaRangeRawDataAnalysisChartQuoteServlet</servlet-class>
+	    <load-on-startup>0</load-on-startup>
+	</servlet>
+	
+	<servlet>
 	    <servlet-name>OptionGreeksMovementAnalysisChartQuoteServlet</servlet-name>
 	    <servlet-class>org.stock.portal.web.servlet.OptionGreeksMovementAnalysisChartQuoteServlet</servlet-class>
 	    <load-on-startup>0</load-on-startup>
@@ -326,6 +332,12 @@
 	    <servlet-name>OptionATMMovementRawDataAnalysisChartQuoteServlet</servlet-name>
 	    <url-pattern>/chart/OptionATMMovementRawDataAnalysisChartQuote</url-pattern>
 	</servlet-mapping>
+	
+	<servlet-mapping>
+	    <servlet-name>OptionDeltaRangeRawDataAnalysisChartQuoteServlet</servlet-name>
+	    <url-pattern>/chart/OptionDeltaRangeRawDataAnalysisChartQuote</url-pattern>
+	</servlet-mapping>
+	
 	
 	<servlet-mapping>
 	    <servlet-name>OptionGreeksMovementAnalysisChartQuoteServlet</servlet-name>

@@ -1,0 +1,115 @@
+<html>
+<head>
+  <title>ATM Movement Raw Data Analysis chart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/data.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+
+<div id="container1" style="min-width: 310px; height: 700px; margin: 0 auto; border-style: solid;"></div>
+
+<script type='text/javascript'>
+
+	function getQueryParameter(name){
+	  const parts = window.location.href.split('?');
+	  if (parts.length > 1) {
+	    name = encodeURIComponent(name);
+	    const params = parts[1].split('&');
+	    const found = params.filter(el => (el.split('=')[0] === name) && el);
+	    if (found.length) return decodeURIComponent(found[0].split('=')[1]);
+	  }
+	}
+	
+	var forDate = getQueryParameter("forDate");
+	var mainInstrumentId = getQueryParameter("mainInstrumentId");
+	var baseDelta = getQueryParameter("baseDelta");
+	
+	Highcharts.chart('container1', {
+	  chart: {
+	    type: 'spline',
+	    zooming: {
+            type: 'x'
+        }
+	  },
+	  title: {
+	    text: ' ATM Option Raw Data Movement Analysis'
+	  },
+	  subtitle: {
+	    text: 'ATM Option Raw Data Analysis ' + mainInstrumentId + ' (Delta '+ baseDelta + ')' 
+	  },
+	  xAxis: {
+        crosshair: true
+      },
+	  yAxis: [{ // Primary yAxis
+          labels: {
+              format: '{value}'
+          },
+          crosshair: true,
+          opposite: true,
+          title: {
+              text: 'Index'
+          }
+      }, { // Secondary yAxis
+          gridLineWidth: 0,
+          crosshair: true,
+          labels: {
+              format: '{value}'
+          },title: {
+              text: 'Time Value'
+          },
+          plotLines: [{
+              color: 'red',
+              width: 2,
+              value: 0,
+              dashStyle: 'longdashdot'}]
+      }, { // Third yAxis
+          gridLineWidth: 0,
+          crosshair: true,
+          labels: {
+              format: '{value}'
+          },title: {
+              text: 'Percent Diff'
+          },
+          plotLines: [{
+              color: 'red',
+              width: 2,
+              value: 0,
+              dashStyle: 'longdashdot'}]
+      },{ // fourth yAxis
+          gridLineWidth: 0,
+          crosshair: true,
+          labels: {
+              format: '{value}'
+          },title: {
+              text: 'Gamma'
+          },
+          plotLines: [{
+              color: 'red',
+              width: 2,
+              value: 0,
+              dashStyle: 'longdashdot'}]
+      }],
+	  data: {
+	    csvURL: '/chart/OptionDeltaRangeRawDataAnalysisChartQuote?baseDelta=' + baseDelta+ '&mainInstrumentId='+ mainInstrumentId + '&forDate='+forDate,
+	    enablePolling: true,
+	    dataRefreshRate: 60
+	  },
+	  series: [
+		  { yAxis: 0, color: '#2a52be'},{ yAxis: 0, visible: false},
+		  { yAxis: 3, visible: false},
+		  
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false},
+		  
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false},
+		  { yAxis: 2, visible: false}, { yAxis: 2, visible: false}
+		 ]
+	});
+  </script>
+</body>
+</html>

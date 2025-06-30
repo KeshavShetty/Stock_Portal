@@ -168,6 +168,12 @@
 												<a href="<%=request.getContextPath()%>/optionATMMovementRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&mainInstrumentId=2" target="_blank">[Nifty]</a>&nbsp;
 												<a href="<%=request.getContextPath()%>/optionATMMovementRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&mainInstrumentId=3" target="_blank">[BN]</a>
 											</li>
+											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
+												Delta Range Raw Data Analysis
+												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&mainInstrumentId=2" target="_blank">[Nifty]</a>&nbsp;
+												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&mainInstrumentId=3" target="_blank">[BN]</a>
+												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&mainInstrumentId=4" target="_blank">[Sensex]</a>
+											</li>
 										</ul>
 									</div>
 								</div>
