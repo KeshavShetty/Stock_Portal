@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -3591,13 +3592,17 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
             		+ "D-R CE Avg-Gamma," 
             		+ "D-R PE Avg-Gamma," 
             		+ "D-R CE Avg-Vega,"
-            		+ "D-R PE Avg-Vega"
+            		+ "D-R PE Avg-Vega,"
+            		+ "D-R CE Worth(Cr.),"
+            		+ "D-R PE Worth(Cr.)"
             		+ "\r\n");
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 			SimpleDateFormat stdFormat = new SimpleDateFormat("dd/MM/yyyy");
 			
+			DecimalFormat decimalFormat = new DecimalFormat("#.##");
+			 
 			String dateStrEnd = "";
 			String dateStrBegin = "";
 			Calendar cal = Calendar.getInstance();
@@ -3618,7 +3623,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			}
 			
 			String fetchSql = "select record_time, instrumentLtp, futures_Ltp, celtp, peltp, cegamma, pegamma, totalceiv, totalpeiv,"
-					+ " deltaRangeCEAvgLtp, deltaRangePEAvgLtp, deltaRangeCEAvgIv, deltaRangePEAvgIv, deltaRangeCEAvgDelta, deltaRangePEAvgDelta, deltaRangeCEAvgGamma, deltaRangePEAvgGamma, deltaRangeCEAvgVega, deltaRangePEAvgVega"
+					+ " deltaRangeCEAvgLtp, deltaRangePEAvgLtp, deltaRangeCEAvgIv, deltaRangePEAvgIv, deltaRangeCEAvgDelta,"
+					+ " deltaRangePEAvgDelta, deltaRangeCEAvgGamma, deltaRangePEAvgGamma, deltaRangeCEAvgVega, deltaRangePEAvgVega,"
+					+ " deltarangeceworth, deltarangepeworth"
 					+ " from db_link_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
@@ -3654,6 +3661,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				float drCEVega = (Float) rowdata[17];
 				float drPEVega = (Float) rowdata[18];
 				
+				float drCEWorth = (Float) rowdata[19];
+				float drPEWorth = (Float) rowdata[20];
+				
 				writer.write(postgresFormat.format(quoteTime)+","+indexltp + "," + futuresLtp + "," +  (ceLtp+peLtp)
 						+ "," + cegamma + "," + pegamma + "," + totalCeOi+ "," + totalPeOi
 						+ "," + drCELtp + "," + drPELtp
@@ -3661,6 +3671,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + drCEDelta + "," + drPEDelta
 						+ "," + drCEGamma + "," + drPEGamma
 						+ "," + drCEVega + "," + drPEVega
+						+ "," + decimalFormat.format(drCEWorth) + "," + decimalFormat.format(drPEWorth)
 						+"\r\n");
 			}
 			writer.close();
