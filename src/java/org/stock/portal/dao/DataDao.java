@@ -3594,7 +3594,11 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
             		+ "D-R CE Avg-Vega,"
             		+ "D-R PE Avg-Vega,"
             		+ "D-R CE Worth(Cr.),"
-            		+ "D-R PE Worth(Cr.)"
+            		+ "D-R PE Worth(Cr.),"
+            		+ "D-R CE OI(Cr.),"
+            		+ "D-R PE OI(Cr.),"
+            		+ "D-R CE Delta OI(Cr.),"
+            		+ "D-R PE Delta OI(Cr.)"
             		+ "\r\n");
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -3625,7 +3629,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			String fetchSql = "select record_time, instrumentLtp, futures_Ltp, celtp, peltp, cegamma, pegamma, totalceiv, totalpeiv,"
 					+ " deltaRangeCEAvgLtp, deltaRangePEAvgLtp, deltaRangeCEAvgIv, deltaRangePEAvgIv, deltaRangeCEAvgDelta,"
 					+ " deltaRangePEAvgDelta, deltaRangeCEAvgGamma, deltaRangePEAvgGamma, deltaRangeCEAvgVega, deltaRangePEAvgVega,"
-					+ " deltarangeceworth, deltarangepeworth"
+					+ " deltarangeceworth, deltarangepeworth,"
+					+ " deltarangeceoi, deltarangepeoi,"
+					+ " deltarangecedeltaoi, deltarangepedeltaoi"
 					+ " from db_link_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
@@ -3664,6 +3670,12 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				float drCEWorth = (Float) rowdata[19];
 				float drPEWorth = (Float) rowdata[20];
 				
+				float drCEOI = (Float) rowdata[21];
+				float drPEOI = (Float) rowdata[22];
+				
+				float drCEDeltaOI = (Float) rowdata[23];
+				float drPEDeltaOI = (Float) rowdata[24];
+				
 				writer.write(postgresFormat.format(quoteTime)+","+indexltp + "," + futuresLtp + "," +  (ceLtp+peLtp)
 						+ "," + cegamma + "," + pegamma + "," + totalCeOi+ "," + totalPeOi
 						+ "," + drCELtp + "," + drPELtp
@@ -3672,6 +3684,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + drCEGamma + "," + drPEGamma
 						+ "," + drCEVega + "," + drPEVega
 						+ "," + decimalFormat.format(drCEWorth) + "," + decimalFormat.format(drPEWorth)
+						+ "," + decimalFormat.format(drCEOI) + "," + decimalFormat.format(drPEOI)
+						+ "," + decimalFormat.format(drCEDeltaOI) + "," + decimalFormat.format(drPEDeltaOI)
 						+"\r\n");
 			}
 			writer.close();
