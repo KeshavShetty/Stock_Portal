@@ -3598,7 +3598,17 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
             		+ "D-R CE OI(Cr.),"
             		+ "D-R PE OI(Cr.),"
             		+ "D-R CE Delta OI(Cr.),"
-            		+ "D-R PE Delta OI(Cr.)"
+            		+ "D-R PE Delta OI(Cr.),"
+            		+ "D-R CE Gamma OI(Cr.),"
+            		+ "D-R PE Gamma OI(Cr.),"
+            		+ "D-R CE Full Delta OI(Cr.),"
+            		+ "D-R PE Full Delta OI(Cr.),"
+            		+ "SS-5 Strike Avg CE IV,"
+            		+ "SS-5 Strike Avg PE IV,"
+            		+ "SS-10 Strike Avg CE IV,"
+            		+ "SS-10 Strike Avg PE IV,"
+            		+ "SS-20 Strike Avg CE IV,"
+            		+ "SS-20 Strike Avg PE IV"
             		+ "\r\n");
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -3631,7 +3641,15 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ " deltaRangePEAvgDelta, deltaRangeCEAvgGamma, deltaRangePEAvgGamma, deltaRangeCEAvgVega, deltaRangePEAvgVega,"
 					+ " deltarangeceworth, deltarangepeworth,"
 					+ " deltarangeceoi, deltarangepeoi,"
-					+ " deltarangecedeltaoi, deltarangepedeltaoi"
+					+ " deltarangecedeltaoi, deltarangepedeltaoi,"
+					
+					+ " deltarangecegammaoi, deltarangepegammaoi,"
+					+ " deltarangecefulldeltaoi, deltarangepefulldeltaoi,"
+					
+					+ " selectivestrike_avgceiv, selectivestrike_avgpeiv,"
+					+ " selective10strike_avgceiv, selective10strike_avgpeiv,"
+					+ " selective20strike_avgceiv, selective20strike_avgpeiv"
+					
 					+ " from db_link_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
@@ -3676,6 +3694,21 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				float drCEDeltaOI = (Float) rowdata[23];
 				float drPEDeltaOI = (Float) rowdata[24];
 				
+				float drCEGammaOI = (Float) rowdata[25];
+				float drPEGammaOI = (Float) rowdata[26];
+				
+				float drCEFullDeltaOI = (Float) rowdata[27];
+				float drPEFullDeltaOI = (Float) rowdata[28];
+				
+				float ss5StrikeAvgCEIV = (Float) rowdata[29];
+				float ss5StrikeAvgPEIV = (Float) rowdata[30];
+				
+				float ss10StrikeAvgCEIV = (Float) rowdata[31];
+				float ss10StrikeAvgPEIV = (Float) rowdata[32];
+				
+				float ss20StrikeAvgCEIV = (Float) rowdata[33];
+				float ss20StrikeAvgPEIV = (Float) rowdata[34];
+				
 				writer.write(postgresFormat.format(quoteTime)+","+indexltp + "," + futuresLtp + "," +  (ceLtp+peLtp)
 						+ "," + cegamma + "," + pegamma + "," + totalCeOi+ "," + totalPeOi
 						+ "," + drCELtp + "," + drPELtp
@@ -3686,6 +3719,13 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + decimalFormat.format(drCEWorth) + "," + decimalFormat.format(drPEWorth)
 						+ "," + decimalFormat.format(drCEOI) + "," + decimalFormat.format(drPEOI)
 						+ "," + decimalFormat.format(drCEDeltaOI) + "," + decimalFormat.format(drPEDeltaOI)
+						
+						+ "," + decimalFormat.format(drCEGammaOI) + "," + decimalFormat.format(drPEGammaOI)
+						+ "," + decimalFormat.format(drCEFullDeltaOI) + "," + decimalFormat.format(drPEFullDeltaOI)
+						
+						+ "," + ss5StrikeAvgCEIV + "," + ss5StrikeAvgPEIV
+						+ "," + ss10StrikeAvgCEIV + "," + ss20StrikeAvgPEIV
+						+ "," + ss10StrikeAvgCEIV + "," + ss20StrikeAvgPEIV
 						+"\r\n");
 			}
 			writer.close();
