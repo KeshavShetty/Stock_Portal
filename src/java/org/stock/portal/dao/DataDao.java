@@ -3614,7 +3614,10 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ "D-R PE Full Avg IV,"
 					
 					+ "D-R CE Hybrid Avg IV,"
-					+ "D-R PE Hybrid Avg IV"
+					+ "D-R PE Hybrid Avg IV,"
+
+					+ "D-R CE Volume 1M,"
+					+ "D-R PE Volume 1M"
 
             		+ "\r\n");
             
@@ -3658,7 +3661,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ " selective20strike_avgceiv, selective20strike_avgpeiv,"
 					
 					+ " deltaRangeCEFullAvgIv, deltaRangePEFullAvgIv,"
-					+ " deltaRangeHybridCEAvgIv, deltaRangeHybridPEAvgIv"
+					+ " deltaRangeHybridCEAvgIv, deltaRangeHybridPEAvgIv,"
+					+ " deltaRangeCEvolume1min, deltaRangePEvolume1min"
 					
 					+ " from db_link_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
@@ -3725,6 +3729,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				float deltaRangeHybridCEAvgIv = (Float) rowdata[37];
 				float deltaRangeHybridPEAvgIv = (Float) rowdata[38];
 				
+				float deltaRangeCEVolume1M = (Float) rowdata[39];
+				float deltaRangePEVolume1M = (Float) rowdata[40];
 				
 				
 				writer.write(postgresFormat.format(quoteTime)+","+indexltp + "," + futuresLtp + "," +  (ceLtp+peLtp)
@@ -3746,6 +3752,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + ss10StrikeAvgCEIV + "," + ss20StrikeAvgPEIV
 						+ "," + deltaRangeCEFullAvgIv + "," + deltaRangePEFullAvgIv
 						+ "," + deltaRangeHybridCEAvgIv + "," + deltaRangeHybridPEAvgIv
+						+ "," + deltaRangeCEVolume1M + "," + deltaRangePEVolume1M
 						+"\r\n");
 			}
 			writer.close();
