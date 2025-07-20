@@ -3854,7 +3854,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ " deltaRangeHybridCEAvgIv, deltaRangeHybridPEAvgIv,"
 					+ " deltaRangeCEvolume1min, deltaRangePEvolume1min"
 					
-					+ " from db_link_option_atm_movement_data oamd"
+					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
 			
