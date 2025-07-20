@@ -38,6 +38,8 @@ public class OptionDeltaRangeRawDataAnalysisChartQuoteServlet extends HttpServle
 	{
 		try
 		{
+			Long beginTime = System.currentTimeMillis();
+			
 			ServletOutputStream stream = response.getOutputStream();
 	        DataOutputStream os = new DataOutputStream(stream);
 	        
@@ -59,7 +61,12 @@ public class OptionDeltaRangeRawDataAnalysisChartQuoteServlet extends HttpServle
 	        }
 	        is.close();
 	        os.close();
-	        stream.close();	        
+	        stream.close();
+	        
+	        Long endTime = System.currentTimeMillis();
+	        Long timeTaken = endTime-beginTime;
+	        
+			System.out.println("OptionDeltaRangeRawDataAnalysisChartQuoteServlet time taken(ms) " + timeTaken);
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}			
