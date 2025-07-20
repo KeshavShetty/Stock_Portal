@@ -1,6 +1,7 @@
 
 package org.stock.portal.dao;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileWriter;
 import java.math.BigInteger;
 import java.sql.Connection;
@@ -3760,5 +3761,195 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			ex.printStackTrace();
 		}
 		return csvFilename;
+	}
+	
+	public byte[] getOptionDeltaRangeRawDataAnalysisAsByteArray(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException {
+		log.info("In getOptionTimeValueAnalysis forDate="+forDate);
+		Map<String, List<OptionOI>> oiDataMap = new HashMap<String, List<OptionOI>>();
+		byte[] retArray = null;
+		try {
+			ByteArrayOutputStream writer = new ByteArrayOutputStream(); // writer = new FileWriter(csvFilename);
+            writer.write(("QuoteTime,IndexAt,Futures Ltp,"
+            		+ "Straddle Premium,"
+            		+ "CE Gamma, PE Gamma,"
+            		+ "Avg CE IV, Avg PE IV,"
+            		+ "D-R CE Avg-Ltp,"
+            		+ "D-R PE Avg-Ltp," 
+            		+ "D-R CE Avg-IV," 
+            		+ "D-R PE Avg-IV," 
+            		+ "D-R CE Avg-Delta," 
+            		+ "D-R PE Avg-Delta," 
+            		+ "D-R CE Avg-Gamma," 
+            		+ "D-R PE Avg-Gamma," 
+            		+ "D-R CE Avg-Vega,"
+            		+ "D-R PE Avg-Vega,"
+            		+ "D-R CE Worth(Cr.),"
+            		+ "D-R PE Worth(Cr.),"
+            		+ "D-R CE OI(Cr.),"
+            		+ "D-R PE OI(Cr.),"
+            		+ "D-R CE Delta OI(Cr.),"
+            		+ "D-R PE Delta OI(Cr.),"
+            		+ "D-R CE Gamma OI(Cr.),"
+            		+ "D-R PE Gamma OI(Cr.),"
+            		+ "D-R CE Full Delta OI(Cr.),"
+            		+ "D-R PE Full Delta OI(Cr.),"
+            		+ "SS-5 Strike Avg CE IV,"
+            		+ "SS-5 Strike Avg PE IV,"
+            		+ "SS-10 Strike Avg CE IV,"
+            		+ "SS-10 Strike Avg PE IV,"
+            		+ "SS-20 Strike Avg CE IV,"
+            		+ "SS-20 Strike Avg PE IV,"
+            		
+					+ "D-R CE Full Avg IV,"
+					+ "D-R PE Full Avg IV,"
+					
+					+ "D-R CE Hybrid Avg IV,"
+					+ "D-R PE Hybrid Avg IV,"
+
+					+ "D-R CE Volume 1M,"
+					+ "D-R PE Volume 1M"
+
+            		+ "\r\n").getBytes());
+            
+            SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			SimpleDateFormat stdFormat = new SimpleDateFormat("dd/MM/yyyy");
+			
+			DecimalFormat decimalFormat = new DecimalFormat("#.##");
+			 
+			String dateStrEnd = "";
+			String dateStrBegin = "";
+			Calendar cal = Calendar.getInstance();
+			if (forDate.length()>12) {
+				cal.setTime(longFormat.parse(forDate));
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.add(Calendar.MINUTE, 15);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			} else  {
+				cal.setTime(stdFormat.parse(forDate));
+				cal.set(Calendar.HOUR_OF_DAY, 9);
+				cal.set(Calendar.MINUTE, 15);
+				
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.set(Calendar.MINUTE, 30);
+				cal.set(Calendar.HOUR_OF_DAY, 15);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			}
+			
+			String fetchSql = "select record_time, instrumentLtp, futures_Ltp, celtp, peltp, cegamma, pegamma, totalceiv, totalpeiv,"
+					+ " deltaRangeCEAvgLtp, deltaRangePEAvgLtp, deltaRangeCEAvgIv, deltaRangePEAvgIv, deltaRangeCEAvgDelta,"
+					+ " deltaRangePEAvgDelta, deltaRangeCEAvgGamma, deltaRangePEAvgGamma, deltaRangeCEAvgVega, deltaRangePEAvgVega,"
+					+ " deltarangeceworth, deltarangepeworth,"
+					+ " deltarangeceoi, deltarangepeoi,"
+					+ " deltarangecedeltaoi, deltarangepedeltaoi,"
+					
+					+ " deltarangecegammaoi, deltarangepegammaoi,"
+					+ " deltarangecefulldeltaoi, deltarangepefulldeltaoi,"
+					
+					+ " selectivestrike_avgceiv, selectivestrike_avgpeiv,"
+					+ " selective10strike_avgceiv, selective10strike_avgpeiv,"
+					+ " selective20strike_avgceiv, selective20strike_avgpeiv,"
+					
+					+ " deltaRangeCEFullAvgIv, deltaRangePEFullAvgIv,"
+					+ " deltaRangeHybridCEAvgIv, deltaRangeHybridPEAvgIv,"
+					+ " deltaRangeCEvolume1min, deltaRangePEvolume1min"
+					
+					+ " from db_link_option_atm_movement_data oamd"
+					+ " where f_main_instrument = '" + mainInstrumentId + "'"
+					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
+			
+			log.info("fetchSql "+fetchSql);
+			Query q = entityManager.createNativeQuery(fetchSql);	
+			List<Object[]> listResults = q.getResultList();
+			Iterator<Object[]> iter = listResults.iterator();
+			while (iter.hasNext()) {
+				Object[] rowdata = iter.next();
+				Date quoteTime = (Timestamp) rowdata[0];
+				float indexltp = (Float) rowdata[1];
+				float futuresLtp = (Float) rowdata[2];
+				
+				float ceLtp = (Float) rowdata[3];
+				float peLtp = (Float) rowdata[4];
+				
+				float cegamma = (Float) rowdata[5];
+				float pegamma = (Float) rowdata[6];
+				float totalCeOi = (Float) rowdata[7];
+				float totalPeOi = (Float) rowdata[8];
+				
+				float drCELtp = (Float) rowdata[9];
+				float drPELtp = (Float) rowdata[10];
+				float drCEIV = (Float) rowdata[11];
+				float drPEIV = (Float) rowdata[12];
+				float drCEDelta = (Float) rowdata[13];
+				float drPEDelta = (Float) rowdata[14];
+				
+				float drCEGamma = (Float) rowdata[15];
+				float drPEGamma = (Float) rowdata[16];
+				
+				float drCEVega = (Float) rowdata[17];
+				float drPEVega = (Float) rowdata[18];
+				
+				float drCEWorth = (Float) rowdata[19];
+				float drPEWorth = (Float) rowdata[20];
+				
+				float drCEOI = (Float) rowdata[21];
+				float drPEOI = (Float) rowdata[22];
+				
+				float drCEDeltaOI = (Float) rowdata[23];
+				float drPEDeltaOI = (Float) rowdata[24];
+				
+				float drCEGammaOI = (Float) rowdata[25];
+				float drPEGammaOI = (Float) rowdata[26];
+				
+				float drCEFullDeltaOI = (Float) rowdata[27];
+				float drPEFullDeltaOI = (Float) rowdata[28];
+				
+				float ss5StrikeAvgCEIV = (Float) rowdata[29];
+				float ss5StrikeAvgPEIV = (Float) rowdata[30];
+				
+				float ss10StrikeAvgCEIV = (Float) rowdata[31];
+				float ss10StrikeAvgPEIV = (Float) rowdata[32];
+				
+				float ss20StrikeAvgCEIV = (Float) rowdata[33];
+				float ss20StrikeAvgPEIV = (Float) rowdata[34];
+				
+				float deltaRangeCEFullAvgIv = (Float) rowdata[35];
+				float deltaRangePEFullAvgIv = (Float) rowdata[36];
+				
+				float deltaRangeHybridCEAvgIv = (Float) rowdata[37];
+				float deltaRangeHybridPEAvgIv = (Float) rowdata[38];
+				
+				float deltaRangeCEVolume1M = (Float) rowdata[39];
+				float deltaRangePEVolume1M = (Float) rowdata[40];
+				
+				
+				writer.write((postgresFormat.format(quoteTime)+","+indexltp + "," + futuresLtp + "," +  (ceLtp+peLtp)
+						+ "," + cegamma + "," + pegamma + "," + totalCeOi+ "," + totalPeOi
+						+ "," + drCELtp + "," + drPELtp
+						+ "," + drCEIV + "," + drPEIV
+						+ "," + drCEDelta + "," + drPEDelta
+						+ "," + drCEGamma + "," + drPEGamma
+						+ "," + drCEVega + "," + drPEVega
+						+ "," + decimalFormat.format(drCEWorth) + "," + decimalFormat.format(drPEWorth)
+						+ "," + decimalFormat.format(drCEOI) + "," + decimalFormat.format(drPEOI)
+						+ "," + decimalFormat.format(drCEDeltaOI) + "," + decimalFormat.format(drPEDeltaOI)
+						
+						+ "," + decimalFormat.format(drCEGammaOI) + "," + decimalFormat.format(drPEGammaOI)
+						+ "," + decimalFormat.format(drCEFullDeltaOI) + "," + decimalFormat.format(drPEFullDeltaOI)
+						
+						+ "," + ss5StrikeAvgCEIV + "," + ss5StrikeAvgPEIV
+						+ "," + ss10StrikeAvgCEIV + "," + ss20StrikeAvgPEIV
+						+ "," + ss10StrikeAvgCEIV + "," + ss20StrikeAvgPEIV
+						+ "," + deltaRangeCEFullAvgIv + "," + deltaRangePEFullAvgIv
+						+ "," + deltaRangeHybridCEAvgIv + "," + deltaRangeHybridPEAvgIv
+						+ "," + deltaRangeCEVolume1M + "," + deltaRangePEVolume1M
+						+"\r\n").getBytes());
+			}
+			retArray = writer.toByteArray();
+			writer.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return retArray;
 	}
 }

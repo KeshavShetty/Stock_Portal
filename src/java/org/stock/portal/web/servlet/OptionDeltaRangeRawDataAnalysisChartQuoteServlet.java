@@ -1,6 +1,7 @@
 
 package org.stock.portal.web.servlet;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,10 +47,11 @@ public class OptionDeltaRangeRawDataAnalysisChartQuoteServlet extends HttpServle
 	        String forDate = request.getParameter("forDate"); 
 	        float baseDelta = Float.parseFloat(request.getParameter("baseDelta"));
 	        
-	        String csvFilename = dataManager.getOptionDeltaRangeRawDataAnalysis(mainInstrumentId, forDate, baseDelta);	
+	        // String csvFilename = dataManager.getOptionDeltaRangeRawDataAnalysis(mainInstrumentId, forDate, baseDelta);	
+	        byte[] csvContents = dataManager.getOptionDeltaRangeRawDataAnalysisAsByteArray(mainInstrumentId, forDate, baseDelta);
 	        
 	        InputStream is = null;
-	        is = new FileInputStream(csvFilename);
+	        is = new ByteArrayInputStream(csvContents);
 	        byte[] buffer = new byte[1024];
 	        int length;
 	        while ((length = is.read(buffer)) > 0) {

@@ -111,5 +111,7 @@ public interface DataManager {
 	public String getOptionGreeksMovmentAnalysis(String indexname, String forDate) throws BusinessException;
 	
 	public String getOptionDeltaRangeRawDataAnalysis(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException;
+	
+	public byte[] getOptionDeltaRangeRawDataAnalysisAsByteArray(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException;
 }
   

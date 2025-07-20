@@ -586,5 +586,10 @@ public class DataManagerBean implements DataManager {
     public String getOptionDeltaRangeRawDataAnalysis(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException {
     	return (new DataDao(entityManager)).getOptionDeltaRangeRawDataAnalysis(mainInstrumentId, forDate, baseDelta);    	
     }
+    
+    @TransactionAttribute( TransactionAttributeType.SUPPORTS )
+    public byte[] getOptionDeltaRangeRawDataAnalysisAsByteArray(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException {
+    	return (new DataDao(entityManager)).getOptionDeltaRangeRawDataAnalysisAsByteArray(mainInstrumentId, forDate, baseDelta);    	
+    }
 }
   
