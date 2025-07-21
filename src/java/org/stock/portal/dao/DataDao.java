@@ -3807,8 +3807,14 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ "D-R PE Hybrid Avg IV,"
 
 					+ "D-R CE Volume 1M,"
-					+ "D-R PE Volume 1M"
+					+ "D-R PE Volume 1M,"
 
+					+ "D-R CE Hybrid Avg Gamma,"
+					+ "D-R PE Hybrid Avg Gamma,"
+					
+					+ "D-R CE Outlier Ratio,"
+					+ "D-R PE Outlier Ratio"
+					
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -3852,7 +3858,10 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					
 					+ " deltaRangeCEFullAvgIv, deltaRangePEFullAvgIv,"
 					+ " deltaRangeHybridCEAvgIv, deltaRangeHybridPEAvgIv,"
-					+ " deltaRangeCEvolume1min, deltaRangePEvolume1min"
+					+ " deltaRangeCEvolume1min, deltaRangePEvolume1min,"
+					
+					+ " deltaRangeHybridCEAvgGamma, deltaRangeHybridPEAvgGamma,"
+					+ " deltaRangeCEOutlierRatio, deltaRangePEOutlierRatio"
 					
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
@@ -3922,6 +3931,12 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				float deltaRangeCEVolume1M = (Float) rowdata[39];
 				float deltaRangePEVolume1M = (Float) rowdata[40];
 				
+				float deltaRangeCEAvgGamma = (Float) rowdata[41];
+				float deltaRangePEAvgGamma = (Float) rowdata[42];
+				
+				float deltaRangeCEOutlierRatio = (Float) rowdata[43];
+				float deltaRangePEOutlierRatio = (Float) rowdata[44];
+				
 				
 				writer.write((postgresFormat.format(quoteTime)+","+indexltp + "," + futuresLtp + "," +  (ceLtp+peLtp)
 						+ "," + cegamma + "," + pegamma + "," + totalCeOi+ "," + totalPeOi
@@ -3943,6 +3958,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + deltaRangeCEFullAvgIv + "," + deltaRangePEFullAvgIv
 						+ "," + deltaRangeHybridCEAvgIv + "," + deltaRangeHybridPEAvgIv
 						+ "," + deltaRangeCEVolume1M + "," + deltaRangePEVolume1M
+						+ "," + deltaRangeCEAvgGamma + "," + deltaRangePEAvgGamma
+						+ "," + deltaRangeCEOutlierRatio + "," + deltaRangePEOutlierRatio
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();
