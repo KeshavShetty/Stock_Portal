@@ -25,6 +25,7 @@
 	var forDate = getQueryParameter("forDate");
 	var mainInstrumentId = getQueryParameter("mainInstrumentId");
 	var baseDelta = getQueryParameter("baseDelta");
+	var instrument = getQueryParameter("Instrument");
 	
 	Highcharts.chart('container1', {
 	  chart: {
@@ -37,7 +38,7 @@
 	    text: ' ATM Option Raw Data Movement Analysis'
 	  },
 	  subtitle: {
-	    text: 'ATM Option Raw Data Analysis ' + mainInstrumentId + ' (Delta '+ baseDelta + ')' 
+	    text: 'ATM Option Raw Data Analysis ' + instrument + ' (Delta '+ baseDelta + ')' 
 	  },
 	  xAxis: {
         crosshair: true

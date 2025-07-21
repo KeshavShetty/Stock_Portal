@@ -170,9 +170,18 @@
 											</li>
 											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
 												Delta Range Raw Data Analysis
-												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&mainInstrumentId=2" target="_blank">[Nifty]</a>&nbsp;
-												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&mainInstrumentId=3" target="_blank">[BN]</a>
-												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&mainInstrumentId=4" target="_blank">[Sensex]</a>
+												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Nifty&mainInstrumentId=2" target="_blank">[Nifty]</a>&nbsp;
+												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Bank Nifty&mainInstrumentId=3" target="_blank">[BN]</a>
+												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Sensex&mainInstrumentId=4" target="_blank">[Sensex]</a>
+											</li>
+											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
+												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Reliance&mainInstrumentId=5" target="_blank">[Reliance]</a>
+												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=HDFC&mainInstrumentId=6" target="_blank">[Hdfc]</a>
+												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Icici&mainInstrumentId=7" target="_blank">[Icici]</a>
+												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Infy&mainInstrumentId=8" target="_blank">[Infy]</a>
+												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Tcs&mainInstrumentId=9" target="_blank">[Tcs]</a>
+												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Bharti&mainInstrumentId=10" target="_blank">[Bharti]</a>
+												
 											</li>
 										</ul>
 									</div>
