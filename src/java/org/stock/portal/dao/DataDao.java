@@ -3817,7 +3817,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					
 					+ "D-R 4-9 CE AvgIv,"
 					+ "D-R 4-9 PE AvgIv,"
-					+ "CE Total Count, CE Outlier Count, PE Total Count, PE Outlier Count"
+					+ "CE Total Count, CE Outlier Count, PE Total Count, PE Outlier Count,"
+					+ "D-R 1-6 CE AvgIv,"
+					+ "D-R 1-6 PE AvgIv"
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -3866,7 +3868,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ " deltaRangeHybridCEAvgGamma, deltaRangeHybridPEAvgGamma,"
 					+ " deltaRangeCEOutlierRatio, deltaRangePEOutlierRatio,"
 					+ " dr4_9CEAvgIv, dr4_9PEAvgIv,"
-					+ " countCETotal, countCEOutlier, countPETotal, countPEOutlier"
+					+ " countCETotal, countCEOutlier, countPETotal, countPEOutlier,"
+					+ " dr1_6CEAvgIv, dr1_6PEAvgIv"
 					
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
@@ -3950,6 +3953,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				int countPETotal = (Integer) rowdata[49];
 				int countPEOutlier  = (Integer) rowdata[50];
 				
+				float dr1_6CEAvgIv = (Float) rowdata[51];
+				float dr1_6PEAvgIv = (Float) rowdata[52];
+				
 				writer.write((postgresFormat.format(quoteTime)+","+indexltp + "," + futuresLtp + "," +  (ceLtp+peLtp)
 						+ "," + cegamma + "," + pegamma + "," + totalCeOi+ "," + totalPeOi
 						+ "," + drCELtp + "," + drPELtp
@@ -3974,6 +3980,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + deltaRangeCEOutlierRatio + "," + deltaRangePEOutlierRatio
 						+ "," + dr4_9CEAvgIv + "," + dr4_9PEAvgIv
 						+ "," + countCETotal + "," + countCEOutlier + "," + countPETotal + "," + countPEOutlier  
+						+ "," + dr1_6CEAvgIv + "," +dr1_6PEAvgIv
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();
