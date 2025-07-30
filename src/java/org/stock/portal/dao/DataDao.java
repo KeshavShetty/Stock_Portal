@@ -3819,7 +3819,10 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ "D-R 4-9 PE AvgIv,"
 					+ "CE Total Count, CE Outlier Count, PE Total Count, PE Outlier Count,"
 					+ "D-R 1-6 CE AvgIv,"
-					+ "D-R 1-6 PE AvgIv"
+					+ "D-R 1-6 PE AvgIv,"
+					
+					+ "D-R Top 5 CE Delta OI,"
+					+ "D-R Top 5 PE Delta OI"
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -3869,7 +3872,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ " deltaRangeCEOutlierRatio, deltaRangePEOutlierRatio,"
 					+ " dr4_9CEAvgIv, dr4_9PEAvgIv,"
 					+ " countCETotal, countCEOutlier, countPETotal, countPEOutlier,"
-					+ " dr1_6CEAvgIv, dr1_6PEAvgIv"
+					+ " dr1_6CEAvgIv, dr1_6PEAvgIv,"
+					
+					+ " ceDeltaOIWorth, peDeltaOIWorth"
 					
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
@@ -3956,6 +3961,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				float dr1_6CEAvgIv = (Float) rowdata[51];
 				float dr1_6PEAvgIv = (Float) rowdata[52];
 				
+				float ceDeltaOIWorth = (Float) rowdata[53];
+				float peDeltaOIWorth = (Float) rowdata[54];
+				
 				writer.write((postgresFormat.format(quoteTime)+","+indexltp + "," + futuresLtp + "," +  (ceLtp+peLtp)
 						+ "," + cegamma + "," + pegamma + "," + totalCeOi+ "," + totalPeOi
 						+ "," + drCELtp + "," + drPELtp
@@ -3981,6 +3989,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + dr4_9CEAvgIv + "," + dr4_9PEAvgIv
 						+ "," + countCETotal + "," + countCEOutlier + "," + countPETotal + "," + countPEOutlier  
 						+ "," + dr1_6CEAvgIv + "," +dr1_6PEAvgIv
+						+"," + ceDeltaOIWorth + "," + peDeltaOIWorth
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();
