@@ -2417,7 +2417,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			FileWriter writer = new FileWriter(csvFilename);
             writer.write("QuoteTime,IndexLtp");
             for(String optiononame : allPptionnames) {
-            	writer.write(","+optiononame+"-LTP"+",IV, Delta, Gamma, Vega, Theta");
+            	writer.write(","+optiononame.trim()+"-LTP"+",IV, Delta, Gamma, Vega, Theta");
             }
             writer.write(",P/L\r\n");
             
@@ -2439,7 +2439,12 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			for(String optiononame : allPptionnames) {
 				List<ZerodhaOptionCandleVO> optionGreekList = new ArrayList<ZerodhaOptionCandleVO>();
 				
-				String fetchSql = "select quote_time, close_price, underlying_index_value, implied_volatility,Delta, Gamma, Vega, Theta  from option_1m_candle where optionname = '" + optiononame + "' and quote_time >= '" + postgresFormat.format(beginTime) + "' and quote_time <= '" + postgresFormat.format(endTime) + "' order by quote_time";
+				//String fetchSql = "select quote_time, close_price, underlying_index_value, implied_volatility,Delta, Gamma, Vega, Theta  from option_1m_candle where optionname = '" + optiononame + "' and quote_time >= '" + postgresFormat.format(beginTime) + "' and quote_time <= '" + postgresFormat.format(endTime) + "' order by quote_time";
+				String fetchSql = "select quote_time, ltp as close_price, underlying_value, iv,Delta, Gamma, Vega, Theta"
+						+ " from fdw_nexcorio_option_greeks "
+						+ " where trading_symbol = '" + optiononame.trim() + "'"
+						+ " and quote_time >= '" + postgresFormat.format(beginTime) + "' and quote_time <= '" + postgresFormat.format(endTime) + "' order by quote_time";
+				
 				Query q = entityManager.createNativeQuery(fetchSql);	
 				List<Object[]> listResults = q.getResultList();
 				Iterator<Object[]> iter = listResults.iterator();
@@ -2481,19 +2486,19 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
             do {
             	float currentTotalOptionPrice = 0f;
             	for(String optiononame : allPptionnames) {
-            		if (firstOptionName==null) firstOptionName = optiononame;
-            		ZerodhaOptionCandleVO aVo = alldataMap.get(optiononame).get(0);
+            		if (firstOptionName==null) firstOptionName = optiononame.trim();
+            		ZerodhaOptionCandleVO aVo = alldataMap.get(optiononame.trim()).get(0);
             		
             		log.info("~~~~ Time aVo.getQuoteTime()"+aVo.getQuoteTime()+" cal.getTime()"+cal.getTime());
             		
             		if (aVo!=null) {
-	            		if (optiononame.equals(firstOptionName)) {
+	            		if (optiononame.trim().equals(firstOptionName)) {
 	            			writer.write(postgresFormat.format(aVo.getQuoteTime())+","+aVo.getUnderlyingIndexValue());
 	            		}
 	            		if ( (aVo.getQuoteTime().getHours()==cal.getTime().getHours()) && (aVo.getQuoteTime().getMinutes()==cal.getTime().getMinutes()) ) {
 	            			currentTotalOptionPrice = currentTotalOptionPrice + aVo.getClosePrice();
 	            			writer.write("," + aVo.getClosePrice()+"," + aVo.getImpliedVolatility() +"," + aVo.getDelta() +"," + aVo.getGamma() +"," + aVo.getVega() +"," + aVo.getTheta()  );
-	            			alldataMap.get(optiononame).remove(0);
+	            			alldataMap.get(optiononame.trim()).remove(0);
 	            		} else {
 	            			log.info("~~~~ Time mismatch aVo.getQuoteTime()"+aVo.getQuoteTime()+" cal.getTime()"+cal.getTime());
 	            			writer.write(",,,,,,");
@@ -3822,7 +3827,18 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ "D-R 1-6 PE AvgIv,"
 					
 					+ "D-R Top 5 CE Delta OI,"
-					+ "D-R Top 5 PE Delta OI"
+					+ "D-R Top 5 PE Delta OI,"
+					
+					+ "ATM CE IV,"
+					+ "ATM PE IV"
+					
+					+ ", fullRangeCETotalIV, fullRangePETotalIV"
+					+ ", dr16CETotalIV, dr16PETotalIV"
+					+ ", dr49CETotalIV, dr49PETotalIV"
+					+ ", dr46CETotalIV, dr46PETotalIV"
+					+ ", dr4PlusCETotalIV, dr4PlusPETotalIV"
+
+            		
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -3874,7 +3890,11 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ " countCETotal, countCEOutlier, countPETotal, countPEOutlier,"
 					+ " dr1_6CEAvgIv, dr1_6PEAvgIv,"
 					
-					+ " ceDeltaOIWorth, peDeltaOIWorth"
+					+ " ceDeltaOIWorth, peDeltaOIWorth,"
+					+ " ceiv, peiv"
+					
+					+ ", fullRangeCETotalIV, fullRangePETotalIV"
+					+ ", dr16CETotalIV, dr16PETotalIV, dr49CETotalIV, dr49PETotalIV, dr46CETotalIV, dr46PETotalIV, dr4PlusCETotalIV, dr4PlusPETotalIV"
 					
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
@@ -3884,6 +3904,10 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			Query q = entityManager.createNativeQuery(fetchSql);	
 			List<Object[]> listResults = q.getResultList();
 			Iterator<Object[]> iter = listResults.iterator();
+			
+			float prevCEStrike = 0f;
+			float prevPEStrike = 0f;
+			
 			while (iter.hasNext()) {
 				Object[] rowdata = iter.next();
 				Date quoteTime = (Timestamp) rowdata[0];
@@ -3964,6 +3988,20 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				float ceDeltaOIWorth = (Float) rowdata[53];
 				float peDeltaOIWorth = (Float) rowdata[54];
 				
+				float ceIV = (Float) rowdata[55];
+				float peIV = (Float) rowdata[56];
+				
+				
+//				if (curCEStrike> 5000f || curCEStrike < -5000f) {
+//					curCEStrike = prevCEStrike;					
+//				} else {
+//					prevCEStrike = curCEStrike;
+//				}
+//				if (curPEStrike > 5000f || curPEStrike < -5000f) {
+//					curPEStrike = prevPEStrike;					
+//				} else {
+//					prevPEStrike = curPEStrike;
+//				}
 				writer.write((postgresFormat.format(quoteTime)+","+indexltp + "," + futuresLtp + "," +  (ceLtp+peLtp)
 						+ "," + cegamma + "," + pegamma + "," + totalCeOi+ "," + totalPeOi
 						+ "," + drCELtp + "," + drPELtp
@@ -3990,6 +4028,13 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + countCETotal + "," + countCEOutlier + "," + countPETotal + "," + countPEOutlier  
 						+ "," + dr1_6CEAvgIv + "," +dr1_6PEAvgIv
 						+"," + ceDeltaOIWorth + "," + peDeltaOIWorth
+						+"," + ceIV + "," + peIV
+						+"," + (Float) rowdata[57] + "," + (Float) rowdata[58]
+								
+						+"," + (Float) rowdata[59] + "," + (Float) rowdata[60]
+						+"," + (Float) rowdata[61] + "," + (Float) rowdata[62]
+						+"," + (Float) rowdata[63] + "," + (Float) rowdata[64]
+						+"," + (Float) rowdata[65] + "," + (Float) rowdata[66]
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();
