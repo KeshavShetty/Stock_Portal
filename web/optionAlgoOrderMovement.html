@@ -27,18 +27,25 @@
 	
 	Highcharts.chart('container1', {
 	  chart: {
-	    type: 'spline'
-	  },
+	    type: 'spline',
+    	zooming: {
+            type: 'x'
+        }
+	  },	  
 	  title: {
 	    text: ' Option Order Movement'
 	  },
 	  subtitle: {
 	    text: 'M2M Profit of Shorting Algo orders ' + forDate
 	  },
+	  xAxis: {
+        crosshair: true
+      },
 	  yAxis: [{ // Primary yAxis
           labels: {
               format: '{value}'
           },
+          crosshair: true,
           opposite: true,
           title: {
               text: 'Index'

@@ -2186,7 +2186,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ " selectiveStrike_AvgCeGamma, selectiveStrike_AvgPeGamma,"
 					+ " futures_Ltp,"
 					+ " selectiveStrike_AvgCeIv, selectiveStrike_AvgPeIv"
-					+ " from db_link_option_atm_movement_data oamd"
+					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
 			
@@ -3702,7 +3702,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ " deltaRangeHybridCEAvgIv, deltaRangeHybridPEAvgIv,"
 					+ " deltaRangeCEvolume1min, deltaRangePEvolume1min"
 					
-					+ " from db_link_option_atm_movement_data oamd"
+					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
 			
