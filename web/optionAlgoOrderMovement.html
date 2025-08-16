@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>Option Price Spikes View</title>
+  <title>Option Algo Order Movement</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -62,7 +62,7 @@
       }],
 	  data: {
 	    csvURL: 'http://localhost/portal/chart/OptionAlgoOrderMovementChartQuote?algoIds=' + algoIds + '&forDate='+forDate,
-	    enablePolling: true,
+	    enablePolling: false,
 	    dataRefreshRate: 60
 	  },
 	  series: [

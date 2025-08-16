@@ -2545,7 +2545,10 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
             writer.write(",Total");
             writer.write("\r\n");
             
-            String orderFetchSql = "select id, option_name, algoname, sell_price, entry_time, exit_time from db_link_nexcorio_options_algo_orders where f_strategy in(" + algoIds+") and short_date = '" + postgresShortFormat.format(stdFormat.parse(forDate)) +"' ";
+            String orderFetchSql = "select f1.id, f1.option_name, f1.f_strategy, f1.sell_price, f1.entry_time, f1.exit_time, f1.buy_price"
+            		+ " from fdw_nexcorio_option_algo_orders f1, fdw_nexcorio_options_algo_strategy f2"
+            		+ " where f1.f_strategy=f2.id"
+            		+ " and f1.f_strategy in(" + algoIds+") and short_date = '" + postgresShortFormat.format(stdFormat.parse(forDate)) +"' ";
             
 			log.info("orderFetchSql "+orderFetchSql);
 			List<OptionAlgoOrderDto> runningOrders = new ArrayList<OptionAlgoOrderDto>();
@@ -2556,12 +2559,12 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				Object[] rowdata = iter.next();
 				Long id= ((BigInteger) rowdata[0]).longValue();
 				String optionName = (String) rowdata[1];
-				String algoname= (String) rowdata[2];
+				String algoname= (BigInteger) rowdata[2] +"";
 				float sellPrice = (Float) rowdata[3];
 				Date entryTime = (Timestamp) rowdata[4];
 				Date exitTime = (Timestamp) rowdata[5];
-				
-				OptionAlgoOrderDto aDto = new OptionAlgoOrderDto(id, optionName, algoname, sellPrice, entryTime, exitTime);
+				float buyPrice = (Float) rowdata[6];
+				OptionAlgoOrderDto aDto = new OptionAlgoOrderDto(id, optionName, algoname, sellPrice, entryTime, exitTime, buyPrice);
 				runningOrders.add(aDto);
 			}
 			
@@ -2574,10 +2577,12 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			
 			cal.set(Calendar.HOUR_OF_DAY, 9);
 			cal.set(Calendar.MINUTE, 16);
-			Map<String, Float> allOrderPrice = new HashMap<String, Float>();
 			
-            do {            	
-            	String fetchIndexPriceQuery = "select last_traded_price, quote_time from db_link_nexcorio_tick_data where trading_symbol = 'NIFTY' and quote_time < '" + postgresFormat.format(cal.getTime())+ "' order by quote_time desc limit 1"; 
+			
+			List<OptionAlgoOrderDto> exitedOrders = new ArrayList<OptionAlgoOrderDto>();
+            do {
+            	Map<String, Float> allOrderPrice = new HashMap<String, Float>();
+            	String fetchIndexPriceQuery = "select last_traded_price, quote_time from fdw_nexcorio_tick_data where trading_symbol = 'NIFTY' and quote_time < '" + postgresFormat.format(cal.getTime())+ "' order by quote_time desc limit 1"; 
             	q = entityManager.createNativeQuery(fetchIndexPriceQuery);
             	listResults = q.getResultList();
     			iter = listResults.iterator();
@@ -2590,9 +2595,14 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
     			
     			for(int i=runningOrders.size()-1; i>=0;i--) {
     				OptionAlgoOrderDto aOrder = runningOrders.get(i);
+    				
+    				if (aOrder.getExitTime()!=null && aOrder.getExitTime().before(cal.getTime()) ) {
+    					exitedOrders.add(aOrder);
+    					runningOrders.remove(i);
+    				}
+    				
     				if (aOrder.getEntryTime().before(cal.getTime()) && aOrder.getExitTime().after(cal.getTime()) ) {
-    					
-    					String optionPriceQuery = "select last_traded_price, quote_time from db_link_nexcorio_tick_data where trading_symbol = '" + aOrder.getOptionName()+ "' and quote_time<'" + postgresFormat.format(cal.getTime()) + "' order by quote_time desc limit 1";
+    					String optionPriceQuery = "select last_traded_price, quote_time from fdw_nexcorio_tick_data where trading_symbol = '" + aOrder.getOptionName()+ "' and quote_time<'" + postgresFormat.format(cal.getTime()) + "' order by quote_time desc limit 1";    					
     					q = entityManager.createNativeQuery(optionPriceQuery);
     	            	listResults = q.getResultList();
     	    			iter = listResults.iterator();
@@ -2602,11 +2612,16 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
     	    				optionPrice = (Float) rowdata[0];
     	    			}
     	    			float profit = aOrder.getSellPrice() - optionPrice;
-    	    			allOrderPrice.put(aOrder.getAlgoname()+"ID"+aOrder.getId(), profit);
+    	    			float profitFromAllOrders = allOrderPrice.get(aOrder.getAlgoname()+"ID")!=null? allOrderPrice.get(aOrder.getAlgoname()+"ID"):0f;
+    	    			allOrderPrice.put(aOrder.getAlgoname()+"ID", profitFromAllOrders+profit);
     				}
-    				if (aOrder.getExitTime()!=null && aOrder.getExitTime().before(cal.getTime()) ) {
-    					runningOrders.remove(i);
-    				}
+    			}
+    			for(int i=0; i < exitedOrders.size(); i++) {
+    				OptionAlgoOrderDto aOrder = exitedOrders.get(i);
+    				
+    				float profit = aOrder.getSellPrice() - aOrder.getBuyPrice();
+	    			float profitFromAllOrders = allOrderPrice.get(aOrder.getAlgoname()+"ID")!=null? allOrderPrice.get(aOrder.getAlgoname()+"ID"):0f;
+	    			allOrderPrice.put(aOrder.getAlgoname()+"ID", profitFromAllOrders+profit);
     			}
     			float totalProfit = 0f;
     			for(String algoname : allAlgoIds) {
@@ -3838,7 +3853,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ ", dr46CETotalIV, dr46PETotalIV"
 					+ ", dr4PlusCETotalIV, dr4PlusPETotalIV"
 
-            		
+					+ ", outlierCEMinIV, outlierPEMinIV, outlierCEMaxIV, outlierPEMaxIV, outlierCETotalIV, outlierPETotalIV, outlierCEAvgIV, outlierPEAvgIV, outlierCEMedianIV, outlierPEMedianIV"
+					+ ", CE (Median-Min), PE (Median-Min) "
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -3895,6 +3911,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					
 					+ ", fullRangeCETotalIV, fullRangePETotalIV"
 					+ ", dr16CETotalIV, dr16PETotalIV, dr49CETotalIV, dr49PETotalIV, dr46CETotalIV, dr46PETotalIV, dr4PlusCETotalIV, dr4PlusPETotalIV"
+					
+					+ ", outlierCEMinIV, outlierPEMinIV, outlierCEMaxIV, outlierPEMaxIV, outlierCETotalIV, outlierPETotalIV, outlierCEAvgIV, outlierPEAvgIV, outlierCEMedianIV, outlierPEMedianIV"
 					
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
@@ -4035,6 +4053,13 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+"," + (Float) rowdata[61] + "," + (Float) rowdata[62]
 						+"," + (Float) rowdata[63] + "," + (Float) rowdata[64]
 						+"," + (Float) rowdata[65] + "," + (Float) rowdata[66]
+								
+						+"," + (Float) rowdata[67] + "," + (Float) rowdata[68]
+						+"," + (Float) rowdata[69] + "," + (Float) rowdata[70]
+						+"," + (Float) rowdata[71] + "," + (Float) rowdata[72]
+						+"," + (Float) rowdata[73] + "," + (Float) rowdata[74]
+						+"," + (Float) rowdata[75] + "," + (Float) rowdata[76]
+						+"," +	((Float) rowdata[73] -  (Float) rowdata[67]) + "," + ((Float) rowdata[74] -  (Float) rowdata[68])
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();

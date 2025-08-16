@@ -16,6 +16,7 @@ public class OptionAlgoOrderDto implements Serializable {
 	private Long id;
 	private String optionName;
 	private float sellPrice;
+	private float buyPrice;
 	private Date entryTime;
 	private Date exitTime;
 	private String algoname;
@@ -24,7 +25,7 @@ public class OptionAlgoOrderDto implements Serializable {
 		super();
 	}
 
-	public OptionAlgoOrderDto(Long id, String optionName, String algoname, float sellPrice, Date entryTime, Date exitTime) {
+	public OptionAlgoOrderDto(Long id, String optionName, String algoname, float sellPrice, Date entryTime, Date exitTime, float buyPrice) {
 		super();
 		this.id = id;
 		this.optionName = optionName;
@@ -32,6 +33,7 @@ public class OptionAlgoOrderDto implements Serializable {
 		this.sellPrice = sellPrice;
 		this.entryTime = entryTime;
 		this.exitTime = exitTime;
+		this.buyPrice = buyPrice;
 	}
 	
 	public Long getId() {
@@ -80,6 +82,14 @@ public class OptionAlgoOrderDto implements Serializable {
 
 	public void setAlgoname(String algoname) {
 		this.algoname = algoname;
+	}
+
+	public float getBuyPrice() {
+		return buyPrice;
+	}
+
+	public void setBuyPrice(float buyPrice) {
+		this.buyPrice = buyPrice;
 	}
 
 	

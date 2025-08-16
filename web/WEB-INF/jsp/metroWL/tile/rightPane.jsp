@@ -60,10 +60,7 @@
 												<a href="javascript:void(0)" onclick="javascript:switchToPage('ChartPage');">
 													Java Chart(Embed)
 												</a>
-											</li>
-											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
-												<a href="<%=request.getContextPath()%>/optionAlgoOrderMovement.html?indexName=BANKNIFTY&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&algonames=AtmOtmOIROCBasedIndexIronCondOr-baseDelta0.5-cutoffPercent5.0" target="_blank">Nifty Bank Algo Order Movement</a>
-											</li>
+											</li>											
 											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
 												<a href="<%=request.getContextPath()%>/optionGreeksRateOfChange.html?indexName=NIFTY BANK&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&method=ByTopOIs&nooftopois=10&filterOptionWorth=true" target="_blank">Nifty Bank Option Greek ROC</a>
 											</li>
@@ -167,6 +164,9 @@
 												ATM Movement Raw Data Analysis
 												<a href="<%=request.getContextPath()%>/optionATMMovementRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&mainInstrumentId=2" target="_blank">[Nifty]</a>&nbsp;
 												<a href="<%=request.getContextPath()%>/optionATMMovementRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&mainInstrumentId=3" target="_blank">[BN]</a>
+											</li>
+											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
+												<a href="<%=request.getContextPath()%>/optionAlgoOrderMovement.html?indexName=NIFTY&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&algoIds=243" target="_blank">Nifty Algo Order Movement</a>
 											</li>
 											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
 												Delta Range Raw Data Analysis
