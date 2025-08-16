@@ -2522,6 +2522,23 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 		return csvFilename;
 	}
 	
+	private String getAlgoname(Long algoId) {
+		String algoname = "X"+algoId;
+		
+		try {
+			algoname = algoname + "-" + (String)this.entityManager.createNativeQuery("select algoname from fdw_nexcorio_options_algo_strategy where id="+algoId).getSingleResult();
+			
+		} catch (NoResultException e) {
+			e.printStackTrace();
+			log.error(e);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error(e);
+		}
+		
+		return algoname;
+	}
+	
 	public String getPandLOfOrder(String algoIds, String forDate)  throws BusinessException {
 		log.info("In getPandLOfOrder forDate="+forDate);
 		Map<String, List<OptionOI>> oiDataMap = new HashMap<String, List<OptionOI>>();
@@ -2538,7 +2555,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			FileWriter writer = new FileWriter(csvFilename);
             writer.write("QuoteTime,IndexLtp");
             for(String aLgoId : allAlgoIds) {
-            	writer.write(","+aLgoId);
+            	writer.write("," + getAlgoname(Long.parseLong(aLgoId)));
             	if (algonameInQuotesForQuery.length()!=0) algonameInQuotesForQuery = algonameInQuotesForQuery + ",";
             	algonameInQuotesForQuery = algonameInQuotesForQuery + "'" + aLgoId +"'";
             }
