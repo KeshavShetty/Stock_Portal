@@ -2559,7 +2559,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
             	if (algonameInQuotesForQuery.length()!=0) algonameInQuotesForQuery = algonameInQuotesForQuery + ",";
             	algonameInQuotesForQuery = algonameInQuotesForQuery + "'" + aLgoId +"'";
             }
-            writer.write(",Total");
+            writer.write(",Total, NoOfOrders");
             writer.write("\r\n");
             
             String orderFetchSql = "select f1.id, f1.option_name, f1.f_strategy, f1.sell_price, f1.entry_time, f1.exit_time, f1.buy_price"
@@ -2598,6 +2598,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			
 			List<OptionAlgoOrderDto> exitedOrders = new ArrayList<OptionAlgoOrderDto>();
             do {
+            	int noOfOrders = 0;
             	Map<String, Float> allOrderPrice = new HashMap<String, Float>();
             	String fetchIndexPriceQuery = "select last_traded_price, quote_time from fdw_nexcorio_tick_data where trading_symbol = 'NIFTY' and quote_time < '" + postgresFormat.format(cal.getTime())+ "' order by quote_time desc limit 1"; 
             	q = entityManager.createNativeQuery(fetchIndexPriceQuery);
@@ -2631,6 +2632,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
     	    			float profit = aOrder.getSellPrice() - optionPrice;
     	    			float profitFromAllOrders = allOrderPrice.get(aOrder.getAlgoname()+"ID")!=null? allOrderPrice.get(aOrder.getAlgoname()+"ID"):0f;
     	    			allOrderPrice.put(aOrder.getAlgoname()+"ID", profitFromAllOrders+profit);
+    	    			noOfOrders++;
     				}
     			}
     			for(int i=0; i < exitedOrders.size(); i++) {
@@ -2639,6 +2641,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
     				float profit = aOrder.getSellPrice() - aOrder.getBuyPrice();
 	    			float profitFromAllOrders = allOrderPrice.get(aOrder.getAlgoname()+"ID")!=null? allOrderPrice.get(aOrder.getAlgoname()+"ID"):0f;
 	    			allOrderPrice.put(aOrder.getAlgoname()+"ID", profitFromAllOrders+profit);
+	    			noOfOrders++;
     			}
     			float totalProfit = 0f;
     			for(String algoname : allAlgoIds) {
@@ -2657,6 +2660,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
     				} else writer.write("," );
     			}
     			writer.write("," +totalProfit);
+    			writer.write("," +noOfOrders);
     			writer.write("\r\n");
             	cal.add(Calendar.SECOND, 10);
             } while(cal.getTime().before(endTime));
