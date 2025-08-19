@@ -3876,6 +3876,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 
 					+ ", outlierCEMinIV, outlierPEMinIV, outlierCEMaxIV, outlierPEMaxIV, outlierCETotalIV, outlierPETotalIV, outlierCEAvgIV, outlierPEAvgIV, outlierCEMedianIV, outlierPEMedianIV"
 					+ ", CE (Median-Min), PE (Median-Min) "
+					+ ", adjustedCEATMLtp, adjustedPEATMLtp, adjustedCEATMIV, adjustedPEATMIV, adjustedCEATMGamma, adjustedPEATMGamma, adjustedCEATMVega, adjustedPEATMVega, adjustedCEATMTheta, adjustedPEATMTheta"
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -3934,6 +3935,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ ", dr16CETotalIV, dr16PETotalIV, dr49CETotalIV, dr49PETotalIV, dr46CETotalIV, dr46PETotalIV, dr4PlusCETotalIV, dr4PlusPETotalIV"
 					
 					+ ", outlierCEMinIV, outlierPEMinIV, outlierCEMaxIV, outlierPEMaxIV, outlierCETotalIV, outlierPETotalIV, outlierCEAvgIV, outlierPEAvgIV, outlierCEMedianIV, outlierPEMedianIV"
+					+ ", adjustedCEATMLtp, adjustedPEATMLtp, adjustedCEATMIV, adjustedPEATMIV, adjustedCEATMGamma, adjustedPEATMGamma, adjustedCEATMVega, adjustedPEATMVega, adjustedCEATMTheta, adjustedPEATMTheta"
 					
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
@@ -4081,6 +4083,14 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+"," + (Float) rowdata[73] + "," + (Float) rowdata[74]
 						+"," + (Float) rowdata[75] + "," + (Float) rowdata[76]
 						+"," +	((Float) rowdata[73] -  (Float) rowdata[67]) + "," + ((Float) rowdata[74] -  (Float) rowdata[68])
+						
+						
+						+"," + (Float) rowdata[77] + "," + (Float) rowdata[78]
+						+"," + (Float) rowdata[79] + "," + (Float) rowdata[80]
+						+"," + (Float) rowdata[81] + "," + (Float) rowdata[82]
+						+"," + (Float) rowdata[83] + "," + (Float) rowdata[84]
+						+"," + (Float) rowdata[85] + "," + (Float) rowdata[86]
+						
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();
