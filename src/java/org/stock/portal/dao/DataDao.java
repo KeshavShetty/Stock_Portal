@@ -3873,10 +3873,11 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ ", dr49CETotalIV, dr49PETotalIV"
 					+ ", dr46CETotalIV, dr46PETotalIV"
 					+ ", dr4PlusCETotalIV, dr4PlusPETotalIV"
-
+					
 					+ ", outlierCEMinIV, outlierPEMinIV, outlierCEMaxIV, outlierPEMaxIV, outlierCETotalIV, outlierPETotalIV, outlierCEAvgIV, outlierPEAvgIV, outlierCEMedianIV, outlierPEMedianIV"
 					+ ", CE (Median-Min), PE (Median-Min) "
 					+ ", adjustedCEATMLtp, adjustedPEATMLtp, adjustedCEATMIV, adjustedPEATMIV, adjustedCEATMGamma, adjustedPEATMGamma, adjustedCEATMVega, adjustedPEATMVega, adjustedCEATMTheta, adjustedPEATMTheta"
+					+ ", DR 1-9 Whole Strike CE Avg IV, DR 1-9 Whole Strike PE Avg IV"
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -3936,6 +3937,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					
 					+ ", outlierCEMinIV, outlierPEMinIV, outlierCEMaxIV, outlierPEMaxIV, outlierCETotalIV, outlierPETotalIV, outlierCEAvgIV, outlierPEAvgIV, outlierCEMedianIV, outlierPEMedianIV"
 					+ ", adjustedCEATMLtp, adjustedPEATMLtp, adjustedCEATMIV, adjustedPEATMIV, adjustedCEATMGamma, adjustedPEATMGamma, adjustedCEATMVega, adjustedPEATMVega, adjustedCEATMTheta, adjustedPEATMTheta"
+					+ ", dr19WholeStrikeCEAvgIV, dr19WholeStrikePEAvgIV"
 					
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
@@ -4090,6 +4092,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+"," + (Float) rowdata[81] + "," + (Float) rowdata[82]
 						+"," + (Float) rowdata[83] + "," + (Float) rowdata[84]
 						+"," + (Float) rowdata[85] + "," + (Float) rowdata[86]
+								
+						+"," + (Float) rowdata[87] + "," + (Float) rowdata[88]
 						
 						+"\r\n").getBytes());
 			}
