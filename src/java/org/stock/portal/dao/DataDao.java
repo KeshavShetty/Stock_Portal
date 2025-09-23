@@ -3337,95 +3337,77 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 		return expiryDateAsOptionNaming;
 	}
 	
-	public String getIndividualOptionOIData(String indexName, String forDate)  throws BusinessException {
+	public String getIndividualOptionOIData(String indexName, String forDate, String greekname)  throws BusinessException {
 		log.info("In getIndividualOptionOIData indexName="+indexName+" forDate="+forDate);
 		Map<String, List<OptionOI>> oiDataMap = new HashMap<String, List<OptionOI>>();
-		String csvFilename = "D:\\temp\\junk\\OI"+indexName+".csv";
+		String csvFilename = "D:\\temp\\junk\\OI"+indexName + "-" +forDate.replace("/", "-")+ "-"+greekname+".csv";
 		try {
-			//int instrumentToken = indexName.startsWith("NIFTY")? 256265 : 260105; // Bank Nifty
-			int instrumentToken =   indexName.startsWith("NIFTY")? 256265 : indexName.startsWith("BANKNIFTY")?260105:257801; // 257801 for FINNIFTY
-			
-			SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			SimpleDateFormat postgresLongFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			SimpleDateFormat postgresShortFormat = new SimpleDateFormat("yyyy-MM-dd");
 			SimpleDateFormat stdFormat = new SimpleDateFormat("dd/MM/yyyy");
 			
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(stdFormat.parse(forDate));
 			cal.set(Calendar.HOUR_OF_DAY, 9);
-			cal.set(Calendar.MINUTE, 14);
-			String dateStrBegin = postgresFormat.format(cal.getTime());	
+			cal.set(Calendar.MINUTE, 15);
+			String dateStrBegin = postgresLongFormat.format(cal.getTime());	
 			
-			cal.set(Calendar.MINUTE, 45);
-			String endStrikeForSpot = postgresFormat.format(cal.getTime());	
+			cal.set(Calendar.HOUR_OF_DAY, 15);
+			cal.set(Calendar.MINUTE, 30);
+			String dateStrEnd = postgresLongFormat.format(cal.getTime());
 			
-			cal.set(Calendar.HOUR_OF_DAY, 16);			
-			String dateStrEnd = postgresFormat.format(cal.getTime());
+			String fetchSql = "select DISTINCT(trading_symbol) as trading_symbol from fdw_nexcorio_option_snapshot"
+					+ " where trading_symbol like '" + indexName + "%' "
+					+ " and record_date = '" + postgresShortFormat.format(cal.getTime()) + "' ORDER BY trading_symbol";
 			
-			String fetchSql = "select last_traded_price as ltp, quote_time as QuoteTime from zerodha_intraday_streaming_data where instrument_token = " + instrumentToken 
-					+" and quote_time >='" +  dateStrBegin +"'"
-					+" and quote_time <='" +  endStrikeForSpot +"'"
-					+ " order by quote_time desc limit 1";
-			log.info(fetchSql);
+			Query q = entityManager.createNativeQuery(fetchSql);
 			
-			Query q = entityManager.createNativeQuery(fetchSql);	
+			List<String> ceOptionNames = new ArrayList<String>();
+			List<String> peOptionNames = new ArrayList<String>();
+			
 			List<Object[]> listResults = q.getResultList();
-			Iterator<Object[]> iter = listResults.iterator();
-			
-			int spotPrice = 0;
-			while (iter.hasNext()) {
-				Object[] rowdata = iter.next();
-				spotPrice = ((Float)rowdata[0]).intValue();
+			Iterator iter2 = listResults.iterator();
+			while (iter2.hasNext()) {
+				String tradingSymbol = (String) iter2.next();
+				if (tradingSymbol.endsWith("CE")) ceOptionNames.add(tradingSymbol);
+				else peOptionNames.add(tradingSymbol);
 			}
-			log.info("spotPrice="+spotPrice);
-			
-			spotPrice = spotPrice/100; // To drop last 2 digit
-			spotPrice = spotPrice*100;
 			
 			List<String> optionNames = new ArrayList<String>();
-			String expirtStr = "BANKNIFTY22O20" ; //"BANKNIFTY22SEP"; //"BANKNIFTY22922"; // Hardcoded	 // BANKNIFTY22O0638200CE	BANKNIFTY22O0638200CE
-			String currentExprStr = getNextExpiryDateForOptionnameStr(indexName, cal.getTime());
 			
-			String fetchExpiryDatePrefixStr = "select trading_symbol from zerodha_intraday_streaming_data where trading_symbol like '" + indexName + currentExprStr+ "%E' and quote_time  >='" +  dateStrBegin + "' and quote_time <= '" + endStrikeForSpot + "' and openinterest>0 limit 1";			
-			log.info(fetchExpiryDatePrefixStr);
-			
-			q = entityManager.createNativeQuery(fetchExpiryDatePrefixStr);	
-			listResults = q.getResultList();
-			iter = listResults.iterator();
-			
-			while (iter.hasNext()) {
-				Object rowdata = iter.next();
-				expirtStr = (String)rowdata;
-				expirtStr = expirtStr.substring(0, expirtStr.length()-7);
+			for(int i=ceOptionNames.size()/2+2;i<ceOptionNames.size()/2+12;i++) {
+				optionNames.add(ceOptionNames.get(i));
 			}
-			log.info("expirtStr="+expirtStr);
-			
-			
-			int nearesrtStrikeprice = spotPrice;
-			for(int i=-4;i<20;i++) {
-				int nextStrike = nearesrtStrikeprice + i*(indexName.startsWith("NIFTY")||indexName.startsWith("FINNIFTY")?50:100);
-				optionNames.add(expirtStr+nextStrike+"CE");
+			for(int i=peOptionNames.size()/2+2;i<peOptionNames.size()/2+12;i++) {
+				optionNames.add(peOptionNames.get(i));
 			}
-			// PE
-			for(int i=-4;i<20;i++) {
-				int nextStrike = nearesrtStrikeprice - i*(indexName.startsWith("NIFTY")||indexName.startsWith("FINNIFTY")?50:100);
-				optionNames.add(expirtStr+nextStrike+"PE");
-			}
-			log.info(optionNames);
+			
 			List<String> timeKeys = new ArrayList<String>();
+			fetchSql = "select trading_symbol, quote_time, oi, iv, delta, vega, theta, gamma from fdw_nexcorio_option_greeks where trading_symbol in (" + getQuotesString(optionNames) + ")"
+					+ " and quote_time > '" + dateStrBegin +"' and quote_time < '" + dateStrEnd + "' order by quote_time";
 			
-			fetchSql = "select trading_symbol, quote_time, openinterest from zerodha_intraday_streaming_data where trading_symbol in (" + getQuotesString(optionNames) + ") and quote_time > '" + dateStrBegin +"' and quote_time < '" + dateStrEnd + "' order by quote_time";
-			//fetchSql = "select trading_symbol, quote_time, openinterest from zerodha_intraday_streaming_data where trading_symbol like '" + indexName + "%E' and quote_time > '" + dateStrBegin +"' and quote_time < '" + dateStrEnd + "' order by quote_time";
-			log.info("fetchSql "+fetchSql);
 			q = entityManager.createNativeQuery(fetchSql);	
 			listResults = q.getResultList();
-			iter = listResults.iterator();
+			
+			log.info("Fetching done");
+			
+			Iterator<Object[]> iter = listResults.iterator();
 			while (iter.hasNext()) {
 				Object[] rowdata = iter.next();
 				String tradingSymbol = (String)rowdata[0];
 				Date quoteTime = (Timestamp) rowdata[1];
-				float openInterest = (Float) rowdata[2];
-				if (quoteTime.getSeconds()==0) {
-					OptionOI optionOI = new OptionOI(tradingSymbol, openInterest, quoteTime);
-					String mapTimeKey = postgresFormat.format(quoteTime);
+				
+				float greekValue = (Float) rowdata[2]; //oi
+				if (greekname.equals("iv")) greekValue = (Float) rowdata[3];
+				else if (greekname.equals("gamma")) greekValue = (Float) rowdata[4];
+				else if (greekname.equals("gammaExposure")) {
+					if (tradingSymbol.endsWith("CE")) greekValue = (Float) rowdata[2]*(Float) rowdata[4];
+					else greekValue = - (Float) rowdata[2]*(Float) rowdata[4];
+				}
+				
+				//if (quoteTime.getSeconds()%5==0) {
+					OptionOI optionOI = new OptionOI(tradingSymbol, greekValue, quoteTime);
+					String mapTimeKey = postgresLongFormat.format(quoteTime);
 					List<OptionOI> dataList = oiDataMap.get(mapTimeKey);
 					if (dataList==null)  {
 						dataList = new ArrayList<OptionOI>();
@@ -3433,7 +3415,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					}
 					dataList.add(optionOI);
 					oiDataMap.put(mapTimeKey, dataList);
-				}
+				//}
 			}
 			// Write to xls
 			
@@ -3878,6 +3860,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ ", CE (Median-Min), PE (Median-Min) "
 					+ ", adjustedCEATMLtp, adjustedPEATMLtp, adjustedCEATMIV, adjustedPEATMIV, adjustedCEATMGamma, adjustedPEATMGamma, adjustedCEATMVega, adjustedPEATMVega, adjustedCEATMTheta, adjustedPEATMTheta"
 					+ ", DR 1-9 Whole Strike CE Avg IV, DR 1-9 Whole Strike PE Avg IV"
+					+ ", Total Change In CE IV, Total Change In PE IV"
+					+ ", Min GammaExposure, Max GammaExposure, Net GammaExposure"
+					+ ", Whole Strike CE DeltaOI, Whole Strike PE DeltaOI"
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -3938,7 +3923,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ ", outlierCEMinIV, outlierPEMinIV, outlierCEMaxIV, outlierPEMaxIV, outlierCETotalIV, outlierPETotalIV, outlierCEAvgIV, outlierPEAvgIV, outlierCEMedianIV, outlierPEMedianIV"
 					+ ", adjustedCEATMLtp, adjustedPEATMLtp, adjustedCEATMIV, adjustedPEATMIV, adjustedCEATMGamma, adjustedPEATMGamma, adjustedCEATMVega, adjustedPEATMVega, adjustedCEATMTheta, adjustedPEATMTheta"
 					+ ", dr19WholeStrikeCEAvgIV, dr19WholeStrikePEAvgIV"
-					
+					+ ", totalChangeInCEIV, totalChangeInPEIV"
+					+ ", minGammaExposure, maxGammaExposure, netGammaExposure"
+					+ ", wholeStrikeCEDeltaOI, wholeStrikePEDeltaOI"
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
@@ -4094,7 +4081,11 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+"," + (Float) rowdata[85] + "," + (Float) rowdata[86]
 								
 						+"," + (Float) rowdata[87] + "," + (Float) rowdata[88]
-						
+						+"," + (Float) rowdata[89] + "," + (Float) rowdata[90]
+								
+						+"," + (Float) rowdata[91] + "," + (Float) rowdata[92] + "," + (Float) rowdata[93]
+						+"," + (Float) rowdata[94] + "," + (Float) rowdata[95]
+										
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();

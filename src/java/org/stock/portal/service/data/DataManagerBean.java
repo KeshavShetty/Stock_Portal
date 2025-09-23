@@ -473,8 +473,8 @@ public class DataManagerBean implements DataManager {
     }
 
     @TransactionAttribute( TransactionAttributeType.SUPPORTS )
-    public String getIndividualOptionOIData(String indexName, String forDate) throws BusinessException {
-    	return (new DataDao(entityManager)).getIndividualOptionOIData(indexName, forDate);    	
+    public String getIndividualOptionOIData(String indexName, String forDate, String greekname) throws BusinessException {
+    	return (new DataDao(entityManager)).getIndividualOptionOIData(indexName, forDate, greekname);    	
     }
     
     @TransactionAttribute( TransactionAttributeType.SUPPORTS )

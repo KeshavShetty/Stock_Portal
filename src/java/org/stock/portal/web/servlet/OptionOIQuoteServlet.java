@@ -43,8 +43,9 @@ public class OptionOIQuoteServlet extends HttpServlet
 	        DataManager dataManager = (DataManager)ServiceLocator.getInstance().getServiceFacade(DataManager.class);	        
 	        String indexName = request.getParameter("indexName");
 	        String forDate = request.getParameter("forDate");
+	        String greekname = request.getParameter("greekname");
 	        
-	        String csvFilename = dataManager.getIndividualOptionOIData(indexName, forDate);	   
+	        String csvFilename = dataManager.getIndividualOptionOIData(indexName, forDate, greekname);	   
 	        
 	        InputStream is = null;
 	        is = new FileInputStream(csvFilename);

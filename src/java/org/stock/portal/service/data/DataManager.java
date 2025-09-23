@@ -73,7 +73,7 @@ public interface DataManager {
 	
 	public List<ScripEOD> getZerodhaCandleMinuteData(String symbol, String dataDate)throws BusinessException;
 
-	public String getIndividualOptionOIData(String indexName, String forDate) throws BusinessException;
+	public String getIndividualOptionOIData(String indexName, String forDate, String greekname) throws BusinessException;
 	
 	public String getOISpikeData(String indexName, String forDate,int nooftopois,boolean filterOptionWorth) throws BusinessException;
 	
