@@ -3925,7 +3925,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ ", dr19WholeStrikeCEAvgIV, dr19WholeStrikePEAvgIV"
 					+ ", totalChangeInCEIV, totalChangeInPEIV"
 					+ ", minGammaExposure, maxGammaExposure, netGammaExposure"
-					+ ", wholeStrikeCEDeltaOI, wholeStrikePEDeltaOI"
+					//+ ", wholeStrikeCEDeltaOI, wholeStrikePEDeltaOI"
+					+ ", minGammaExposureStrike, maxGammaExposureStrike"
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
