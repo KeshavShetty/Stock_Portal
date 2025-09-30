@@ -3794,6 +3794,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			ByteArrayOutputStream writer = new ByteArrayOutputStream(); // writer = new FileWriter(csvFilename);
             writer.write(("QuoteTime,IndexAt,Futures Ltp,"
             		+ "Straddle Premium,"
+            		+ "Adj. Straddle Premium,"
             		+ "CE Gamma, PE Gamma,"
             		+ "Avg CE IV, Avg PE IV,"
             		+ "D-R CE Avg-Ltp,"
@@ -3862,6 +3863,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ ", DR 1-9 Whole Strike CE Avg IV, DR 1-9 Whole Strike PE Avg IV"
 					+ ", Total Change In CE IV, Total Change In PE IV"
 					+ ", Min GammaExposure, Max GammaExposure, Net GammaExposure"
+					+ ", ChangeIn 5Sec CE IV, ChangeIn 5Sec PE IV "
 					+ ", Whole Strike CE DeltaOI, Whole Strike PE DeltaOI"
             		+ "\r\n").getBytes());
             
@@ -3925,8 +3927,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ ", dr19WholeStrikeCEAvgIV, dr19WholeStrikePEAvgIV"
 					+ ", totalChangeInCEIV, totalChangeInPEIV"
 					+ ", minGammaExposure, maxGammaExposure, netGammaExposure"
-					//+ ", wholeStrikeCEDeltaOI, wholeStrikePEDeltaOI"
-					+ ", minGammaExposureStrike, maxGammaExposureStrike"
+					+ ", changein5secCeIV, changein5secPeIV"
+					+ ", wholeStrikeCEDeltaOI, wholeStrikePEDeltaOI"
+					//+ ", minGammaExposureStrike, maxGammaExposureStrike"
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
@@ -4023,6 +4026,13 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				float peIV = (Float) rowdata[56];
 				
 				
+				// 77 adjusted CE Ltp abd PE Ltp
+				float adjustedATMCeLtp = (Float) rowdata[77];
+				float adjustedATMPeLtp = (Float) rowdata[78];
+				
+				float straddlePremium = ceLtp+peLtp;
+				float adjustedStraddlePremium = adjustedATMCeLtp + adjustedATMPeLtp;
+				
 //				if (curCEStrike> 5000f || curCEStrike < -5000f) {
 //					curCEStrike = prevCEStrike;					
 //				} else {
@@ -4033,7 +4043,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 //				} else {
 //					prevPEStrike = curPEStrike;
 //				}
-				writer.write((postgresFormat.format(quoteTime)+","+indexltp + "," + futuresLtp + "," +  (ceLtp+peLtp)
+				writer.write((postgresFormat.format(quoteTime)+","+indexltp + "," + futuresLtp + "," +  straddlePremium + "," + adjustedStraddlePremium
 						+ "," + cegamma + "," + pegamma + "," + totalCeOi+ "," + totalPeOi
 						+ "," + drCELtp + "," + drPELtp
 						+ "," + drCEIV + "," + drPEIV
@@ -4075,7 +4085,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+"," +	((Float) rowdata[73] -  (Float) rowdata[67]) + "," + ((Float) rowdata[74] -  (Float) rowdata[68])
 						
 						
-						+"," + (Float) rowdata[77] + "," + (Float) rowdata[78]
+						//+"," + (Float) rowdata[77] + "," + (Float) rowdata[78]
+						+"," + 	adjustedATMCeLtp + "," + adjustedATMPeLtp
 						+"," + (Float) rowdata[79] + "," + (Float) rowdata[80]
 						+"," + (Float) rowdata[81] + "," + (Float) rowdata[82]
 						+"," + (Float) rowdata[83] + "," + (Float) rowdata[84]
@@ -4086,6 +4097,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 								
 						+"," + (Float) rowdata[91] + "," + (Float) rowdata[92] + "," + (Float) rowdata[93]
 						+"," + (Float) rowdata[94] + "," + (Float) rowdata[95]
+						+"," + (Float) rowdata[96] + "," + (Float) rowdata[97]
 										
 						+"\r\n").getBytes());
 			}
