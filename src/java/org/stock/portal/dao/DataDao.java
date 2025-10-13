@@ -3865,6 +3865,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ ", Min GammaExposure, Max GammaExposure, Net GammaExposure"
 					+ ", ChangeIn 5Sec CE IV, ChangeIn 5Sec PE IV "
 					+ ", Whole Strike CE DeltaOI, Whole Strike PE DeltaOI"
+					+ ", Accumulated 5Sec CE IV Change,Accmltd 5Sec PE IV Change"
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -3929,7 +3930,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ ", minGammaExposure, maxGammaExposure, netGammaExposure"
 					+ ", changein5secCeIV, changein5secPeIV"
 					+ ", wholeStrikeCEDeltaOI, wholeStrikePEDeltaOI"
-					//+ ", minGammaExposureStrike, maxGammaExposureStrike"
+					+ ", accumulatedChangein5secCeIV, accumulatedChangein5secPeIV"
+					//+ ", accumulatedTop5EachTypeChangein5secCeIV, accumulatedTop5EachTypeChangein5secPeIV"
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
@@ -3941,6 +3943,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			
 			float prevCEStrike = 0f;
 			float prevPEStrike = 0f;
+			
+			float accumulatedChangein5secCeIV = 0f;
+			float accumulatedChangein5secPeIV = 0f;
 			
 			while (iter.hasNext()) {
 				Object[] rowdata = iter.next();
@@ -4043,6 +4048,10 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 //				} else {
 //					prevPEStrike = curPEStrike;
 //				}
+				
+				accumulatedChangein5secCeIV = accumulatedChangein5secCeIV + (Float) rowdata[94];
+				accumulatedChangein5secPeIV = accumulatedChangein5secPeIV + (Float) rowdata[95];
+				
 				writer.write((postgresFormat.format(quoteTime)+","+indexltp + "," + futuresLtp + "," +  straddlePremium + "," + adjustedStraddlePremium
 						+ "," + cegamma + "," + pegamma + "," + totalCeOi+ "," + totalPeOi
 						+ "," + drCELtp + "," + drPELtp
@@ -4098,7 +4107,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+"," + (Float) rowdata[91] + "," + (Float) rowdata[92] + "," + (Float) rowdata[93]
 						+"," + (Float) rowdata[94] + "," + (Float) rowdata[95]
 						+"," + (Float) rowdata[96] + "," + (Float) rowdata[97]
-										
+						//+"," + accumulatedChangein5secCeIV + "," + accumulatedChangein5secPeIV
+						+"," + (Float) rowdata[98] + "," + (Float) rowdata[99]
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();
