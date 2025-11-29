@@ -3868,6 +3868,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					+ ", Accumulated 5Sec CE IV Change,Accmltd 5Sec PE IV Change"
 					+ ", minGammaExposureWithStrike, maxGammaExposureWithStrike, NetGammaExposureWithStrike"
 					+ ", minGammaExposureTopN, maxGammaExposureTopN, NetGammaExposureTopN"
+					+ ", Res DR CE Avg IV, Res DR PE Avg IV"
+					+ ", Cum. CE Avg IV Diff, Cum. PE Avg IV Diff"
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -3936,6 +3938,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					//+ ", accumulatedTop5EachTypeChangein5secCeIV, accumulatedTop5EachTypeChangein5secPeIV"
 					+ ", minGammaExposureWithStrike, maxGammaExposureWithStrike, netGammaExposureWithStrike"
 					+ ", minGammaExposureTopN, maxGammaExposureTopN, netGammaExposureTopN"
+					+ ", resDeltaRangeCEAvgIv, resDeltaRangePEAvgIv"
+					+ ", cumulativeCEAvgIVDiff, cumulativePEAvgIVDiff"
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
@@ -4115,6 +4119,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+"," + (Float) rowdata[98] + "," + (Float) rowdata[99]
 						+"," + (Float) rowdata[100] + "," + (Float) rowdata[101]+ "," + (Float) rowdata[102]
 						+"," + (Float) rowdata[103] + "," + (Float) rowdata[104]+ "," + (Float) rowdata[105]
+						+"," + (Float) rowdata[106] + "," + (Float) rowdata[107]
+						+"," + (Float) rowdata[108] + "," + (Float) rowdata[109]
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();
