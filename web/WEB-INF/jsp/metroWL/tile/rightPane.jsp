@@ -183,6 +183,16 @@
 												<a href="<%=request.getContextPath()%>/optionDeltaRangeRawDataAnalysisChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Bharti&mainInstrumentId=10" target="_blank">[Bharti]</a>
 												
 											</li>
+											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
+												Options Insight
+												<a href="<%=request.getContextPath()%>/optionsInsightChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Nifty&mainInstrumentId=2" target="_blank">[Nifty]</a>&nbsp;
+												<a href="<%=request.getContextPath()%>/optionsInsightChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Bank Nifty&mainInstrumentId=3" target="_blank">[BN]</a>
+												<a href="<%=request.getContextPath()%>/optionsInsightChart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Sensex&mainInstrumentId=4" target="_blank">[Sensex]</a>
+											</li>
+											
+											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
+												<a href="<%=request.getContextPath()%>/optionsDrawdownChart.html?fromDate=01/09/2025&toDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&strategyIds=9751,9685" target="_blank">[Option DD Chart]</a>&nbsp;
+											</li>
 										</ul>
 									</div>
 								</div>

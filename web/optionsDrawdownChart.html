@@ -1,0 +1,124 @@
+<html>
+<head>
+  <title>Options Drawdown chart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/data.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+
+<div id="container1" style="min-width: 310px; height: 700px; margin: 0 auto; border-style: solid;"></div>
+
+<script type='text/javascript'>
+
+	function getQueryParameter(name){
+	  const parts = window.location.href.split('?');
+	  if (parts.length > 1) {
+	    name = encodeURIComponent(name);
+	    const params = parts[1].split('&');
+	    const found = params.filter(el => (el.split('=')[0] === name) && el);
+	    if (found.length) return decodeURIComponent(found[0].split('=')[1]);
+	  }
+	}
+	
+	var fromDate = getQueryParameter("fromDate");
+	var toDate = getQueryParameter("toDate");
+	var strategyIds = getQueryParameter("strategyIds");
+	
+	Highcharts.chart('container1', {
+	  chart: {
+	    type: 'spline',
+	    zooming: {
+            type: 'x'
+        }
+	  },
+	  title: {
+	    text: ' Options Drawdown'
+	  },
+	  scrollbar: {
+          enabled: true,
+          barBackgroundColor: 'gray',
+          barBorderRadius: 7,
+          barBorderWidth: 0,
+          buttonBackgroundColor: 'gray',
+          buttonBorderWidth: 0,
+          buttonArrowColor: 'yellow',
+          buttonBorderRadius: 7,
+          rifleColor: 'yellow',
+          trackBackgroundColor: 'white',
+          trackBorderWidth: 1,
+          trackBorderColor: 'silver',
+          trackBorderRadius: 7
+      },
+	  xAxis: {
+        crosshair: true,
+        scrollbar: {
+            enabled: true
+        }
+      },
+	  yAxis: [{ // Primary yAxis
+          labels: {
+              format: '{value}'
+          },
+          crosshair: true,
+          opposite: true,
+          title: {
+              text: 'Index'
+          }
+      }, { // Secondary yAxis
+          gridLineWidth: 0,
+          crosshair: true,
+          labels: {
+              format: '{value}'
+          },title: {
+              text: 'Time Value'
+          },
+          plotLines: [{
+              color: 'red',
+              width: 2,
+              value: 0,
+              dashStyle: 'longdashdot'}]
+      }, { // Third yAxis
+          gridLineWidth: 0,
+          crosshair: true,
+          labels: {
+              format: '{value}'
+          },title: {
+              text: 'Percent Diff'
+          },
+          plotLines: [{
+              color: 'red',
+              width: 2,
+              value: 0,
+              dashStyle: 'longdashdot'}]
+      },{ // fourth yAxis
+          gridLineWidth: 0,
+          crosshair: true,
+          labels: {
+              format: '{value}'
+          },title: {
+              text: 'Gamma'
+          },
+          plotLines: [{
+              color: 'red',
+              width: 2,
+              value: 0,
+              dashStyle: 'longdashdot'}]
+      }],
+	  data: {
+	    csvURL: '/chart/OptionsDrawdownChartQuote?fromDate=' + fromDate+ '&toDate='+ toDate + '&strategyIds='+strategyIds,
+	    enablePolling: false,
+	    dataRefreshRate: 60
+	  },
+	  series: [
+		  { yAxis: 2, color: '#5dade2', visible: false},
+		  { yAxis: 2, color: '#58d68d'},
+		  { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#58d68d', visible: false}
+		  
+		 ]
+	});
+  </script>
+</body>
+</html>

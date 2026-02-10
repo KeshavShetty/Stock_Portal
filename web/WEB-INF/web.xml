@@ -145,7 +145,17 @@
 	    <load-on-startup>0</load-on-startup>
 	</servlet>
 	
+	<servlet>
+	    <servlet-name>OptionsInsightChartQuoteServlet</servlet-name>
+	    <servlet-class>org.stock.portal.web.servlet.OptionsInsightChartQuoteServlet</servlet-class>
+	    <load-on-startup>0</load-on-startup>
+	</servlet>
 	
+	<servlet>
+	    <servlet-name>OptionsDrawdownChartQuoteServlet</servlet-name>
+	    <servlet-class>org.stock.portal.web.servlet.OptionsDrawdownChartQuoteServlet</servlet-class>
+	    <load-on-startup>0</load-on-startup>
+	</servlet>
 	
 	<servlet>
 	    <servlet-name>Option1MPremiumDecayChartQuoteServlet</servlet-name>
@@ -343,6 +353,16 @@
 	    <servlet-name>OptionGreeksMovementAnalysisChartQuoteServlet</servlet-name>
 	    <url-pattern>/chart/OptionGreeksMovementAnalysisChartQuote</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+	    <servlet-name>OptionsInsightChartQuoteServlet</servlet-name>
+	    <url-pattern>/chart/OptionsInsightChartQuote</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+	    <servlet-name>OptionsDrawdownChartQuoteServlet</servlet-name>
+	    <url-pattern>/chart/OptionsDrawdownChartQuote</url-pattern>
+	</servlet-mapping>
+	
 	
 	<servlet-mapping>
 	    <servlet-name>Option1MPremiumDecayChartQuoteServlet</servlet-name>
