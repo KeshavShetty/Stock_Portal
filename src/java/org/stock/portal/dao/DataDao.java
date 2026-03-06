@@ -4,8 +4,6 @@ package org.stock.portal.dao;
 import java.io.ByteArrayOutputStream;
 import java.io.FileWriter;
 import java.math.BigInteger;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -16,9 +14,12 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalDouble;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -41,6 +42,7 @@ import org.stock.portal.domain.TreePerformance;
 import org.stock.portal.domain.ZeordhaDomVO;
 import org.stock.portal.domain.dto.IntradaySummarySearchCriteriaDTO;
 import org.stock.portal.domain.dto.OptionAlgoOrderDto;
+import org.stock.portal.domain.dto.OptionGreek;
 import org.stock.portal.domain.dto.OptionOI;
 import org.stock.portal.domain.dto.OptionSummaryDto;
 import org.stock.portal.domain.dto.ScripEOD;
@@ -48,7 +50,6 @@ import org.stock.portal.domain.dto.ScripPerformanceDTO;
 import org.stock.portal.domain.dto.ZerodhaOptionCandleVO;
 import org.stock.portal.domain.metroWL.dto.IntradaySnapshotSearchCriteriaDTO;
 import org.stock.portal.domain.metroWL.dto.PastAchieversSearchCriteriaDTO;
-
 
 /**
  * 
@@ -3267,7 +3268,6 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 	private String getNextExpiryDateForOptionnameStr(String indexname, Date forDate) {
 		String expiryDateAsOptionNaming = null;
 		
-		Connection conn = null;
 		try {
 			
 			String fetchSql = "SELECT expiry_date from option_expiry_dates where index_short_name = '" + indexname + "' order by expiry_date";
@@ -4174,7 +4174,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			SimpleDateFormat stdFormat = new SimpleDateFormat("dd/MM/yyyy");
 			
 			ByteArrayOutputStream writer = new ByteArrayOutputStream(); // writer = new FileWriter(csvFilename);
-            writer.write(("Date,Daily Profit, CumulativeGain, +ve Streak, -ve Streak\r\n").getBytes());
+            writer.write(("Date,Daily Profit, CumulativeGain, +ve Streak, -ve Streak,DD\r\n").getBytes());
             
             int noOfStrategies = strategyIds.split(",").length;
             
@@ -4192,7 +4192,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			
 			Double winningStrekAmount = 0d;
 			Double losingStrekAmount = 0d;
-			
+			Double ath = 0d;
 			while (iter.hasNext()) {
 				Object[] rowdata = iter.next();
 				Date quoteTime = (Date) rowdata[0];
@@ -4206,7 +4206,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					losingStrekAmount = losingStrekAmount + profit;
 					winningStrekAmount = 0d;
 				}
-				writer.write((postgresShortFormat.format(quoteTime)+"," + profit + "," + accumulatedProfit + "," + winningStrekAmount + "," + losingStrekAmount + "\r\n").getBytes());
+				if (accumulatedProfit > ath) ath = accumulatedProfit;
+				writer.write((postgresShortFormat.format(quoteTime)+"," + profit + "," + accumulatedProfit + "," + winningStrekAmount + "," + losingStrekAmount + "," + (accumulatedProfit-ath) + "\r\n").getBytes());
 			}
 			
 			retArray = writer.toByteArray();
@@ -4217,49 +4218,227 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 		return retArray;
 	}
 	
+	public byte[] getOptionGreeksSnapshot(String instrument, String forDateTime, boolean excludeOddStrikes, float startingDelta) throws BusinessException {
+		byte[] retArray = null;
+		try {
+			SimpleDateFormat postgresShortFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat stdFormat = new SimpleDateFormat("dd/MM/yyyy");
+			SimpleDateFormat regularLongFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			
+			Calendar cal = Calendar.getInstance();
+			if (forDateTime != null && forDateTime.trim().length() > 0 ) {
+				cal.setTime(regularLongFormat.parse(forDateTime));
+			} else {
+				
+			}
+			
+			ByteArrayOutputStream writer = new ByteArrayOutputStream(); // writer = new FileWriter(csvFilename);
+            writer.write(("Strike,CE Ltp, PE Ltp,CE IV, PE IV, CE Delta, PE Delta,CE Gamma, PE Gamma, CE Vega, PE Vega, CE Theta, PE Theta, CE OI, PE OI, CE Gamma Exp, PE Gamma Exp \r\n").getBytes());
+            
+            
+            List<String> optionnames = new ArrayList<>();
+            
+            // First try to fetch from Snapshot table
+         	String fetchSql = "select trading_symbol as trading_symbol, strike from fdw_nexcorio_option_snapshot"
+         			+ " where trading_symbol like '" + instrument + "%' "
+         			+ " and record_date = '" + postgresShortFormat.format(cal.getTime()) + "'";
+         			
+         	Query q = entityManager.createNativeQuery(fetchSql);	
+			List<Object[]> listResults = q.getResultList();
+			Iterator<Object[]> iter = listResults.iterator();
+			
+			while (iter.hasNext()) {
+				Object[] rowdata = iter.next();
+				optionnames.add((String)rowdata[0]);
+			}
+         	
+         	
+			if (optionnames.size()==0) {
+				fetchSql = "select DISTINCT(trading_symbol) as trading_symbol,1 from fdw_nexcorio_option_greeks"
+         					+ " where trading_symbol like '" + instrument + "%' "
+         					+ " and quote_time > '" + postgresShortFormat.format(cal.getTime()) + " 09:15:00'"
+         					+ " and quote_time < '" + postgresShortFormat.format(cal.getTime()) + " 09:20:00'";
+         			
+				q = entityManager.createNativeQuery(fetchSql);	
+				listResults = q.getResultList();
+				iter = listResults.iterator();
+				
+				while (iter.hasNext()) {
+					Object[] rowdata = iter.next();
+					optionnames.add((String)rowdata[0]);
+				}
+			}
+			
+			Map<Integer, OptionGreek> ceOptionGreeksMap = new HashMap<Integer, OptionGreek>();
+			Map<Integer, OptionGreek> peOptionGreeksMap = new HashMap<Integer, OptionGreek>();
+			SortedSet<Integer> allStrikes = new TreeSet<Integer>();
+			
+			
+			List<OptionGreek> allOptionGreeks = getOptionGreeks(optionnames, cal.getTime());
+			
+			for(OptionGreek aGreek:allOptionGreeks ) {
+				if (excludeOddStrikes==true && aGreek.getStrike()%100!=0) continue; 
+				else if (aGreek!=null && Math.abs(aGreek.getDelta()) >= startingDelta && Math.abs(aGreek.getDelta()) <= (1f-startingDelta)) {
+					allStrikes.add(aGreek.getStrike());
+					if (aGreek.getTradingSymbol().endsWith("CE")) {
+						ceOptionGreeksMap.put(aGreek.getStrike(), aGreek);
+					} else {
+						peOptionGreeksMap.put(aGreek.getStrike(), aGreek);
+					}
+				}
+			}
+			
+			System.out.println("ceOptionGreeksMap="+ceOptionGreeksMap.size()+" peOptionGreeksMap.size()="+peOptionGreeksMap.size()+" allStrikes="+allStrikes.size()+" excludeOddStrikes="+excludeOddStrikes);
+			Iterator<Integer> strkIterator = allStrikes.iterator();
+			while(strkIterator.hasNext()) {
+				Integer aKey = strkIterator.next();
+				OptionGreek ceGreek = ceOptionGreeksMap.get(aKey);
+				OptionGreek peGreek = peOptionGreeksMap.get(aKey);
+				
+				//System.out.println("aKey="+aKey+" ceGreek="+ceGreek+ " peGreek="+peGreek); 
+				if (ceGreek!=null && peGreek!=null ) {
+					writer.write( (aKey
+							+"," + ceGreek.getLtp()+"," + peGreek.getLtp()
+							+"," + ceGreek.getIv()+"," + peGreek.getIv()
+							+"," + ceGreek.getDelta()+"," + -peGreek.getDelta()
+							+"," + ceGreek.getGamma()+"," + peGreek.getGamma()
+							+"," + ceGreek.getVega()+"," + peGreek.getVega()
+							+"," + ceGreek.getTheta()+"," + peGreek.getTheta()
+							+"," + ceGreek.getOi()+"," + peGreek.getOi()
+							+"," + ceGreek.getOi()*ceGreek.getGamma()+"," + peGreek.getOi()*peGreek.getGamma()
+							+ "\r\n").getBytes());
+				}
+				
+			}
+			retArray = writer.toByteArray();
+            writer.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return retArray;
+	}
+	
+	private  OptionGreek getOptionGreeks(String optionName, Date forTime) {
+		
+		if (optionName==null || optionName.equals("")) return null;
+		
+		OptionGreek retVal = null;
+		try {
+			int instrumentId = 2;
+			if (optionName.startsWith("BANKNIFTY")) instrumentId = 3;
+			else if (optionName.startsWith("SENSEX")) instrumentId = 4;
+			
+			SimpleDateFormat postgresLongDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			
+			String fetchSql = "select iv, delta, vega, theta, gamma, ltp, oi, underlying_value from fdw_nexcorio_option_greeks  where trading_symbol = '" + optionName + "'"
+					+ " and f_main_instrument=" + instrumentId
+					+ " and quote_time <= '" + postgresLongDateFormat.format(forTime) + "'"
+					+ " order by quote_time desc limit 1";
+			//System.out.println("recTimestamp="+recTimestamp+" sql=" +fetchSql);
+			
+			Query q = entityManager.createNativeQuery(fetchSql);	
+			List<Object[]> listResults = q.getResultList();
+			Iterator<Object[]> iter = listResults.iterator();
+			
+			while (iter.hasNext()) {
+				Object[] rowdata = iter.next();
+				retVal = new OptionGreek(optionName, (float) rowdata[0], (float) rowdata[1], (float) rowdata[2], (float) rowdata[3], (float) rowdata[4], (float) rowdata[5], (float) rowdata[6]);
+				retVal.setUnderlyingValue((float) rowdata[7]);
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return retVal;
+	}
+	
+	private List<OptionGreek> getOptionGreeks(List<String> optionnames, Date forTime) {
+		
+		List<OptionGreek> retList = new ArrayList<OptionGreek>();
+		try {
+			SimpleDateFormat postgresLongDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(forTime);
+			cal.add(Calendar.SECOND, -5);
+			
+			
+			
+			String fetchSql = "WITH RankedRows AS"
+					+ " ("
+					+ " SELECT "
+					+ " trading_symbol, iv, delta, vega, theta, gamma, ltp, oi, underlying_value,"
+					+ " ROW_NUMBER() OVER (PARTITION BY trading_symbol ORDER BY quote_time DESC, id DESC) AS rank"
+					+ " FROM fdw_nexcorio_option_greeks"
+					+ " WHERE trading_symbol IN (" + "'" + String.join("','", optionnames) + "'" + ")"
+					+ " AND quote_time <= '" + postgresLongDateFormat.format(forTime)  + "'"
+					+ " AND quote_time >= '" + postgresLongDateFormat.format(cal.getTime())  + "'"
+					+ " )"
+					+ " SELECT trading_symbol, iv, delta, vega, theta, gamma, ltp, oi, underlying_value FROM RankedRows WHERE rank = 1";
+			
+			System.out.println("fetchSql="+fetchSql);
+			
+			Query q = entityManager.createNativeQuery(fetchSql);	
+			List<Object[]> listResults = q.getResultList();
+			Iterator<Object[]> iter = listResults.iterator();
+			
+			while (iter.hasNext()) {
+				Object[] rowdata = iter.next();
+				//public OptionGreek(String tradingSymbol, float iv, float delta, float vega, float theta, float gamma, float ltp, float oi) {
+
+				OptionGreek aGreek = new OptionGreek((String) rowdata[0], (float) rowdata[1], (float) rowdata[2], (float) rowdata[3], (float) rowdata[4], (float) rowdata[5], (float) rowdata[6], (float) rowdata[7]);
+				aGreek.setUnderlyingValue((float) rowdata[8]);
+				retList.add(aGreek);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return retList;
+	}
+	
 	public byte[] getOptionsInsight(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException {
 		log.info("In getOptionTimeValueAnalysis forDate="+forDate);
 		Map<String, List<OptionOI>> oiDataMap = new HashMap<String, List<OptionOI>>();
 		byte[] retArray = null;
 		try {
 			ByteArrayOutputStream writer = new ByteArrayOutputStream(); // writer = new FileWriter(csvFilename);
-            writer.write(("QuoteTime,IndexAt"
-            		+ ", Straddle Premium"
-            		+ ", dr16CEAvgIv, dr16PEAvgIv"
-            		+ ", [O] drWhlStrkAccmlChnge5SecCETheta, drWhlStrkAccmlChnge5SecPETheta"
-            		+ ", accumlChng5SecCeIV, accumlChng5SecPeIV"
-            		+ ", selectivesAvgCEGamma, selectivesAvgPEGamma"
-            		+ ", DrCEFullAvgIv, DrPEFullAvgIv"
-            		+ ", maxGammaExpWithStrike, minGammaExpWithStrike"
-            		+ ", dr49CEAvgIv, dr49PEAvgIv"
-            		+ ", DrCEAvgiv, DrPEAvgiv"
-            		+ ", dr19WhlStrkCEAvgIV, dr19WhlStrkPEAvgIV"
-            		+ ", DrCEOoutlierRatio, DrPEOoutlierRatio"            		
-            		+ ", DrCEGammaOi, DrPEGammaOi"
-            		+ ", DrWhlStrkAccmlChng5secCEVega, DrWhlStrkAccmlChng5secPEVega"
-            		+ ", Dr49AccmlChng5secCeTheta, Dr49AccmlChng5secPeTheta"
-            		+ ", OutlierCountCE, OutlierCountPE"
-            		+ ", dr16AccmlChnge5SecCETheta, dr16AccmlChnge5SecPETheta"
-            		+ ", Dr49WhlStrkAccmlChng5secCeIv, Dr49WhlStrkAccmlChng5secPeIv"
-            		+ ", Dr49WhlStrkAccmlChng5secCeTheta, Dr49WhlStrkAccmlChng5secPeTheta"
-            		+ ", Dr49WhlStrkAccmlChng5secCeGamma, Dr49WhlStrkAccmlChng5secPeGamma"
-            		+ ", Dr49AccmlChng5secCeGamma, Dr49AccmlChng5secPeGamma"
-            		+ ", drITMWhlStrkSameSizeCEAvgIv, drITMWhlStrkSameSizePEAvgIv"
-            		+ ", drITMWhlStrkSameSizeCEAvgGamma, drITMWhlStrkSameSizePEAvgGamma"
-            		+ ", drITMWhlStrkSameSizeCEAvgVega, drITMWhlStrkSameSizePEAvgVega"            		
-            		+ ", Above5WhlStrkCEAvgIv, Above5WhlStrkPEAvgIv"
-            		+ ", [O] ALTabove5WhlStrkCEAvgIv, ALTabove5WhlStrkPEAvgIv"
-            		+ ", altAbove5WhlStrkAccmltCETheta, altAbove5WhlStrkAccmltPETheta"
-            		+ ", altAbove5WhlStrkCEAvgGama, altAbove5WhlStrkPEAvgGama"
-            		+ ", tmpAccmlCeTheta, tmpAccmlPeTheta"
-            		+ ", whlStrkOTMAccmlCETheta, whlStrkOTMAccmlPETheta"
-					+ ", whlStrkATMAccmlCETheta, whlStrkATMAccmlPETheta"
-					+ ", whlStrkITMAccmlCETheta, whlStrkITMAccmlPETheta"
+			 writer.write(("QuoteTime,indexltp , futureLtp , futurePriceDiffPercent"
+	            		+ ", StraddlePremium"
+	            		+ ", future_Outstanding_Volume"
+	            		+ ", top5OiDiff"
+	            		+ ", dr1_6CEAvgIv, dr1_6PEAvgIv"
+	            		+ ", drWhlStrkaccumulatedchangein5seccetheta, drWhlStrkaccumulatedchangein5secpetheta"
+	            		+ ", accumulatedChangein5secCeIV, accumulatedChangein5secPeIV"
+	            		+ ", selectivestrike_avgcegamma, selectivestrike_avgpegamma"
+	            		+ ", deltaRangeCEFullAvgIv, deltaRangePEFullAvgIv"
+	            		+ ", maxGammaExposureWithStrike, minGammaExposureWithStrike"
+	            		+ ", dr4_9CEAvgIv, dr4_9PEAvgIv"
+	            		+ ", deltarangeceavgiv, deltarangepeavgiv"
+	            		+ ", dr19WholeStrikeCEAvgIV, dr19WholeStrikePEAvgIV"
+	            		+ ", deltarangeceoutlierratio, deltarangepeoutlierratio"
+	            		+ ", deltarangecegammaoi, deltarangepegammaoi"
+	            		+ ", drWhlStrkaccumulatedchangein5seccevega, drWhlStrkaccumulatedchangein5secpevega"
+	            		+ ", dr49AccumulatedChangein5secCeTheta, dr49AccumulatedChangein5secPeTheta"
+	            		+ ", countCEOutlier, countPEOutlier"
+	            		+ ", dr16AccumulatedChangein5secCeTheta, dr16AccumulatedChangein5secPeTheta"
+	            		+ ", dr49AccumulatedChangein5secCeGamma, dr49AccumulatedChangein5secPeGamma"
+	            		+ ", drITMWhlStrkSameSizeCEAvgIv, drITMWhlStrkSameSizePEAvgIv"
+	            		+ ", above5WhlStrkCEAvgIv, above5WhlStrkPEAvgIv"
+	            		+ ", ALTabove5WhlStrkCEAvgIv, ALTabove5WhlStrkPEAvgIv"
+	            		+ ", altAbove5WhlStrkAccmltCETheta, altAbove5WhlStrkAccmltPETheta"
+	            		+ ", otm250x750AccmlCeTheta, otm250x750AccmlPeTheta"
+	            		+ ", itm1000x500AvgCeIv, itm1000x500AvgPeIv"
+	            		+ ", dr19fixedSizeCEAvgIV, dr19fixedSizePEAvgIV"	            		
+	            		
+	            		+ ", range350CEAvgIv, range350PEAvgIv"
+	            		+ ", range350CEAvgGamma, range350PEAvgGamma"
+	            		+ ", range350CEAvgVega, range350PEAvgVega"
+	            		+ ", range350CEAvgTheta, range350PEAvgTheta"
+	            		+ ", range700CEAvgIv, range700PEAvgIv"
+	            		+ ", range700CEAvgGamma, range700PEAvgGamma"
+	            		+ ", range700CEAvgVega, range700PEAvgVega"
+	            		+ ", range700CEAvgTheta, range700PEAvgTheta"
 					
-					+ ", [O] otm250x750AccmlCeTheta, otm250x750AccmlPeTheta"
-					+ ", [O] itm1000x500AvgCeIv, itm1000x500AvgPeIv"
-					+ ", dr19fixedSizeCEAvgIV, dr19fixedSizePEAvgIV"
-					+ ", ML XGB Prediction"
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -4287,45 +4466,84 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				dateStrEnd = postgresFormat.format(cal.getTime());
 			}
 			
-			String fetchSql = "select record_time, instrumentLtp, celtp, peltp"
-					+ ", dr1_6CEAvgIv, dr1_6PEAvgIv "
-					+ ", drWhlStrkaccumulatedchangein5seccetheta, drWhlStrkaccumulatedchangein5secpetheta"
-					+ ", accumulatedChangein5secCeIV, accumulatedChangein5secPeIV"
-					+ ", selectivestrike_avgcegamma, selectivestrike_avgpegamma"
-					+ ", deltaRangeCEFullAvgIv, deltaRangePEFullAvgIv"
-					+ ", maxGammaExposureWithStrike, minGammaExposureWithStrike"
-					+ ", dr4_9CEAvgIv, dr4_9PEAvgIv"
-					+ ", deltarangeceavgiv, deltarangepeavgiv"
-					+ ", dr19WholeStrikeCEAvgIV, dr19WholeStrikePEAvgIV"
-					+ ", deltarangeceoutlierratio, deltarangepeoutlierratio"
-					+ ", deltarangecegammaoi, deltarangepegammaoi"
-					+ ", drWhlStrkaccumulatedchangein5seccevega, drWhlStrkaccumulatedchangein5secpevega"
-					+ ", dr49AccumulatedChangein5secCeTheta, dr49AccumulatedChangein5secPeTheta"
-					+ ", countCEOutlier, countPEOutlier"
-					+ ", dr16AccumulatedChangein5secCeTheta, dr16AccumulatedChangein5secPeTheta"
-					+ ", dr49WhlStrkaccumulatedchangein5secceIv, dr49WhlStrkaccumulatedchangein5secpeIv"
-					+ ", dr49WhlStrkaccumulatedchangein5secceTheta, dr49WhlStrkaccumulatedchangein5secpeTheta"
-					+ ", dr49WhlStrkaccumulatedchangein5secceGamma, dr49WhlStrkaccumulatedchangein5secpeGamma"
-					+ ", dr49AccumulatedChangein5secCeGamma, dr49AccumulatedChangein5secPeGamma"
-					+ ", drITMWhlStrkSameSizeCEAvgIv, drITMWhlStrkSameSizePEAvgIv"
-					+ ", drITMWhlStrkSameSizeCEAvgGamma, drITMWhlStrkSameSizePEAvgGamma"
-					+ ", drITMWhlStrkSameSizeCEAvgVega, drITMWhlStrkSameSizePEAvgVega"
-					+ ", above5WhlStrkCEAvgIv, above5WhlStrkPEAvgIv"
-					+ ", ALTabove5WhlStrkCEAvgIv, ALTabove5WhlStrkPEAvgIv"
-					+ ", altAbove5WhlStrkAccmltCETheta, altAbove5WhlStrkAccmltPETheta"
-					+ ", altAbove5WhlStrkCEAvgGama, altAbove5WhlStrkPEAvgGama"
-					+ ", tmpAccmlCeTheta, tmpAccmlPeTheta"
-					
-					+ ", whlStrkOTMAccmlCETheta, whlStrkOTMAccmlPETheta"
-					+ ", whlStrkATMAccmlCETheta, whlStrkATMAccmlPETheta"
-					+ ", whlStrkITMAccmlCETheta, whlStrkITMAccmlPETheta"
-					
-					+ ", otm250x750AccmlCeTheta, otm250x750AccmlPeTheta"
-					+ ", itm1000x500AvgCeIv, itm1000x500AvgPeIv"
-					
-					+ ", dr19fixedSizeCEAvgIV, dr19fixedSizePEAvgIV"
-					+ ", ml_xgb_prediction"
-					
+	        LinkedHashMap<String, Integer> sqlFields = new LinkedHashMap<>();
+			int idx = 0;
+			sqlFields.put("record_time", idx++);			
+			sqlFields.put("instrumentLtp", idx++);
+			sqlFields.put("celtp", idx++);
+			sqlFields.put("peltp", idx++);
+			sqlFields.put("dr1_6CEAvgIv", idx++);
+			sqlFields.put("dr1_6PEAvgIv", idx++);
+			sqlFields.put("drWhlStrkaccumulatedchangein5seccetheta", idx++);
+			sqlFields.put("drWhlStrkaccumulatedchangein5secpetheta", idx++);
+			sqlFields.put("accumulatedChangein5secCeIV", idx++);
+			sqlFields.put("accumulatedChangein5secPeIV", idx++);
+			sqlFields.put("selectivestrike_avgcegamma", idx++);
+			sqlFields.put("selectivestrike_avgpegamma", idx++);
+			sqlFields.put("deltaRangeCEFullAvgIv", idx++);
+			sqlFields.put("deltaRangePEFullAvgIv", idx++);
+			sqlFields.put("maxGammaExposureWithStrike", idx++);
+			sqlFields.put("minGammaExposureWithStrike", idx++);
+			sqlFields.put("dr4_9CEAvgIv", idx++);
+			sqlFields.put("dr4_9PEAvgIv", idx++);
+			sqlFields.put("deltarangeceavgiv", idx++);
+			sqlFields.put("deltarangepeavgiv", idx++);
+			sqlFields.put("dr19WholeStrikeCEAvgIV", idx++);
+			sqlFields.put("dr19WholeStrikePEAvgIV", idx++);
+			sqlFields.put("deltarangeceoutlierratio", idx++);
+			sqlFields.put("deltarangepeoutlierratio", idx++);
+			sqlFields.put("deltarangecegammaoi", idx++);
+			sqlFields.put("deltarangepegammaoi", idx++);
+			sqlFields.put("drWhlStrkaccumulatedchangein5seccevega", idx++);
+			sqlFields.put("drWhlStrkaccumulatedchangein5secpevega", idx++);
+			sqlFields.put("dr49AccumulatedChangein5secCeTheta", idx++);
+			sqlFields.put("dr49AccumulatedChangein5secPeTheta", idx++);
+			sqlFields.put("countCEOutlier", idx++);
+			sqlFields.put("countPEOutlier", idx++);
+			sqlFields.put("dr16AccumulatedChangein5secCeTheta", idx++);
+			sqlFields.put("dr16AccumulatedChangein5secPeTheta", idx++);
+			
+			sqlFields.put("dr49AccumulatedChangein5secCeGamma", idx++);
+			sqlFields.put("dr49AccumulatedChangein5secPeGamma", idx++);
+			sqlFields.put("drITMWhlStrkSameSizeCEAvgIv", idx++);
+			sqlFields.put("drITMWhlStrkSameSizePEAvgIv", idx++);
+			
+			sqlFields.put("above5WhlStrkCEAvgIv", idx++);
+			sqlFields.put("above5WhlStrkPEAvgIv", idx++);
+			sqlFields.put("ALTabove5WhlStrkCEAvgIv", idx++);
+			sqlFields.put("ALTabove5WhlStrkPEAvgIv", idx++);
+			sqlFields.put("altAbove5WhlStrkAccmltCETheta", idx++);
+			sqlFields.put("altAbove5WhlStrkAccmltPETheta", idx++);
+			
+			sqlFields.put("otm250x750AccmlCeTheta", idx++);
+			sqlFields.put("otm250x750AccmlPeTheta", idx++);
+			sqlFields.put("itm1000x500AvgCeIv", idx++);
+			sqlFields.put("itm1000x500AvgPeIv", idx++);
+			sqlFields.put("dr19fixedSizeCEAvgIV", idx++);
+			sqlFields.put("dr19fixedSizePEAvgIV", idx++);
+			
+			sqlFields.put("futures_ltp", idx++);
+			sqlFields.put("future_Outstanding_Volume", idx++);
+			
+			sqlFields.put("top5OiDiff", idx++);
+			sqlFields.put("range350CEAvgIv", idx++);
+			sqlFields.put("range350PEAvgIv", idx++);
+			sqlFields.put("range350CEAvgGamma", idx++);
+			sqlFields.put("range350PEAvgGamma", idx++);
+			sqlFields.put("range350CEAvgVega", idx++);
+			sqlFields.put("range350PEAvgVega", idx++);
+			sqlFields.put("range350CEAvgTheta", idx++);
+			sqlFields.put("range350PEAvgTheta", idx++);
+			sqlFields.put("range700CEAvgIv", idx++);
+			sqlFields.put("range700PEAvgIv", idx++);
+			sqlFields.put("range700CEAvgGamma", idx++);
+			sqlFields.put("range700PEAvgGamma", idx++);
+			sqlFields.put("range700CEAvgVega", idx++);
+			sqlFields.put("range700PEAvgVega", idx++);
+			sqlFields.put("range700CEAvgTheta", idx++);
+			sqlFields.put("range700PEAvgTheta", idx++);
+			
+			String fetchSql = "select " +  String.join(",", sqlFields.keySet())
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
 					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
@@ -4337,52 +4555,62 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			
 			while (iter.hasNext()) {
 				Object[] rowdata = iter.next();
-				Date quoteTime = (Timestamp) rowdata[0];
-				float indexltp = (Float) rowdata[1];
+				Date quoteTime = (Timestamp) rowdata[sqlFields.get("record_time")];
+				float indexltp = (Float) rowdata[sqlFields.get("instrumentLtp")];
 				
-				float ceLtp = (Float) rowdata[2];
-				float peLtp = (Float) rowdata[3];
+				float ceLtp = (Float) rowdata[sqlFields.get("celtp")];
+				float peLtp = (Float) rowdata[sqlFields.get("peltp")];
 				
-				float ceDelta = (Float) rowdata[46];
-				float peDelta = (Float) rowdata[47];
+				float futureLtp = (Float) rowdata[sqlFields.get("futures_ltp")];
 				
-				writer.write((postgresFormat.format(quoteTime)+","+indexltp  
-						+ "," +  (ceLtp+peLtp) 	
-						+ "," + (Float) rowdata[4] + "," + (Float) rowdata[5]
-						+ "," + (Float) rowdata[6] + "," + (Float) rowdata[7]
-						+ "," + (Float) rowdata[8] + "," + (Float) rowdata[9]
-						+ "," + (Float) rowdata[10] + "," + (Float) rowdata[11]
-						+ "," + (Float) rowdata[12] + "," + (Float) rowdata[13]
-						+ "," + (Float) rowdata[14] + "," + (Float) rowdata[15]
-						+ "," + (Float) rowdata[16] + "," + (Float) rowdata[17]
-						+ "," + (Float) rowdata[18] + "," + (Float) rowdata[19]
-						+ "," + (Float) rowdata[20] + "," + (Float) rowdata[21]
-						+ "," + (Float) rowdata[22] + "," + (Float) rowdata[23]
-						+ "," + (Float) rowdata[24] + "," + (Float) rowdata[25]
-						+ "," + (Float) rowdata[26] + "," + (Float) rowdata[27]
-						+ "," + (Float) rowdata[28] + "," + (Float) rowdata[29]
-						+ "," + (Integer) rowdata[30] + "," + (Integer) rowdata[31]
-						+ "," + (Float) rowdata[32] + "," + (Float) rowdata[33]
-						+ "," + (Float) rowdata[34] + "," + (Float) rowdata[35]
-						+ "," + (Float) rowdata[36] + "," + (Float) rowdata[37]
-						+ "," + (Float) rowdata[38] + "," + (Float) rowdata[39]
-						+ "," + (Float) rowdata[40] + "," + (Float) rowdata[41]
-						+ "," + (Float) rowdata[42] + "," + (Float) rowdata[43]
-						+ "," + (Float) rowdata[44] + "," + (Float) rowdata[45]
-						+ "," + (Float) rowdata[46] + "," + (Float) rowdata[47]
-						+ "," + (Float) rowdata[48] + "," + (Float) rowdata[49]
-						+ "," + (Float) rowdata[50] + "," + (Float) rowdata[51]
-						+ "," + (Float) rowdata[52] + "," + (Float) rowdata[53]
-						+ "," + (Float) rowdata[54] + "," + (Float) rowdata[55]
-						+ "," + (Float) rowdata[56] + "," + (Float) rowdata[57]
+				float futurePriceDiffPercent = (futureLtp-indexltp)*100f/indexltp;
+				
+				writer.write((postgresFormat.format(quoteTime)+","+indexltp + "," + futureLtp + "," + futurePriceDiffPercent
+						+ "," +  (ceLtp+peLtp) 
+						
+						+ "," + (Float) rowdata[sqlFields.get("future_Outstanding_Volume")]
+						+ "," + (Float) rowdata[sqlFields.get("top5OiDiff")] 
+										
+						+ "," + (Float) rowdata[sqlFields.get("dr1_6CEAvgIv")] + "," + (Float) rowdata[sqlFields.get("dr1_6PEAvgIv")]
+						+ "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5seccetheta")] + "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5secpetheta")]
+						+ "," + (Float) rowdata[sqlFields.get("accumulatedChangein5secCeIV")] + "," + (Float) rowdata[sqlFields.get("accumulatedChangein5secPeIV")]
+						+ "," + (Float) rowdata[sqlFields.get("selectivestrike_avgcegamma")] + "," + (Float) rowdata[sqlFields.get("selectivestrike_avgpegamma")]
+						+ "," + (Float) rowdata[sqlFields.get("deltaRangeCEFullAvgIv")] + "," + (Float) rowdata[sqlFields.get("deltaRangePEFullAvgIv")]
+						+ "," + (Float) rowdata[sqlFields.get("maxGammaExposureWithStrike")] + "," + (Float) rowdata[sqlFields.get("minGammaExposureWithStrike")]
+						+ "," + (Float) rowdata[sqlFields.get("dr4_9CEAvgIv")] + "," + (Float) rowdata[sqlFields.get("dr4_9PEAvgIv")]
+						+ "," + (Float) rowdata[sqlFields.get("deltarangeceavgiv")] + "," + (Float) rowdata[sqlFields.get("deltarangepeavgiv")]
+						+ "," + (Float) rowdata[sqlFields.get("dr19WholeStrikeCEAvgIV")] + "," + (Float) rowdata[sqlFields.get("dr19WholeStrikePEAvgIV")]
+						+ "," + (Float) rowdata[sqlFields.get("deltarangeceoutlierratio")] + "," + (Float) rowdata[sqlFields.get("deltarangepeoutlierratio")]
+						+ "," + (Float) rowdata[sqlFields.get("deltarangecegammaoi")] + "," + (Float) rowdata[sqlFields.get("deltarangepegammaoi")]
+						+ "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5seccevega")] + "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5secpevega")]
+						+ "," + (Float) rowdata[sqlFields.get("dr49AccumulatedChangein5secCeTheta")] + "," + (Float) rowdata[sqlFields.get("dr49AccumulatedChangein5secPeTheta")]
+						+ "," + (Integer) rowdata[sqlFields.get("countCEOutlier")] + "," + (Integer) rowdata[sqlFields.get("countPEOutlier")]
+						+ "," + (Float) rowdata[sqlFields.get("dr16AccumulatedChangein5secCeTheta")] + "," + (Float) rowdata[sqlFields.get("dr16AccumulatedChangein5secPeTheta")]
+						
+						+ "," + (Float) rowdata[sqlFields.get("dr49AccumulatedChangein5secCeGamma")] + "," + (Float) rowdata[sqlFields.get("dr49AccumulatedChangein5secPeGamma")]
+						+ "," + (Float) rowdata[sqlFields.get("drITMWhlStrkSameSizeCEAvgIv")] + "," + (Float) rowdata[sqlFields.get("drITMWhlStrkSameSizePEAvgIv")]
+						
+						+ "," + (Float) rowdata[sqlFields.get("above5WhlStrkCEAvgIv")] + "," + (Float) rowdata[sqlFields.get("above5WhlStrkPEAvgIv")]
+						+ "," + (Float) rowdata[sqlFields.get("ALTabove5WhlStrkCEAvgIv")] + "," + (Float) rowdata[sqlFields.get("ALTabove5WhlStrkPEAvgIv")]
+						+ "," + (Float) rowdata[sqlFields.get("altAbove5WhlStrkAccmltCETheta")] + "," + (Float) rowdata[sqlFields.get("altAbove5WhlStrkAccmltPETheta")]
+						
+						+ "," + (Float) rowdata[sqlFields.get("otm250x750AccmlCeTheta")] + "," + (Float) rowdata[sqlFields.get("otm250x750AccmlPeTheta")]
+						+ "," + (Float) rowdata[sqlFields.get("itm1000x500AvgCeIv")] + "," + (Float) rowdata[sqlFields.get("itm1000x500AvgPeIv")]
+						+ "," + (Float) rowdata[sqlFields.get("dr19fixedSizeCEAvgIV")] + "," + (Float) rowdata[sqlFields.get("dr19fixedSizePEAvgIV")]
+						
+						
+						
+						+ "," + (Float) rowdata[sqlFields.get("range350CEAvgIv")] + "," + (Float) rowdata[sqlFields.get("range350PEAvgIv")]
+						+ "," + (Float) rowdata[sqlFields.get("range350CEAvgGamma")] + "," + (Float) rowdata[sqlFields.get("range350PEAvgGamma")]
+										
+						+ "," + (Float) rowdata[sqlFields.get("range350CEAvgVega")] + "," + (Float) rowdata[sqlFields.get("range350PEAvgVega")]
+						+ "," + (Float) rowdata[sqlFields.get("range350CEAvgTheta")] + "," + (Float) rowdata[sqlFields.get("range350PEAvgTheta")]
 								
-						+ "," + (Float) rowdata[58] + "," + (Float) rowdata[59]
-						+ "," + (Float) rowdata[60] + "," + (Float) rowdata[61]
-						+ "," + (Float) rowdata[62] + "," + (Float) rowdata[63]
-						+ "," + (Float) rowdata[64] + "," + (Float) rowdata[65]
-						+ "," + (Float) rowdata[66] + "," + (Float) rowdata[67]
-						+ "," + (Float) rowdata[68] + "," + (Float) rowdata[69]
-						+ "," + (Float) rowdata[70]
+						+ "," + (Float) rowdata[sqlFields.get("range700CEAvgIv")] + "," + (Float) rowdata[sqlFields.get("range700PEAvgIv")]
+						+ "," + (Float) rowdata[sqlFields.get("range700CEAvgGamma")] + "," + (Float) rowdata[sqlFields.get("range700PEAvgGamma")]
+						+ "," + (Float) rowdata[sqlFields.get("range700CEAvgVega")] + "," + (Float) rowdata[sqlFields.get("range700PEAvgVega")]
+						+ "," + (Float) rowdata[sqlFields.get("range700CEAvgTheta")] + "," + (Float) rowdata[sqlFields.get("range700PEAvgTheta")]
+										
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();

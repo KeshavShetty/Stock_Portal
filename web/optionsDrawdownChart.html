@@ -58,6 +58,7 @@
         }
       },
 	  yAxis: [{ // Primary yAxis
+		  type: 'linear',
           labels: {
               format: '{value}'
           },
@@ -67,7 +68,8 @@
               text: 'Index'
           }
       }, { // Secondary yAxis
-          gridLineWidth: 0,
+    	  type: 'linear',
+    	  gridLineWidth: 0,
           crosshair: true,
           labels: {
               format: '{value}'
@@ -80,6 +82,7 @@
               value: 0,
               dashStyle: 'longdashdot'}]
       }, { // Third yAxis
+    	  type: 'linear',
           gridLineWidth: 0,
           crosshair: true,
           labels: {
@@ -93,6 +96,7 @@
               value: 0,
               dashStyle: 'longdashdot'}]
       },{ // fourth yAxis
+    	  type: 'linear',
           gridLineWidth: 0,
           crosshair: true,
           labels: {
@@ -113,9 +117,10 @@
 	  },
 	  series: [
 		  { yAxis: 2, color: '#5dade2', visible: false},
-		  { yAxis: 2, color: '#58d68d'},
+		  { yAxis: 2, color: '#2765F5'},
 		  { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#58d68d', visible: false}
+		  { yAxis: 2, color: '#F52727', visible: false},
+		  { yAxis: 2, color: '#F52750', visible: false}
 		  
 		 ]
 	});

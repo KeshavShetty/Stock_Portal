@@ -1,0 +1,178 @@
+<html>
+<head>
+  <title>Option Greeks Snapshot chart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/data.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+
+<div id="container1" style="min-width: 310px; height: 700px; margin: 0 auto; border-style: solid;"></div>
+
+<script type='text/javascript'>
+
+	function getQueryParameter(name){
+	  const parts = window.location.href.split('?');
+	  if (parts.length > 1) {
+	    name = encodeURIComponent(name);
+	    const params = parts[1].split('&');
+	    const found = params.filter(el => (el.split('=')[0] === name) && el);
+	    if (found.length) return decodeURIComponent(found[0].split('=')[1]);
+	  }
+	}
+	
+	var forDateTime = getQueryParameter("forDateTime");
+	var instrument = getQueryParameter("instrument");
+	var excludeOddStrikes = getQueryParameter("excludeOddStrikes");
+	var startingDelta = getQueryParameter("startingDelta");
+	
+	// Function to parse dd/MM/yyyy HH:mm:ss to Date object
+	function parseDateTime(dateTimeStr) {
+	    var parts = dateTimeStr.split(/[/ :]/);
+	    var day = parseInt(parts[0], 10);
+	    var month = parseInt(parts[1], 10) - 1; // Month is zero-based in JavaScript Date
+	    var year = parseInt(parts[2], 10);
+	    var hour = parseInt(parts[3], 10);
+	    var minute = parseInt(parts[4], 10);
+	    var second = parseInt(parts[5], 10);
+
+	    return new Date(year, month, day, hour, minute, second);
+	}
+
+	// Function to format Date object back to dd/MM/yyyy HH:mm:ss
+	function formatDateTime(date) {
+	    var day = String(date.getDate()).padStart(2, '0');
+	    var month = String(date.getMonth() + 1).padStart(2, '0'); // Month is zero-based
+	    var year = date.getFullYear();
+	    var hour = String(date.getHours()).padStart(2, '0');
+	    var minute = String(date.getMinutes()).padStart(2, '0');
+	    var second = String(date.getSeconds()).padStart(2, '0');
+
+	    return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
+	}
+
+	// Parse the original datetime string into a Date object
+	var dateObj = parseDateTime(forDateTime);
+
+	// Add 5 seconds (5000 milliseconds)
+	dateObj.setMilliseconds(dateObj.getMilliseconds() + 15000);
+
+	// Format the updated Date object back to the desired format
+	var updatedForDateTime = formatDateTime(dateObj);
+
+	//alert(updatedForDateTime); // This will be the new datetime string with 5 seconds added
+	
+	// Construct the new URL with the updated forDateTime parameter
+	var currentUrl = window.location.href; // Get the current URL
+	var baseUrl = currentUrl.split('?')[0]; // Extract the base URL without query parameters
+	var newUrl = `${baseUrl}?excludeOddStrikes=false&startingDelta=${startingDelta}&instrument=${instrument}&forDateTime=${encodeURIComponent(updatedForDateTime)}`;
+
+	// Create an <a> tag with the new URL and redirect
+	document.write(`<a href="${newUrl}">Redirect to updated time</a>`);
+	
+	
+	Highcharts.chart('container1', {
+	  chart: {
+	    type: 'spline',
+	    zooming: {
+            type: 'x'
+        }
+	  },
+	  title: {
+	    text: ' Options Snapshot'
+	  },
+	  subtitle: {
+	    text: 'Options Insight ' + instrument + ' (Time '+ forDateTime + ')' 
+	  },
+	  scrollbar: {
+          enabled: true,
+          barBackgroundColor: 'gray',
+          barBorderRadius: 7,
+          barBorderWidth: 0,
+          buttonBackgroundColor: 'gray',
+          buttonBorderWidth: 0,
+          buttonArrowColor: 'yellow',
+          buttonBorderRadius: 7,
+          rifleColor: 'yellow',
+          trackBackgroundColor: 'white',
+          trackBorderWidth: 1,
+          trackBorderColor: 'silver',
+          trackBorderRadius: 7
+      },
+	  xAxis: {
+        crosshair: true,
+        scrollbar: {
+            enabled: true
+        }
+      },
+	  yAxis: [{ // Primary yAxis
+          labels: {
+              format: '{value}'
+          },
+          crosshair: true,
+          opposite: true,
+          title: {
+              text: 'Index'
+          }
+      }, { // Secondary yAxis
+          gridLineWidth: 0,
+          crosshair: true,
+          labels: {
+              format: '{value}'
+          },title: {
+              text: 'Time Value'
+          },
+          plotLines: [{
+              color: 'red',
+              width: 2,
+              value: 0,
+              dashStyle: 'longdashdot'}]
+      }, { // Third yAxis
+          gridLineWidth: 0,
+          crosshair: true,
+          labels: {
+              format: '{value}'
+          },title: {
+              text: 'Percent Diff'
+          },
+          plotLines: [{
+              color: 'red',
+              width: 2,
+              value: 0,
+              dashStyle: 'longdashdot'}]
+      },{ // fourth yAxis
+          gridLineWidth: 0,
+          crosshair: true,
+          labels: {
+              format: '{value}'
+          },title: {
+              text: 'Gamma'
+          },
+          plotLines: [{
+              color: 'red',
+              width: 2,
+              value: 0,
+              dashStyle: 'longdashdot'}]
+      }],
+	  data: {
+	    csvURL: '/chart/OptionGreeksSnapshotChartQuote?excludeOddStrikes='+excludeOddStrikes+'&instrument=' + instrument+ '&forDateTime='+ forDateTime + '&startingDelta='+startingDelta,
+	    enablePolling: true,
+	    dataRefreshRate: 10
+	  },
+	  series: [
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 3, color: '#1447E6',  visible: true, dashStyle: 'ShortDashDotDot'}, { yAxis: 3, color: '#E12AFB', visible: true, dashStyle: 'ShortDashDotDot'},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: true}, { yAxis: 2, color: '#58d68d', visible: true},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false}
+		  
+		 ]
+	});
+  </script>
+</body>
+</html>

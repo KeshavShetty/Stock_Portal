@@ -8,7 +8,7 @@
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
 
 
-<div id="container1" style="min-width: 310px; height: 700px; margin: 0 auto; border-style: solid;"></div>
+<div id="container1" style="min-width: 310px; height: 900px; margin: 0 auto; border-style: solid;"></div>
 
 <script type='text/javascript'>
 
@@ -28,6 +28,13 @@
 	var instrument = getQueryParameter("Instrument");
 	
 	Highcharts.chart('container1', {
+		/* legend: {
+		     layout: 'vertical',
+		     align: 'right',
+		     verticalAlign: 'middle',
+		     itemMarginTop: 10,
+		     itemMarginBottom: 10
+		   }, */
 	  chart: {
 	    type: 'spline',
 	    zooming: {
@@ -112,11 +119,55 @@
       }],
 	  data: {
 	    csvURL: '/chart/OptionsInsightChartQuote?baseDelta=' + baseDelta+ '&mainInstrumentId='+ mainInstrumentId + '&forDate='+forDate,
-	    enablePolling: true,
+	    enablePolling: false,
 	    dataRefreshRate: 60
 	  },
 	  series: [
 		  { yAxis: 0, color: '#5dade2'},
+		  { yAxis: 0, color: '#5d6d7e',  visible: false},
+		  { yAxis: 3, color: '#eb984e',  visible: false},
+		  { yAxis: 2, color: '#eb984e',  visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 3, color: '#eb984e',  visible: false},
+		  { yAxis: 3, color: '#eb984e',  visible: false},{ yAxis: 3, color: '#eb984e',  visible: false},{ yAxis: 3, color: '#eb984e',  visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
 		  { yAxis: 3, color: '#eb984e',  visible: false},
 		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
 		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
@@ -125,33 +176,7 @@
 		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
 		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
 		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false},
-		  { yAxis: 2, color: '#ec7063',  visible: false}
+		  { yAxis: 2, color: '#ec7063',  visible: false}, { yAxis: 2, color: '#58d68d', visible: false}
 		  
 		 ]
 	});

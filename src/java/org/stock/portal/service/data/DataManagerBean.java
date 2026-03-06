@@ -601,5 +601,10 @@ public class DataManagerBean implements DataManager {
     public byte[] getOptionsDrawdown(String strategyIds, String fromDate, String toDate) throws BusinessException {
     	return (new DataDao(entityManager)).getOptionsDrawdown(strategyIds, fromDate, toDate);    	
     }
+    
+    @TransactionAttribute( TransactionAttributeType.SUPPORTS )
+    public byte[] getOptionGreeksSnapshot(String instrument, String forDateTime, boolean excludeOddStrikes, float startingDelta) throws BusinessException {
+    	return (new DataDao(entityManager)).getOptionGreeksSnapshot(instrument, forDateTime, excludeOddStrikes, startingDelta);    	
+    }
 }
   
