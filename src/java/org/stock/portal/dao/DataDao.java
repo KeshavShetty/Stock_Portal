@@ -4404,8 +4404,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			ByteArrayOutputStream writer = new ByteArrayOutputStream(); // writer = new FileWriter(csvFilename);
 			 writer.write(("QuoteTime,indexltp , futureLtp , futurePriceDiffPercent"
 	            		+ ", StraddlePremium"
-	            		+ ", future_Outstanding_Volume"
-	            		+ ", top5OiDiff"
+	            		+ ", Future Outstanding Volume"
+	            		+ ", Top5 OI Diff"
+	            		+ ", CEOutlier, PEOutlier"
 	            		+ ", dr1_6CEAvgIv, dr1_6PEAvgIv"
 	            		+ ", drWhlStrkaccumulatedchangein5seccetheta, drWhlStrkaccumulatedchangein5secpetheta"
 	            		+ ", accumulatedChangein5secCeIV, accumulatedChangein5secPeIV"
@@ -4419,7 +4420,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 	            		+ ", deltarangecegammaoi, deltarangepegammaoi"
 	            		+ ", drWhlStrkaccumulatedchangein5seccevega, drWhlStrkaccumulatedchangein5secpevega"
 	            		+ ", dr49AccumulatedChangein5secCeTheta, dr49AccumulatedChangein5secPeTheta"
-	            		+ ", countCEOutlier, countPEOutlier"
+	            		
 	            		+ ", dr16AccumulatedChangein5secCeTheta, dr16AccumulatedChangein5secPeTheta"
 	            		+ ", dr49AccumulatedChangein5secCeGamma, dr49AccumulatedChangein5secPeGamma"
 	            		+ ", drITMWhlStrkSameSizeCEAvgIv, drITMWhlStrkSameSizePEAvgIv"
@@ -4438,6 +4439,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 	            		+ ", range700CEAvgGamma, range700PEAvgGamma"
 	            		+ ", range700CEAvgVega, range700PEAvgVega"
 	            		+ ", range700CEAvgTheta, range700PEAvgTheta"
+	            		+ ", OTM50x500AccmlCETheta, OTM250x500AccmlPETheta"
+	            		+ ", ITM0_350CEAvgIv, ITM0_350PEAvgIv"
 					
             		+ "\r\n").getBytes());
             
@@ -4543,6 +4546,11 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			sqlFields.put("range700CEAvgTheta", idx++);
 			sqlFields.put("range700PEAvgTheta", idx++);
 			
+			sqlFields.put("otm250x500accmlcetheta", idx++);
+			sqlFields.put("otm250x500accmlpetheta", idx++);
+			sqlFields.put("itm0_350CEAvgIv", idx++);
+			sqlFields.put("itm0_350PEAvgIv", idx++);
+			
 			String fetchSql = "select " +  String.join(",", sqlFields.keySet())
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
@@ -4570,6 +4578,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						
 						+ "," + (Float) rowdata[sqlFields.get("future_Outstanding_Volume")]
 						+ "," + (Float) rowdata[sqlFields.get("top5OiDiff")] 
+						+ "," + (Integer) rowdata[sqlFields.get("countCEOutlier")] + "," + (Integer) rowdata[sqlFields.get("countPEOutlier")]
 										
 						+ "," + (Float) rowdata[sqlFields.get("dr1_6CEAvgIv")] + "," + (Float) rowdata[sqlFields.get("dr1_6PEAvgIv")]
 						+ "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5seccetheta")] + "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5secpetheta")]
@@ -4584,7 +4593,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + (Float) rowdata[sqlFields.get("deltarangecegammaoi")] + "," + (Float) rowdata[sqlFields.get("deltarangepegammaoi")]
 						+ "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5seccevega")] + "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5secpevega")]
 						+ "," + (Float) rowdata[sqlFields.get("dr49AccumulatedChangein5secCeTheta")] + "," + (Float) rowdata[sqlFields.get("dr49AccumulatedChangein5secPeTheta")]
-						+ "," + (Integer) rowdata[sqlFields.get("countCEOutlier")] + "," + (Integer) rowdata[sqlFields.get("countPEOutlier")]
+						
 						+ "," + (Float) rowdata[sqlFields.get("dr16AccumulatedChangein5secCeTheta")] + "," + (Float) rowdata[sqlFields.get("dr16AccumulatedChangein5secPeTheta")]
 						
 						+ "," + (Float) rowdata[sqlFields.get("dr49AccumulatedChangein5secCeGamma")] + "," + (Float) rowdata[sqlFields.get("dr49AccumulatedChangein5secPeGamma")]
@@ -4610,7 +4619,12 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + (Float) rowdata[sqlFields.get("range700CEAvgGamma")] + "," + (Float) rowdata[sqlFields.get("range700PEAvgGamma")]
 						+ "," + (Float) rowdata[sqlFields.get("range700CEAvgVega")] + "," + (Float) rowdata[sqlFields.get("range700PEAvgVega")]
 						+ "," + (Float) rowdata[sqlFields.get("range700CEAvgTheta")] + "," + (Float) rowdata[sqlFields.get("range700PEAvgTheta")]
-										
+								
+						//+ "," + (Float) rowdata[sqlFields.get("tmpaccmlcetheta")] + "," + (Float) rowdata[sqlFields.get("tmpaccmlpetheta")]
+								
+						+ "," + (Float) rowdata[sqlFields.get("otm250x500accmlcetheta")] + "," + (Float) rowdata[sqlFields.get("otm250x500accmlpetheta")]
+						+ "," + (Float) rowdata[sqlFields.get("itm0_350CEAvgIv")] + "," + (Float) rowdata[sqlFields.get("itm0_350PEAvgIv")]
+												
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();
