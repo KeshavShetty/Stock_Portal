@@ -114,6 +114,7 @@ public interface DataManager {
 	
 	public byte[] getOptionDeltaRangeRawDataAnalysisAsByteArray(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException;
 	public byte[] getOptionsInsight(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException;
+	public byte[] getOptionsInsight2(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException;
 	
 	public byte[] getOptionsDrawdown(String strategyIds, String fromDate, String toDate) throws BusinessException;
 	

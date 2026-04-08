@@ -196,6 +196,12 @@
 											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
 												<a href="<%=request.getContextPath()%>/optionGreeksSnapshotChart.html?startingDelta=0.1&excludeOddStrikes=false&instrument=NIFTY&forDateTime=" target="_blank">[Nifty - Option Greeks Snapshot]</a>&nbsp;
 											</li>
+											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
+												Options Insight
+												<a href="<%=request.getContextPath()%>/optionsInsightChart2.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Nifty&mainInstrumentId=2" target="_blank">[Nifty 2]</a>&nbsp;
+												<a href="<%=request.getContextPath()%>/optionsInsightChart2.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Bank Nifty&mainInstrumentId=3" target="_blank">[BN 2]</a>
+												<a href="<%=request.getContextPath()%>/optionsInsightChart2.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Sensex&mainInstrumentId=4" target="_blank">[Sensex 2]</a>
+											</li>
 										</ul>
 									</div>
 								</div>

@@ -598,6 +598,11 @@ public class DataManagerBean implements DataManager {
     }
     
     @TransactionAttribute( TransactionAttributeType.SUPPORTS )
+    public byte[] getOptionsInsight2(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException {
+    	return (new DataDao(entityManager)).getOptionsInsight2(mainInstrumentId, forDate, baseDelta);    	
+    }
+    
+    @TransactionAttribute( TransactionAttributeType.SUPPORTS )
     public byte[] getOptionsDrawdown(String strategyIds, String fromDate, String toDate) throws BusinessException {
     	return (new DataDao(entityManager)).getOptionsDrawdown(strategyIds, fromDate, toDate);    	
     }

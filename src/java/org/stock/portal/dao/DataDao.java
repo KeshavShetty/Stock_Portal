@@ -4407,8 +4407,10 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 	            		+ ", Future Outstanding Volume"
 	            		+ ", Top5 OI Diff"
 	            		+ ", CEOutlier, PEOutlier"
-	            		+ ", dr1_6CEAvgIv, dr1_6PEAvgIv"
-	            		+ ", drWhlStrkaccumulatedchangein5seccetheta, drWhlStrkaccumulatedchangein5secpetheta"
+	            		+ ", [685] drWhlStrkaccumulatedchangein5seccetheta, drWhlStrkaccumulatedchangein5secpetheta"
+	            		+ ", [751] ALTabove5WhlStrkCEAvgIv, ALTabove5WhlStrkPEAvgIv"
+	            		+ ", drWhlStrkaccumulatedchangein5seccegamma, drWhlStrkaccumulatedchangein5secpegamma"
+	            		+ ", dr1_6CEAvgIv, dr1_6PEAvgIv"	            		
 	            		+ ", accumulatedChangein5secCeIV, accumulatedChangein5secPeIV"
 	            		+ ", selectivestrike_avgcegamma, selectivestrike_avgpegamma"
 	            		+ ", deltaRangeCEFullAvgIv, deltaRangePEFullAvgIv"
@@ -4419,18 +4421,15 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 	            		+ ", deltarangeceoutlierratio, deltarangepeoutlierratio"
 	            		+ ", deltarangecegammaoi, deltarangepegammaoi"
 	            		+ ", drWhlStrkaccumulatedchangein5seccevega, drWhlStrkaccumulatedchangein5secpevega"
-	            		+ ", dr49AccumulatedChangein5secCeTheta, dr49AccumulatedChangein5secPeTheta"
-	            		
+	            		+ ", dr49AccumulatedChangein5secCeTheta, dr49AccumulatedChangein5secPeTheta"	            		
 	            		+ ", dr16AccumulatedChangein5secCeTheta, dr16AccumulatedChangein5secPeTheta"
 	            		+ ", dr49AccumulatedChangein5secCeGamma, dr49AccumulatedChangein5secPeGamma"
 	            		+ ", drITMWhlStrkSameSizeCEAvgIv, drITMWhlStrkSameSizePEAvgIv"
-	            		+ ", above5WhlStrkCEAvgIv, above5WhlStrkPEAvgIv"
-	            		+ ", ALTabove5WhlStrkCEAvgIv, ALTabove5WhlStrkPEAvgIv"
+	            		+ ", above5WhlStrkCEAvgIv, above5WhlStrkPEAvgIv"	            		
 	            		+ ", altAbove5WhlStrkAccmltCETheta, altAbove5WhlStrkAccmltPETheta"
 	            		+ ", otm250x750AccmlCeTheta, otm250x750AccmlPeTheta"
 	            		+ ", itm1000x500AvgCeIv, itm1000x500AvgPeIv"
 	            		+ ", dr19fixedSizeCEAvgIV, dr19fixedSizePEAvgIV"	            		
-	            		
 	            		+ ", range350CEAvgIv, range350PEAvgIv"
 	            		+ ", range350CEAvgGamma, range350PEAvgGamma"
 	            		+ ", range350CEAvgVega, range350PEAvgVega"
@@ -4439,8 +4438,21 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 	            		+ ", range700CEAvgGamma, range700PEAvgGamma"
 	            		+ ", range700CEAvgVega, range700PEAvgVega"
 	            		+ ", range700CEAvgTheta, range700PEAvgTheta"
-	            		+ ", OTM50x500AccmlCETheta, OTM250x500AccmlPETheta"
-	            		+ ", ITM0_350CEAvgIv, ITM0_350PEAvgIv"
+	            		+ ", OTM250x750AccmlCETheta, OTM250x750AccmlPETheta"
+	            		+ ", lowerStrikeCEAvgIv, lowerStrikePEAvgIv"
+	            		+ ", upperStrikeCEAvgIv, upperStrikePEAvgIv"
+	            		+ ", otm200_400AccmlCeTheta,otm200_400AccmlPeTheta"
+	            		+ ", tmpaccmlcetheta, tmpaccmlpetheta"
+	            		+ ", atmAccmlCEVega, atmAccmlPEVega"
+	            		+ ", otmAccmlCEVega, otmAccmlPEVega"
+	            		
+	            		+ ",otm0_200CEAccmlTheta,otm0_200PEAccmlTheta"
+	            		+ ",otm200_400CEAccmlTheta,otm200_400PEAccmlTheta"
+	            		+ ",otm400_600CEAccmlTheta,otm400_600PEAccmlTheta"
+	            		+ ",mingammaexposure,maxgammaexposure"
+	            		+ ",mingammaexposuretopn, maxgammaexposuretopn"
+	            		+ ",startingMinGammaExposure, startingMaxGammaExposure"
+	            		+ ",MinGammaExposureRise, MaxGammaExposureRise"
 					
             		+ "\r\n").getBytes());
             
@@ -4461,7 +4473,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			} else  {
 				cal.setTime(stdFormat.parse(forDate));
 				cal.set(Calendar.HOUR_OF_DAY, 9);
-				cal.set(Calendar.MINUTE, 15);
+				cal.set(Calendar.MINUTE, 20);
+				cal.set(Calendar.SECOND, 0);
 				
 				dateStrBegin = postgresFormat.format(cal.getTime());
 				cal.set(Calendar.MINUTE, 30);
@@ -4481,6 +4494,10 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			sqlFields.put("drWhlStrkaccumulatedchangein5secpetheta", idx++);
 			sqlFields.put("accumulatedChangein5secCeIV", idx++);
 			sqlFields.put("accumulatedChangein5secPeIV", idx++);
+			
+			sqlFields.put("drWhlStrkaccumulatedchangein5seccegamma", idx++);
+			sqlFields.put("drWhlStrkaccumulatedchangein5secpegamma", idx++);
+			
 			sqlFields.put("selectivestrike_avgcegamma", idx++);
 			sqlFields.put("selectivestrike_avgpegamma", idx++);
 			sqlFields.put("deltaRangeCEFullAvgIv", idx++);
@@ -4546,10 +4563,41 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			sqlFields.put("range700CEAvgTheta", idx++);
 			sqlFields.put("range700PEAvgTheta", idx++);
 			
-			sqlFields.put("otm250x500accmlcetheta", idx++);
-			sqlFields.put("otm250x500accmlpetheta", idx++);
-			sqlFields.put("itm0_350CEAvgIv", idx++);
-			sqlFields.put("itm0_350PEAvgIv", idx++);
+			sqlFields.put("otm250_750AccmlCeTheta", idx++);
+			sqlFields.put("otm250_750AccmlPeTheta", idx++);
+			
+			sqlFields.put("lowerStrikeCEAvgIv", idx++);
+			sqlFields.put("lowerStrikePEAvgIv", idx++);
+			
+			sqlFields.put("upperStrikeCEAvgIv", idx++);
+			sqlFields.put("upperStrikePEAvgIv", idx++);
+			
+			sqlFields.put("otm200_400AccmlCeTheta", idx++);
+			sqlFields.put("otm200_400AccmlPeTheta", idx++);
+			
+			sqlFields.put("tmpaccmlcetheta", idx++);
+			sqlFields.put("tmpaccmlpetheta", idx++);
+			
+			sqlFields.put("atmAccmlCEVega", idx++);
+			sqlFields.put("atmAccmlPEVega", idx++);
+			
+			sqlFields.put("otmAccmlCEVega", idx++);
+			sqlFields.put("otmAccmlPEVega", idx++);
+			
+			sqlFields.put("otm0_200CEAccmlTheta", idx++);
+			sqlFields.put("otm0_200PEAccmlTheta", idx++);
+			
+			sqlFields.put("otm200_400CEAccmlTheta", idx++);
+			sqlFields.put("otm200_400PEAccmlTheta", idx++);
+			
+			sqlFields.put("otm400_600CEAccmlTheta", idx++);
+			sqlFields.put("otm400_600PEAccmlTheta", idx++);
+			
+			sqlFields.put("mingammaexposure", idx++);
+			sqlFields.put("maxgammaexposure", idx++);
+			
+			sqlFields.put("mingammaexposuretopn", idx++);
+			sqlFields.put("maxgammaexposuretopn", idx++);
 			
 			String fetchSql = "select " +  String.join(",", sqlFields.keySet())
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
@@ -4560,6 +4608,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			Query q = entityManager.createNativeQuery(fetchSql);	
 			List<Object[]> listResults = q.getResultList();
 			Iterator<Object[]> iter = listResults.iterator();
+			
+			float startingMinGammaExposure = 0f;
+			float startingMaxGammaExposure = 0f;
 			
 			while (iter.hasNext()) {
 				Object[] rowdata = iter.next();
@@ -4573,15 +4624,27 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				
 				float futurePriceDiffPercent = (futureLtp-indexltp)*100f/indexltp;
 				
+				float mingammaexposure = (Float) rowdata[sqlFields.get("mingammaexposure")];
+				float maxgammaexposure = (Float) rowdata[sqlFields.get("maxgammaexposure")];
+				
+				if (startingMinGammaExposure == 0f && startingMaxGammaExposure==0f) {
+					startingMinGammaExposure = mingammaexposure;
+					startingMaxGammaExposure = maxgammaexposure;
+				}
+				
+				
+				
 				writer.write((postgresFormat.format(quoteTime)+","+indexltp + "," + futureLtp + "," + futurePriceDiffPercent
 						+ "," +  (ceLtp+peLtp) 
 						
 						+ "," + (Float) rowdata[sqlFields.get("future_Outstanding_Volume")]
 						+ "," + (Float) rowdata[sqlFields.get("top5OiDiff")] 
 						+ "," + (Integer) rowdata[sqlFields.get("countCEOutlier")] + "," + (Integer) rowdata[sqlFields.get("countPEOutlier")]
-										
-						+ "," + (Float) rowdata[sqlFields.get("dr1_6CEAvgIv")] + "," + (Float) rowdata[sqlFields.get("dr1_6PEAvgIv")]
 						+ "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5seccetheta")] + "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5secpetheta")]
+						+ "," + (Float) rowdata[sqlFields.get("ALTabove5WhlStrkCEAvgIv")] + "," + (Float) rowdata[sqlFields.get("ALTabove5WhlStrkPEAvgIv")]
+						+ "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5seccegamma")] + "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5secpegamma")]
+								
+						+ "," + (Float) rowdata[sqlFields.get("dr1_6CEAvgIv")] + "," + (Float) rowdata[sqlFields.get("dr1_6PEAvgIv")]						
 						+ "," + (Float) rowdata[sqlFields.get("accumulatedChangein5secCeIV")] + "," + (Float) rowdata[sqlFields.get("accumulatedChangein5secPeIV")]
 						+ "," + (Float) rowdata[sqlFields.get("selectivestrike_avgcegamma")] + "," + (Float) rowdata[sqlFields.get("selectivestrike_avgpegamma")]
 						+ "," + (Float) rowdata[sqlFields.get("deltaRangeCEFullAvgIv")] + "," + (Float) rowdata[sqlFields.get("deltaRangePEFullAvgIv")]
@@ -4600,7 +4663,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + (Float) rowdata[sqlFields.get("drITMWhlStrkSameSizeCEAvgIv")] + "," + (Float) rowdata[sqlFields.get("drITMWhlStrkSameSizePEAvgIv")]
 						
 						+ "," + (Float) rowdata[sqlFields.get("above5WhlStrkCEAvgIv")] + "," + (Float) rowdata[sqlFields.get("above5WhlStrkPEAvgIv")]
-						+ "," + (Float) rowdata[sqlFields.get("ALTabove5WhlStrkCEAvgIv")] + "," + (Float) rowdata[sqlFields.get("ALTabove5WhlStrkPEAvgIv")]
+						
 						+ "," + (Float) rowdata[sqlFields.get("altAbove5WhlStrkAccmltCETheta")] + "," + (Float) rowdata[sqlFields.get("altAbove5WhlStrkAccmltPETheta")]
 						
 						+ "," + (Float) rowdata[sqlFields.get("otm250x750AccmlCeTheta")] + "," + (Float) rowdata[sqlFields.get("otm250x750AccmlPeTheta")]
@@ -4620,11 +4683,194 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + (Float) rowdata[sqlFields.get("range700CEAvgVega")] + "," + (Float) rowdata[sqlFields.get("range700PEAvgVega")]
 						+ "," + (Float) rowdata[sqlFields.get("range700CEAvgTheta")] + "," + (Float) rowdata[sqlFields.get("range700PEAvgTheta")]
 								
-						//+ "," + (Float) rowdata[sqlFields.get("tmpaccmlcetheta")] + "," + (Float) rowdata[sqlFields.get("tmpaccmlpetheta")]
+						+ "," + (Float) rowdata[sqlFields.get("otm250_750AccmlCeTheta")] + "," + (Float) rowdata[sqlFields.get("otm250_750AccmlPeTheta")]
+						
+						+ "," + (Float) rowdata[sqlFields.get("lowerStrikeCEAvgIv")] + "," + (Float) rowdata[sqlFields.get("lowerStrikePEAvgIv")]
 								
-						+ "," + (Float) rowdata[sqlFields.get("otm250x500accmlcetheta")] + "," + (Float) rowdata[sqlFields.get("otm250x500accmlpetheta")]
-						+ "," + (Float) rowdata[sqlFields.get("itm0_350CEAvgIv")] + "," + (Float) rowdata[sqlFields.get("itm0_350PEAvgIv")]
-												
+						+ "," + (Float) rowdata[sqlFields.get("upperStrikeCEAvgIv")] + "," + (Float) rowdata[sqlFields.get("upperStrikePEAvgIv")]
+						
+						+ "," + (Float) rowdata[sqlFields.get("otm200_400AccmlCeTheta")] + "," + (Float) rowdata[sqlFields.get("otm200_400AccmlPeTheta")]
+						+ "," + ((Float) rowdata[sqlFields.get("tmpaccmlcetheta")]) + "," + (Float) rowdata[sqlFields.get("tmpaccmlpetheta")]
+								
+						+ "," + (Float) rowdata[sqlFields.get("atmAccmlCEVega")] + "," + (Float) rowdata[sqlFields.get("atmAccmlPEVega")]
+						+ "," + (Float) rowdata[sqlFields.get("otmAccmlCEVega")] + "," + (Float) rowdata[sqlFields.get("otmAccmlPEVega")]
+							
+						+ "," + (Float) rowdata[sqlFields.get("otm0_200CEAccmlTheta")] + "," + (Float) rowdata[sqlFields.get("otm0_200PEAccmlTheta")]
+						+ "," + (Float) rowdata[sqlFields.get("otm200_400CEAccmlTheta")] + "," + (Float) rowdata[sqlFields.get("otm200_400PEAccmlTheta")]
+						+ "," + (Float) rowdata[sqlFields.get("otm400_600CEAccmlTheta")] + "," + (Float) rowdata[sqlFields.get("otm400_600PEAccmlTheta")]
+								
+						+ "," + mingammaexposure + "," + maxgammaexposure
+						+ "," + (Float) rowdata[sqlFields.get("mingammaexposuretopn")] + "," + (Float) rowdata[sqlFields.get("maxgammaexposuretopn")]
+						
+						+ ", " + startingMinGammaExposure + "," + startingMaxGammaExposure
+							
+						+ "," + (mingammaexposure - startingMinGammaExposure)
+						+ "," + (maxgammaexposure - startingMaxGammaExposure)
+								
+						+"\r\n").getBytes());
+			}
+			retArray = writer.toByteArray();
+			writer.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return retArray;
+	}
+	
+	public byte[] getOptionsInsight2(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException {
+		log.info("In getOptionTimeValueAnalysis forDate="+forDate);
+		Map<String, List<OptionOI>> oiDataMap = new HashMap<String, List<OptionOI>>();
+		byte[] retArray = null;
+		try {
+			ByteArrayOutputStream writer = new ByteArrayOutputStream(); // writer = new FileWriter(csvFilename);
+			 writer.write(("QuoteTime,indexltp , futureLtp"
+	            		+ ", StraddlePremium"
+	            		+ ", Future Outstanding Volume"
+	            		+ ", Top5 OI Diff"
+	            		+ ", CEOutlier, PEOutlier"
+	            		+ ", [685] drWhlStrkaccumulatedchangein5seccetheta, drWhlStrkaccumulatedchangein5secpetheta"
+	            		+ ", [751] ALTabove5WhlStrkCEAvgIv, ALTabove5WhlStrkPEAvgIv"
+	            		
+						+ ", minGammaExposureWithStrike, maxGammaExposureWithStrike"
+						+ ", dr16AccumulatedChangein5secCeTheta, dr16AccumulatedChangein5secPeTheta"
+						+ ", otm250x750AccmlCeTheta, otm250x750AccmlPeTheta"
+						+ ", drWhlStrkaccumulatedchangein5seccegamma, drWhlStrkaccumulatedchangein5secpegamma"
+						+ ", drWhlStrkaccumulatedchangein5seccevega, drWhlStrkaccumulatedchangein5secpevega"
+						+ ", mingammaexposure,maxgammaexposure"
+						+ ", MinGammaExposureRise, MaxGammaExposureRise"
+						+ ", altAbove5WhlStrkCEAvgTimevalue,altAbove5WhlStrkPEAvgTimevalue"
+						
+						+ ", fullOtm0x600CEGreeks, fullOtm0x600PEGreeks"
+						+ ", lowerOtm0x300CEGreeks, lowerOtm0x300PEGreeks"
+						+ ", upperOtm300x600CEGreeks, upperOtm300x600PEGreeks"
+						+ ", upperOtm150x300CEGreeks, upperOtm150x300PEGreeks"
+						
+						+ ", tmpaccmlcetheta, tmpaccmlpetheta"
+					
+            		+ "\r\n").getBytes());
+            
+            SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			SimpleDateFormat stdFormat = new SimpleDateFormat("dd/MM/yyyy");
+			
+			DecimalFormat decimalFormat = new DecimalFormat("#.##");
+			 
+			String dateStrEnd = "";
+			String dateStrBegin = "";
+			Calendar cal = Calendar.getInstance();
+			if (forDate.length()>12) {
+				cal.setTime(longFormat.parse(forDate));
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.add(Calendar.MINUTE, 15);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			} else  {
+				cal.setTime(stdFormat.parse(forDate));
+				cal.set(Calendar.HOUR_OF_DAY, 9);
+				cal.set(Calendar.MINUTE, 20);
+				cal.set(Calendar.SECOND, 0);
+				
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.set(Calendar.MINUTE, 30);
+				cal.set(Calendar.HOUR_OF_DAY, 15);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			}
+			
+	        LinkedHashMap<String, Integer> sqlFields = new LinkedHashMap<>();
+			int idx = 0;
+			sqlFields.put("record_time", idx++);			
+			sqlFields.put("instrumentLtp", idx++);
+			sqlFields.put("celtp", idx++);
+			sqlFields.put("peltp", idx++);
+			sqlFields.put("futures_ltp", idx++);
+			sqlFields.put("future_Outstanding_Volume", idx++);
+			sqlFields.put("top5OiDiff", idx++);
+			sqlFields.put("countCEOutlier", idx++);
+			sqlFields.put("countPEOutlier", idx++);
+			sqlFields.put("drWhlStrkaccumulatedchangein5seccetheta", idx++);
+			sqlFields.put("drWhlStrkaccumulatedchangein5secpetheta", idx++);
+			sqlFields.put("ALTabove5WhlStrkCEAvgIv", idx++);
+			sqlFields.put("ALTabove5WhlStrkPEAvgIv", idx++);
+			sqlFields.put("maxGammaExposureWithStrike", idx++);
+			sqlFields.put("minGammaExposureWithStrike", idx++);
+			sqlFields.put("dr16AccumulatedChangein5secCeTheta", idx++);
+			sqlFields.put("dr16AccumulatedChangein5secPeTheta", idx++);
+			sqlFields.put("otm250x750AccmlCeTheta", idx++);
+			sqlFields.put("otm250x750AccmlPeTheta", idx++);
+			sqlFields.put("drWhlStrkaccumulatedchangein5seccegamma", idx++);
+			sqlFields.put("drWhlStrkaccumulatedchangein5secpegamma", idx++);
+			sqlFields.put("drWhlStrkaccumulatedchangein5seccevega", idx++);
+			sqlFields.put("drWhlStrkaccumulatedchangein5secpevega", idx++);
+			sqlFields.put("mingammaexposure", idx++);
+			sqlFields.put("maxgammaexposure", idx++);
+			sqlFields.put("altAbove5WhlStrkCEAvgTimevalue", idx++);
+			sqlFields.put("altAbove5WhlStrkPEAvgTimevalue", idx++);
+			
+			sqlFields.put("fullOtm0x600CEGreeks", idx++);
+			sqlFields.put("fullOtm0x600PEGreeks", idx++);
+			sqlFields.put("lowerOtm0x300CEGreeks", idx++);
+			sqlFields.put("lowerOtm0x300PEGreeks", idx++);
+			sqlFields.put("upperOtm300x600CEGreeks", idx++);
+			sqlFields.put("upperOtm300x600PEGreeks", idx++);
+			sqlFields.put("upperOtm150x300CEGreeks", idx++);
+			sqlFields.put("upperOtm150x300PEGreeks", idx++);
+			
+			sqlFields.put("tmpaccmlcetheta", idx++);
+			sqlFields.put("tmpaccmlpetheta", idx++);
+			
+			String fetchSql = "select " +  String.join(",", sqlFields.keySet())
+					+ " from fdw_nexcorio_option_atm_movement_data oamd"
+					+ " where f_main_instrument = '" + mainInstrumentId + "'"
+					+ " and record_time > '" + dateStrBegin +"' and record_time < '" + dateStrEnd + "' order by record_time";
+			
+			log.info("fetchSql "+fetchSql);
+			Query q = entityManager.createNativeQuery(fetchSql);	
+			List<Object[]> listResults = q.getResultList();
+			Iterator<Object[]> iter = listResults.iterator();
+			
+			float startingMinGammaExposure = 0f;
+			float startingMaxGammaExposure = 0f;
+			boolean startingMinGammaExposureSet = false;
+			
+			while (iter.hasNext()) {
+				Object[] rowdata = iter.next();
+				Date quoteTime = (Timestamp) rowdata[sqlFields.get("record_time")];
+				float indexltp = (Float) rowdata[sqlFields.get("instrumentLtp")];
+				
+				float ceLtp = (Float) rowdata[sqlFields.get("celtp")];
+				float peLtp = (Float) rowdata[sqlFields.get("peltp")];
+				
+				float futureLtp = (Float) rowdata[sqlFields.get("futures_ltp")];
+				
+				float mingammaexposure = (Float) rowdata[sqlFields.get("mingammaexposure")];
+				float maxgammaexposure = (Float) rowdata[sqlFields.get("maxgammaexposure")];
+				
+				if (startingMinGammaExposureSet == false) {
+					startingMinGammaExposure = mingammaexposure;
+					startingMaxGammaExposure = maxgammaexposure;
+					startingMinGammaExposureSet = true;
+				}
+				 
+				writer.write((postgresFormat.format(quoteTime)+","+indexltp + "," + futureLtp + "," +  (ceLtp+peLtp) + "," + (Float) rowdata[sqlFields.get("future_Outstanding_Volume")] + "," + (Float) rowdata[sqlFields.get("top5OiDiff")] 
+						+ "," + (Integer) rowdata[sqlFields.get("countCEOutlier")] + "," + (Integer) rowdata[sqlFields.get("countPEOutlier")]
+						+ "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5seccetheta")] + "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5secpetheta")]
+						+ "," + (Float) rowdata[sqlFields.get("ALTabove5WhlStrkCEAvgIv")] + "," + (Float) rowdata[sqlFields.get("ALTabove5WhlStrkPEAvgIv")]
+						+ "," + (Float) rowdata[sqlFields.get("minGammaExposureWithStrike")] + "," + (Float) rowdata[sqlFields.get("maxGammaExposureWithStrike")]
+						+ "," + (Float) rowdata[sqlFields.get("dr16AccumulatedChangein5secCeTheta")] + "," + (Float) rowdata[sqlFields.get("dr16AccumulatedChangein5secPeTheta")]			
+						+ "," + (Float) rowdata[sqlFields.get("otm250x750AccmlCeTheta")] + "," + (Float) rowdata[sqlFields.get("otm250x750AccmlPeTheta")]
+						+ "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5seccegamma")] + "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5secpegamma")]					
+						+ "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5seccevega")] + "," + (Float) rowdata[sqlFields.get("drWhlStrkaccumulatedchangein5secpevega")]				
+						+ "," + mingammaexposure + "," + maxgammaexposure
+						+ "," + (mingammaexposure - startingMinGammaExposure) + "," + (maxgammaexposure - startingMaxGammaExposure)
+						+ "," + (Float) rowdata[sqlFields.get("altAbove5WhlStrkCEAvgTimevalue")] + "," + (Float) rowdata[sqlFields.get("altAbove5WhlStrkPEAvgTimevalue")]
+								
+						+ "," + (Float) rowdata[sqlFields.get("fullOtm0x600CEGreeks")] + "," + (Float) rowdata[sqlFields.get("fullOtm0x600PEGreeks")]  
+						+ "," + (Float) rowdata[sqlFields.get("lowerOtm0x300CEGreeks")] + "," + (Float) rowdata[sqlFields.get("lowerOtm0x300PEGreeks")]  
+						+ "," + (Float) rowdata[sqlFields.get("upperOtm300x600CEGreeks")] + "," + (Float) rowdata[sqlFields.get("upperOtm300x600PEGreeks")]  
+						+ "," + (Float) rowdata[sqlFields.get("upperOtm150x300CEGreeks")] + "," + (Float) rowdata[sqlFields.get("upperOtm150x300PEGreeks")]  
+								
+								
+						+ "," + (Float) rowdata[sqlFields.get("tmpaccmlcetheta")] + "," + (Float) rowdata[sqlFields.get("tmpaccmlpetheta")]
+						
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();
