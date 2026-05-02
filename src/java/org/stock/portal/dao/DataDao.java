@@ -4360,7 +4360,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(forTime);
-			cal.add(Calendar.SECOND, -5);
+			cal.add(Calendar.MINUTE, -5);
 			
 			
 			
@@ -4746,6 +4746,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ ", upperOtm150x300CEGreeks, upperOtm150x300PEGreeks"
 						
 						+ ", tmpaccmlcetheta, tmpaccmlpetheta"
+						
+						+ ", otm0x400CEGreeks,otm0x400PEGreeks,otm400x800CEGreeks,otm400x800PEGreeks"
 					
             		+ "\r\n").getBytes());
             
@@ -4817,6 +4819,12 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			sqlFields.put("tmpaccmlcetheta", idx++);
 			sqlFields.put("tmpaccmlpetheta", idx++);
 			
+			sqlFields.put("otm0x400CEGreeks", idx++);
+			sqlFields.put("otm400x800CEGreeks", idx++);
+			
+			sqlFields.put("otm0x400PEGreeks", idx++);
+			sqlFields.put("otm400x800PEGreeks", idx++);
+			
 			String fetchSql = "select " +  String.join(",", sqlFields.keySet())
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
@@ -4870,6 +4878,11 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 								
 								
 						+ "," + (Float) rowdata[sqlFields.get("tmpaccmlcetheta")] + "," + (Float) rowdata[sqlFields.get("tmpaccmlpetheta")]
+						
+						+ "," + (Float) rowdata[sqlFields.get("otm0x400CEGreeks")] + "," +  (Float) rowdata[sqlFields.get("otm0x400PEGreeks")]
+						+ "," + (Float) rowdata[sqlFields.get("otm400x800CEGreeks")]+ "," + (Float) rowdata[sqlFields.get("otm400x800PEGreeks")]
+								
+								 
 						
 						+"\r\n").getBytes());
 			}
