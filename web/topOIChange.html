@@ -1,0 +1,85 @@
+<html>
+<head>
+  <title>Option Top OI change chart (x1K) </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<script src="/portal/metroWL/js/highcharts.js"></script>
+<script src="/portal/metroWL/js/modules/data.js"></script>
+<script src="/portal/metroWL/js/modules/exporting.js"></script>
+
+
+<div id="container1" style="min-width: 310px; height: 700px; margin: 0 auto; border-style: solid;"></div>
+
+<script type='text/javascript'>
+
+	function getQueryParameter(name){
+	  const parts = window.location.href.split('?');
+	  if (parts.length > 1) {
+	    name = encodeURIComponent(name);
+	    const params = parts[1].split('&');
+	    const found = params.filter(el => (el.split('=')[0] === name) && el);
+	    if (found.length) return decodeURIComponent(found[0].split('=')[1]);
+	  }
+	}
+	
+	var forDateTime = getQueryParameter("forDateTime");
+	var instrument = getQueryParameter("instrument");
+	
+	Highcharts.chart('container1', {
+	  chart: {
+	    type: 'column'
+	  },
+	  title: {
+	    text: ' Top 5 OI Change over time'
+	  },
+	  xAxis: {
+        crosshair: true,
+        scrollbar: {
+            enabled: true
+        }
+      },
+      yAxis: {
+          min: 0,
+          title: {
+              text: 'Share'
+          },
+          stackLabels: {
+              enabled: true
+          }
+      },
+      legend: {
+          align: 'right',
+          x: 70,
+          verticalAlign: 'top',
+          y: 10,
+          floating: true,
+          backgroundColor: 'var(--highcharts-background-color, #ffffff)',
+          borderColor: 'var(--highcharts-neutral-color-20, #cccccc)',
+          borderWidth: 1,
+          shadow: false
+      },
+      plotOptions: {
+          column: {
+              stacking: 'normal',
+              dataLabels: {
+                  enabled: false
+              }
+          }
+      },
+	  data: {
+	    csvURL: '/chart/TopOIChangeChartQuote?instrument=' + instrument+ '&forDateTime='+ forDateTime,
+	    enablePolling: true,
+	    dataRefreshRate: 90
+	  },
+	  series: [
+		  { yAxis: 0, color: '#ec7063',  visible: true},{ yAxis: 0, color: '#58d68d',  visible: true},
+		  { yAxis: 0, color: '#ec7063',  visible: true},{ yAxis: 0, color: '#58d68d',  visible: true},
+		  { yAxis: 0, color: '#ec7063',  visible: true},{ yAxis: 0, color: '#58d68d',  visible: true},
+		  { yAxis: 0, color: '#ec7063',  visible: true},{ yAxis: 0, color: '#58d68d',  visible: true},
+		  { yAxis: 0, color: '#ec7063',  visible: true},{ yAxis: 0, color: '#58d68d',  visible: true}
+		  
+		 ]
+	});
+  </script>
+</body>
+</html>

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.persistence.EntityManager;
@@ -4318,6 +4319,171 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 		return retArray;
 	}
 	
+	public byte[] getFuturesOrderflow(String instrument, String forDateTime) throws BusinessException {
+		byte[] retArray = null;
+		try {
+			SimpleDateFormat postgresLongDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			SimpleDateFormat stdFormat = new SimpleDateFormat("dd/MM/yyyy");
+			SimpleDateFormat regularLongFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			
+			Calendar cal = Calendar.getInstance();
+			if (forDateTime != null && forDateTime.trim().length() > 0 ) {
+				cal.setTime(regularLongFormat.parse(forDateTime));
+			} else {
+				
+			}
+			Date endTime = cal.getTime();
+			
+			cal.set(Calendar.HOUR_OF_DAY, 9);
+			cal.set(Calendar.MINUTE, 16);
+			Date beginTime = cal.getTime();
+			
+			ByteArrayOutputStream writer = new ByteArrayOutputStream(); // writer = new FileWriter(csvFilename);
+            writer.write(("Strike,Volume \r\n").getBytes());
+            
+            
+            String fetchSql = "SELECT instrumentLtp, future_Outstanding_Volume "
+            		+ " from fdw_nexcorio_option_atm_movement_data oamd"
+					+ " where f_main_instrument = '" + instrument + "'"
+					+ " and record_time > '" + postgresLongDateFormat.format(beginTime) +"' and record_time < '" + postgresLongDateFormat.format(endTime) + "' order by record_time";
+            
+         	Query q = entityManager.createNativeQuery(fetchSql);	
+			List<Object[]> listResults = q.getResultList();
+			Iterator<Object[]> iter = listResults.iterator();
+			
+			boolean baseVolumeSet = false;
+			float prevFutureOutstandingVolume = 0f;
+			
+			Map<Integer, Float> orderFlowMap = new TreeMap<>(Collections.reverseOrder());
+			while (iter.hasNext()) {
+				Object[] rowdata = iter.next();
+				
+				int instrumentLtp = ((Float) rowdata[0]).intValue();
+				Float futureOutstandingVolume = (Float) rowdata[1];
+				
+				if (baseVolumeSet==false) {
+					baseVolumeSet = true;
+				} else {
+					float changeInVolume = futureOutstandingVolume - prevFutureOutstandingVolume;
+					
+					int last2DigitReminder = instrumentLtp%100;
+					int strikeKey = (instrumentLtp/10);
+					strikeKey = strikeKey * 10;
+					
+//					if (last2DigitReminder >= 75 &&  last2DigitReminder < 25) { // 25491 - 25528
+//						if (last2DigitReminder >= 75) strikeKey = strikeKey + 100;
+//					} else if (last2DigitReminder >= 25 &&  last2DigitReminder < 75) { // 25528 - 25573
+//						strikeKey = strikeKey + 50;
+//					}
+					float existingVolume = orderFlowMap.get(strikeKey)!=null ? orderFlowMap.get(strikeKey) : 0f;
+					
+					orderFlowMap.put(strikeKey, (existingVolume+changeInVolume) );
+					
+				}
+				prevFutureOutstandingVolume = futureOutstandingVolume;
+			}
+         	
+			Iterator<Integer> keys = orderFlowMap.keySet().iterator();
+			while(keys.hasNext()) {
+				Integer nextKey = keys.next();
+				 writer.write((nextKey + "," + orderFlowMap.get(nextKey)+ "\r\n").getBytes());
+			}
+			retArray = writer.toByteArray();
+            writer.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return retArray;
+	}
+	
+	public byte[] getTopOIChange(String instrument, String forDateTime) throws BusinessException {
+		byte[] retArray = null;
+		try {
+			SimpleDateFormat postgresLongDateFormat  = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			SimpleDateFormat postgresShortDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat stdFormat = new SimpleDateFormat("dd/MM/yyyy");
+			SimpleDateFormat regularLongFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			SimpleDateFormat chartHourFormat  = new SimpleDateFormat("HH:mm");
+			
+			Calendar cal = Calendar.getInstance();
+			if (forDateTime != null && forDateTime.trim().length() > 0 ) {
+				cal.setTime(regularLongFormat.parse(forDateTime));
+			} else {
+//				cal.set(Calendar.HOUR_OF_DAY, 9);
+//				cal.set(Calendar.MINUTE, 15);
+//				cal.set(Calendar.SECOND, 10);
+				cal.add(Calendar.MINUTE, -60);
+			}
+			Date beginTime = cal.getTime();
+			
+			cal.set(Calendar.HOUR_OF_DAY, 15);
+			cal.set(Calendar.MINUTE, 15);
+			Date endTime = cal.getTime();
+			
+			ByteArrayOutputStream writer = new ByteArrayOutputStream(); // writer = new FileWriter(csvFilename);
+            writer.write(("Time, Top1CE, Top1PE, Top2CE, Top2PE, Top3CE, Top3PE, Top4CE, Top4PE, Top5CE, Top5PE \r\n").getBytes());
+			
+			Calendar loopCal = Calendar.getInstance();		
+			loopCal.setTime(beginTime);
+			
+			do {
+				System.out.println("Top OI For " + postgresLongDateFormat.format(cal.getTime()));
+				
+				loopCal.add(Calendar.SECOND, -10);
+				String fromTimeStr = postgresLongDateFormat.format(loopCal.getTime());
+				
+				loopCal.add(Calendar.SECOND, 10);
+				String toTimeStr = postgresLongDateFormat.format(loopCal.getTime());
+				
+				String oiFetchSql = "WITH RankedRows AS"
+						+ " ("
+						+ " SELECT quote_time, trading_symbol, oi, ltp, ROW_NUMBER() OVER (PARTITION BY trading_symbol ORDER BY quote_time DESC, id DESC) AS rank FROM fdw_nexcorio_option_greeks"
+						+ " WHERE trading_symbol IN (select trading_symbol from fdw_nexcorio_option_snapshot where trading_symbol like '" + instrument.trim().toUpperCase() + "%' and record_date = '" + postgresShortDateFormat.format(loopCal.getTime())+ "')"
+						+ " AND quote_time >= '" + fromTimeStr + "'"
+						+ " AND quote_time <= '" + toTimeStr + "'"
+						+ ") "
+						+ " SELECT quote_time, trading_symbol, ltp, oi FROM RankedRows WHERE rank = 1 and oi*ltp/10000000 > 10 order by oi desc limit 5";				
+				
+				Query q = entityManager.createNativeQuery(oiFetchSql);	
+				List<Object[]> listResults = q.getResultList();
+				Iterator<Object[]> iter = listResults.iterator();
+								
+				Map<String, Float> oiMap = new LinkedHashMap<>();
+				float totalOI = 0f;
+				while (iter.hasNext()) {
+					Object[] rowdata = iter.next();
+					
+					String tradingSymbol = (String) rowdata[1];
+					Float oi = (Float) rowdata[3];
+					
+					totalOI = totalOI + oi;
+					oiMap.put(tradingSymbol, oi);
+				}
+				if (oiMap.size()>0) {
+					String csvStr = chartHourFormat.format(loopCal.getTime());
+					for (Map.Entry<String, Float> entry : oiMap.entrySet()) {
+						String tradingSymbol = entry.getKey();
+						Float oi = entry.getValue();
+						
+						if (tradingSymbol.endsWith("CE")) {
+							csvStr = csvStr + "," + oi/1000 + ",0"; 
+						} else {
+							csvStr = csvStr + ",0," + oi/1000 ;
+						}
+					}
+					csvStr = csvStr + "\r\n";
+					writer.write(csvStr.getBytes());
+				}
+				loopCal.add(Calendar.MINUTE, 3);
+			} while(loopCal.getTime().before(endTime));
+			retArray = writer.toByteArray();
+            writer.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return retArray;
+	}
+	
 	private  OptionGreek getOptionGreeks(String optionName, Date forTime) {
 		
 		if (optionName==null || optionName.equals("")) return null;
@@ -4748,6 +4914,10 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ ", tmpaccmlcetheta, tmpaccmlpetheta"
 						
 						+ ", otm0x400CEGreeks,otm0x400PEGreeks,otm400x800CEGreeks,otm400x800PEGreeks"
+						+ ", dr19fixedSizeCEAvgIV, dr19fixedSizePEAvgIV"
+						+ ", upperDeltaPeMinIv, upperDeltaPeMaxIv, upperDeltaPeAvgIv"
+						+ ", lowerDeltaPeMinIv, lowerDeltaPeMaxIv, lowerDeltaPeAvgIv"
+						+ ", fullOtm0x500CEGreeks, fullOtm0x500PEGreeks, fullOtm50x400CEGreeks, fullOtm50x400PEGreeks"
 					
             		+ "\r\n").getBytes());
             
@@ -4825,6 +4995,23 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			sqlFields.put("otm0x400PEGreeks", idx++);
 			sqlFields.put("otm400x800PEGreeks", idx++);
 			
+			sqlFields.put("dr19fixedSizeCEAvgIV", idx++);
+			sqlFields.put("dr19fixedSizePEAvgIV", idx++);
+			
+			sqlFields.put("upperDeltaPeMinIv", idx++);
+			sqlFields.put("upperDeltaPeMaxIv", idx++);
+			sqlFields.put("upperDeltaPeAvgIv", idx++);
+			 
+			sqlFields.put("lowerDeltaPeMinIv", idx++);
+			sqlFields.put("lowerDeltaPeMaxIv", idx++);
+			sqlFields.put("lowerDeltaPeAvgIv", idx++);
+			
+			
+			sqlFields.put("fullOtm0x500CEGreeks", idx++);			 
+			sqlFields.put("fullOtm0x500PEGreeks", idx++);
+			sqlFields.put("fullOtm50x400CEGreeks", idx++);
+			sqlFields.put("fullOtm50x400PEGreeks", idx++);
+			
 			String fetchSql = "select " +  String.join(",", sqlFields.keySet())
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
@@ -4882,8 +5069,23 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + (Float) rowdata[sqlFields.get("otm0x400CEGreeks")] + "," +  (Float) rowdata[sqlFields.get("otm0x400PEGreeks")]
 						+ "," + (Float) rowdata[sqlFields.get("otm400x800CEGreeks")]+ "," + (Float) rowdata[sqlFields.get("otm400x800PEGreeks")]
 								
-								 
+						+ "," + (Float) rowdata[sqlFields.get("dr19fixedSizeCEAvgIV")]+ "," + (Float) rowdata[sqlFields.get("dr19fixedSizePEAvgIV")]
 						
+						+ "," + (Float) rowdata[sqlFields.get("upperDeltaPeMinIv")]
+						+ "," + (Float) rowdata[sqlFields.get("upperDeltaPeMaxIv")]
+						+ "," + (Float) rowdata[sqlFields.get("upperDeltaPeAvgIv")]
+								
+						+ "," + (Float) rowdata[sqlFields.get("lowerDeltaPeMinIv")]
+						+ "," + (Float) rowdata[sqlFields.get("lowerDeltaPeMaxIv")]
+						+ "," + (Float) rowdata[sqlFields.get("lowerDeltaPeAvgIv")] 
+								
+						+ "," + (Float) rowdata[sqlFields.get("fullOtm0x500CEGreeks")]										
+						+ "," + (Float) rowdata[sqlFields.get("fullOtm0x500PEGreeks")]
+						+ "," + (Float) rowdata[sqlFields.get("fullOtm50x400CEGreeks")]
+						+ "," + (Float) rowdata[sqlFields.get("fullOtm50x400PEGreeks")] 
+								
+								
+								
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();

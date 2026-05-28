@@ -611,5 +611,15 @@ public class DataManagerBean implements DataManager {
     public byte[] getOptionGreeksSnapshot(String instrument, String forDateTime, boolean excludeOddStrikes, float startingDelta) throws BusinessException {
     	return (new DataDao(entityManager)).getOptionGreeksSnapshot(instrument, forDateTime, excludeOddStrikes, startingDelta);    	
     }
+    
+    @TransactionAttribute( TransactionAttributeType.SUPPORTS )
+    public byte[] getFuturesOrderflow(String instrument, String forDateTime) throws BusinessException {
+    	return (new DataDao(entityManager)).getFuturesOrderflow(instrument, forDateTime);    	
+    }
+    
+    @TransactionAttribute( TransactionAttributeType.SUPPORTS )
+    public byte[] getTopOIChange(String instrument, String forDateTime) throws BusinessException {
+    	return (new DataDao(entityManager)).getTopOIChange(instrument, forDateTime);    	
+    }
 }
   

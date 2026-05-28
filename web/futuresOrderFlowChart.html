@@ -1,0 +1,86 @@
+<html>
+<head>
+  <title>Option Greeks Snapshot chart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<script src="/portal/metroWL/js/highcharts.js"></script>
+<script src="/portal/metroWL/js/modules/data.js"></script>
+<script src="/portal/metroWL/js/modules/exporting.js"></script>
+
+
+<div id="container1" style="min-width: 310px; height: 700px; margin: 0 auto; border-style: solid;"></div>
+
+<script type='text/javascript'>
+
+	function getQueryParameter(name){
+	  const parts = window.location.href.split('?');
+	  if (parts.length > 1) {
+	    name = encodeURIComponent(name);
+	    const params = parts[1].split('&');
+	    const found = params.filter(el => (el.split('=')[0] === name) && el);
+	    if (found.length) return decodeURIComponent(found[0].split('=')[1]);
+	  }
+	}
+	
+	var forDateTime = getQueryParameter("forDateTime");
+	var instrument = getQueryParameter("instrument");
+	
+	
+	
+	Highcharts.chart('container1', {
+	  chart: {
+	    type: 'bar',
+	    zooming: {
+            type: 'x'
+        }
+	  },
+	  title: {
+	    text: ' Options Snapshot'
+	  },
+	  subtitle: {
+	    text: 'Options Insight ' + instrument + ' (Time '+ forDateTime + ')' 
+	  },
+	  scrollbar: {
+          enabled: true,
+          barBackgroundColor: 'gray',
+          barBorderRadius: 7,
+          barBorderWidth: 0,
+          buttonBackgroundColor: 'gray',
+          buttonBorderWidth: 0,
+          buttonArrowColor: 'yellow',
+          buttonBorderRadius: 7,
+          rifleColor: 'yellow',
+          trackBackgroundColor: 'white',
+          trackBorderWidth: 1,
+          trackBorderColor: 'silver',
+          trackBorderRadius: 7
+      },
+	  xAxis: {
+        crosshair: true,
+        scrollbar: {
+            enabled: true
+        }
+      },
+	  yAxis: [{ // Primary yAxis
+          labels: {
+              format: '{value}'
+          },
+          crosshair: true,
+          opposite: true,
+          title: {
+              text: 'Volume'
+          }
+      }],
+	  data: {
+	    csvURL: '/chart/FuturesOrderflowChartQuote?instrument=' + instrument+ '&forDateTime='+ forDateTime,
+	    enablePolling: true,
+	    dataRefreshRate: 10
+	  },
+	  series: [
+		  { yAxis: 0, color: '#ec7063',  visible: true}
+		  
+		 ]
+	});
+  </script>
+</body>
+</html>

@@ -119,5 +119,9 @@ public interface DataManager {
 	public byte[] getOptionsDrawdown(String strategyIds, String fromDate, String toDate) throws BusinessException;
 	
 	public byte[] getOptionGreeksSnapshot(String instrument, String forDateTime, boolean excludeOddStrikes, float startingDelta) throws BusinessException;
+	
+	public byte[] getFuturesOrderflow(String instrument, String forDateTime) throws BusinessException;
+	
+	public byte[] getTopOIChange(String instrument, String forDateTime) throws BusinessException;
 }
   
