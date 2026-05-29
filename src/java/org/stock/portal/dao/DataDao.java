@@ -4234,7 +4234,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			}
 			
 			ByteArrayOutputStream writer = new ByteArrayOutputStream(); // writer = new FileWriter(csvFilename);
-            writer.write(("Strike,CE Ltp, PE Ltp,CE IV, PE IV, CE Delta, PE Delta,CE Gamma, PE Gamma, CE Vega, PE Vega, CE Theta, PE Theta, CE OI, PE OI, CE Gamma Exp, PE Gamma Exp \r\n").getBytes());
+            writer.write(("Strike,CE Ltp, PE Ltp,CE IV, PE IV, CE Delta, PE Delta,CE Gamma, PE Gamma, CE Vega, PE Vega, CE Theta, PE Theta, CE OI, PE OI, CE Gamma Exp, PE Gamma Exp, IV Percent Diff \r\n").getBytes());
             
             
             List<String> optionnames = new ArrayList<>();
@@ -4298,6 +4298,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				
 				//System.out.println("aKey="+aKey+" ceGreek="+ceGreek+ " peGreek="+peGreek); 
 				if (ceGreek!=null && peGreek!=null ) {
+					
+					float ivPercentDiff = (peGreek.getIv() - ceGreek.getIv() )*100f/ceGreek.getIv();
+					
 					writer.write( (aKey
 							+"," + ceGreek.getLtp()+"," + peGreek.getLtp()
 							+"," + ceGreek.getIv()+"," + peGreek.getIv()
@@ -4307,6 +4310,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 							+"," + ceGreek.getTheta()+"," + peGreek.getTheta()
 							+"," + ceGreek.getOi()+"," + peGreek.getOi()
 							+"," + ceGreek.getOi()*ceGreek.getGamma()+"," + peGreek.getOi()*peGreek.getGamma()
+							+"," + ivPercentDiff
 							+ "\r\n").getBytes());
 				}
 				
