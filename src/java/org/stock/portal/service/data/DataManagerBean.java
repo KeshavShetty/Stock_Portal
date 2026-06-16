@@ -603,8 +603,8 @@ public class DataManagerBean implements DataManager {
     }
     
     @TransactionAttribute( TransactionAttributeType.SUPPORTS )
-    public byte[] getOptionsDrawdown(String strategyIds, String fromDate, String toDate) throws BusinessException {
-    	return (new DataDao(entityManager)).getOptionsDrawdown(strategyIds, fromDate, toDate);    	
+    public byte[] getOptionsDrawdown(String strategyIds, String fromDate, String toDate, String dte) throws BusinessException {
+    	return (new DataDao(entityManager)).getOptionsDrawdown(strategyIds, fromDate, toDate, dte);    	
     }
     
     @TransactionAttribute( TransactionAttributeType.SUPPORTS )

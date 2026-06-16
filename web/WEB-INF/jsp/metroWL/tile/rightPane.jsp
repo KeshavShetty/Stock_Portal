@@ -191,7 +191,8 @@
 											</li>
 											
 											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
-												<a href="<%=request.getContextPath()%>/optionsDrawdownChart.html?fromDate=01/09/2025&toDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&strategyIds=9751,9865" target="_blank">[Option DD Chart]</a>&nbsp;
+												<a href="<%=request.getContextPath()%>/optionsDrawdownChart.html?fromDate=01/09/2025&toDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&dte=0&strategyIds=9751,9865,9880,9874" target="_blank">[Drawdown Chart DTE0]</a>&nbsp;
+												<a href="<%=request.getContextPath()%>/optionsDrawdownChart.html?fromDate=01/09/2025&toDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&dte=7&strategyIds=9880,9886" target="_blank">[All DTE]</a>&nbsp;
 											</li>
 											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
 												<a href="<%=request.getContextPath()%>/optionGreeksSnapshotChart.html?startingDelta=0.01&excludeOddStrikes=false&instrument=NIFTY&forDateTime=" target="_blank">[Nifty - Option Greeks Snapshot]</a>&nbsp;

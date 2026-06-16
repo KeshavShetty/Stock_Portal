@@ -49,8 +49,10 @@ public class OptionsDrawdownChartQuoteServlet extends HttpServlet
 	        String fromDate = request.getParameter("fromDate"); 
 	        String toDate = request.getParameter("toDate");
 	        
+	        String dte = request.getParameter("dte");
+	        
 	        // String csvFilename = dataManager.getOptionDeltaRangeRawDataAnalysis(mainInstrumentId, forDate, baseDelta);	
-	        byte[] csvContents = dataManager.getOptionsDrawdown(strategyIds, fromDate, toDate);
+	        byte[] csvContents = dataManager.getOptionsDrawdown(strategyIds, fromDate, toDate, dte);
 	        
 	        InputStream is = null;
 	        is = new ByteArrayInputStream(csvContents);

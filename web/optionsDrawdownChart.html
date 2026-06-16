@@ -25,6 +25,7 @@
 	var fromDate = getQueryParameter("fromDate");
 	var toDate = getQueryParameter("toDate");
 	var strategyIds = getQueryParameter("strategyIds");
+	var dte = getQueryParameter("dte");
 	
 	Highcharts.chart('container1', {
 	  chart: {
@@ -112,7 +113,7 @@
               dashStyle: 'longdashdot'}]
       }],
 	  data: {
-	    csvURL: '/chart/OptionsDrawdownChartQuote?fromDate=' + fromDate+ '&toDate='+ toDate + '&strategyIds='+strategyIds,
+	    csvURL: '/chart/OptionsDrawdownChartQuote?fromDate=' + fromDate+ '&toDate='+ toDate + '&strategyIds='+strategyIds + '&dte=' + dte,
 	    enablePolling: false,
 	    dataRefreshRate: 60
 	  },

@@ -4168,7 +4168,20 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 		return retArray;
 	}
 	
-	public byte[] getOptionsDrawdown(String strategyIds, String fromDate, String toDate) throws BusinessException {
+	private int parseNumber(String str) {
+		int retVal = -1;
+	
+		if (str != null && !str.isEmpty()) {
+		    try {
+		    	retVal = (int) Double.parseDouble(str);
+		    } catch (NumberFormatException e) {
+		    }
+		}
+	    
+		return retVal;
+	}
+	
+	public byte[] getOptionsDrawdown(String strategyIds, String fromDate, String toDate, String dte) throws BusinessException {
 		byte[] retArray = null;
 		try {
 			SimpleDateFormat postgresShortFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -4184,6 +4197,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
             		+ " WHERE f_strategy IN (" + strategyIds + ")"
             		+ " AND short_date >= '" + postgresShortFormat.format(stdFormat.parse(fromDate))+ "'"
             		+ " AND short_date <= '" + postgresShortFormat.format(stdFormat.parse(toDate))+ "'"
+            		+ ( parseNumber(dte) >= 0 ? " AND dte ="+dte : "") 
             		+ " GROUP BY short_date";
 			
 			log.info("fetchSql "+fetchSql);
@@ -4922,6 +4936,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ ", upperDeltaPeMinIv, upperDeltaPeMaxIv, upperDeltaPeAvgIv"
 						+ ", lowerDeltaPeMinIv, lowerDeltaPeMaxIv, lowerDeltaPeAvgIv"
 						+ ", fullOtm0x500CEGreeks, fullOtm0x500PEGreeks, fullOtm50x400CEGreeks, fullOtm50x400PEGreeks"
+						+ ", [886] itm1000x500AvgCeIv, itm1000x500AvgPeIv"
 					
             		+ "\r\n").getBytes());
             
@@ -4942,7 +4957,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			} else  {
 				cal.setTime(stdFormat.parse(forDate));
 				cal.set(Calendar.HOUR_OF_DAY, 9);
-				cal.set(Calendar.MINUTE, 20);
+				cal.set(Calendar.MINUTE, 15);
 				cal.set(Calendar.SECOND, 0);
 				
 				dateStrBegin = postgresFormat.format(cal.getTime());
@@ -5016,6 +5031,10 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			sqlFields.put("fullOtm50x400CEGreeks", idx++);
 			sqlFields.put("fullOtm50x400PEGreeks", idx++);
 			
+			sqlFields.put("itm1000x500AvgCeIv", idx++);
+			sqlFields.put("itm1000x500AvgPeIv", idx++);
+			
+			
 			String fetchSql = "select " +  String.join(",", sqlFields.keySet())
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
@@ -5088,7 +5107,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + (Float) rowdata[sqlFields.get("fullOtm50x400CEGreeks")]
 						+ "," + (Float) rowdata[sqlFields.get("fullOtm50x400PEGreeks")] 
 								
-								
+						+ "," + (Float) rowdata[sqlFields.get("itm1000x500AvgCeIv")]
+						+ "," + (Float) rowdata[sqlFields.get("itm1000x500AvgPeIv")]
+										
 								
 						+"\r\n").getBytes());
 			}

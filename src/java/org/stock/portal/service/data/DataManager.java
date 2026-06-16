@@ -116,7 +116,7 @@ public interface DataManager {
 	public byte[] getOptionsInsight(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException;
 	public byte[] getOptionsInsight2(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException;
 	
-	public byte[] getOptionsDrawdown(String strategyIds, String fromDate, String toDate) throws BusinessException;
+	public byte[] getOptionsDrawdown(String strategyIds, String fromDate, String toDate, String dte) throws BusinessException;
 	
 	public byte[] getOptionGreeksSnapshot(String instrument, String forDateTime, boolean excludeOddStrikes, float startingDelta) throws BusinessException;
 	
