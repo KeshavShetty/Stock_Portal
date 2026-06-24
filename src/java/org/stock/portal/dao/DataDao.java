@@ -4309,7 +4309,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				Integer aKey = strkIterator.next();
 				OptionGreek ceGreek = ceOptionGreeksMap.get(aKey);
 				OptionGreek peGreek = peOptionGreeksMap.get(aKey);
-				
+				//public OptionGreek(String tradingSymbol, float iv, float delta, float vega, float theta, float gamma, float ltp, float oi) {
+				if (ceGreek==null) ceGreek = new OptionGreek("-NA-", 0.001f, 0.001f, 1f, -1f, 0.000001f, 0.01f, 1);
+				if (peGreek==null) peGreek = new OptionGreek("-NA-", 0.001f, 0.001f, 1f, -1f, 0.000001f, 0.01f, 1);
 				//System.out.println("aKey="+aKey+" ceGreek="+ceGreek+ " peGreek="+peGreek); 
 				if (ceGreek!=null && peGreek!=null ) {
 					
