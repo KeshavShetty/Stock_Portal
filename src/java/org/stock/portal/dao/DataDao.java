@@ -4945,8 +4945,6 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ ", lowerDeltaPeMinIv, lowerDeltaPeMaxIv, lowerDeltaPeAvgIv"
 						+ ", fullOtm0x500CEGreeks, fullOtm0x500PEGreeks, fullOtm50x400CEGreeks, fullOtm50x400PEGreeks"
 						+ ", [886] itm1000x500AvgCeIv, itm1000x500AvgPeIv"
-						
-						
 					
             		+ "\r\n").getBytes());
             
@@ -5044,8 +5042,6 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			sqlFields.put("itm1000x500AvgCeIv", idx++);
 			sqlFields.put("itm1000x500AvgPeIv", idx++);
 			
-			
-			
 			String fetchSql = "select " +  String.join(",", sqlFields.keySet())
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
 					+ " where f_main_instrument = '" + mainInstrumentId + "'"
@@ -5120,7 +5116,6 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 								
 						+ "," + (Float) rowdata[sqlFields.get("itm1000x500AvgCeIv")]
 						+ "," + (Float) rowdata[sqlFields.get("itm1000x500AvgPeIv")]
-										
 						
 						+"\r\n").getBytes());
 			}
