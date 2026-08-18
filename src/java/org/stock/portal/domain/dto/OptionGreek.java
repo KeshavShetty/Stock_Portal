@@ -1,4 +1,7 @@
 package org.stock.portal.domain.dto;
+
+import java.sql.Timestamp;
+
 /**
  * 
  * @author Keshav Shetty
@@ -17,9 +20,15 @@ public class OptionGreek {
 	private float oi;
 	private float changeInIv=0f;
 	
+	private long volumeTradedToday;
+	
+	private Timestamp quoteTime;
+	
 	private int strike=0; 
 	
 	private float underlyingValue;
+	
+	private float timevalue=0;
 	
 	public OptionGreek(String tradingSymbol, float iv, float delta, float vega, float theta, float gamma) {
 		super();
@@ -171,6 +180,30 @@ public class OptionGreek {
 
 	public void setStrike(int strike) {
 		this.strike = strike;
+	}
+
+	public long getVolumeTradedToday() {
+		return volumeTradedToday;
+	}
+
+	public void setVolumeTradedToday(long volumeTradedToday) {
+		this.volumeTradedToday = volumeTradedToday;
+	}
+
+	public Timestamp getQuoteTime() {
+		return quoteTime;
+	}
+
+	public void setQuoteTime(Timestamp quoteTime) {
+		this.quoteTime = quoteTime;
+	}
+
+	public float getTimevalue() {
+		return timevalue;
+	}
+
+	public void setTimevalue(float timevalue) {
+		this.timevalue = timevalue;
 	}
 }
 

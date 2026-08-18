@@ -4197,7 +4197,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
             		+ " WHERE f_strategy IN (" + strategyIds + ")"
             		+ " AND short_date >= '" + postgresShortFormat.format(stdFormat.parse(fromDate))+ "'"
             		+ " AND short_date <= '" + postgresShortFormat.format(stdFormat.parse(toDate))+ "'"
-            		+ ( parseNumber(dte) >= 0 ? " AND dte ="+dte : "") 
+            		+ ( dte!=null && dte.length()>0 ? " AND dte in ("+dte+")" : "") 
             		+ " GROUP BY short_date";
 			
 			log.info("fetchSql "+fetchSql);
@@ -4241,55 +4241,61 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			SimpleDateFormat regularLongFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 			
 			Calendar cal = Calendar.getInstance();
+			boolean tryFromRedis = false;
 			if (forDateTime != null && forDateTime.trim().length() > 0 ) {
 				cal.setTime(regularLongFormat.parse(forDateTime));
 			} else {
-				
+				tryFromRedis = true;
 			}
 			
 			ByteArrayOutputStream writer = new ByteArrayOutputStream(); // writer = new FileWriter(csvFilename);
             writer.write(("Strike,CE Ltp, PE Ltp,CE IV, PE IV, CE Delta, PE Delta,CE Gamma, PE Gamma, CE Vega, PE Vega, CE Theta, PE Theta, CE OI, PE OI, CE Gamma Exp, PE Gamma Exp, IV Percent Diff \r\n").getBytes());
             
-            
-            List<String> optionnames = new ArrayList<>();
-            
-            // First try to fetch from Snapshot table
-         	String fetchSql = "select trading_symbol as trading_symbol, strike from fdw_nexcorio_option_snapshot"
-         			+ " where trading_symbol like '" + instrument + "%' "
-         			+ " and record_date = '" + postgresShortFormat.format(cal.getTime()) + "'";
-         			
-         	Query q = entityManager.createNativeQuery(fetchSql);	
-			List<Object[]> listResults = q.getResultList();
-			Iterator<Object[]> iter = listResults.iterator();
-			
-			while (iter.hasNext()) {
-				Object[] rowdata = iter.next();
-				optionnames.add((String)rowdata[0]);
-			}
-         	
-         	
-			if (optionnames.size()==0) {
-				fetchSql = "select DISTINCT(trading_symbol) as trading_symbol,1 from fdw_nexcorio_option_greeks"
-         					+ " where trading_symbol like '" + instrument + "%' "
-         					+ " and quote_time > '" + postgresShortFormat.format(cal.getTime()) + " 09:15:00'"
-         					+ " and quote_time < '" + postgresShortFormat.format(cal.getTime()) + " 09:20:00'";
-         			
-				q = entityManager.createNativeQuery(fetchSql);	
-				listResults = q.getResultList();
-				iter = listResults.iterator();
+            List<OptionGreek> allOptionGreeks = null;
+            if (tryFromRedis) {
+            	System.out.println(" -------------------------- TRYING FROM REDIS ");
+            	allOptionGreeks = RedisCache.getMatchingOptionGreek("OptionGreek:" + instrument + "*");
+            	System.out.println(" -------------------------- GOT FROM REDIS "+allOptionGreeks.size());
+            } 
+            if (allOptionGreeks==null || allOptionGreeks.size()==0) {
+	            List<String> optionnames = new ArrayList<>();
+	            
+	            // First try to fetch from Snapshot table
+	         	String fetchSql = "select trading_symbol as trading_symbol, strike from fdw_nexcorio_option_snapshot"
+	         			+ " where trading_symbol like '" + instrument + "%' "
+	         			+ " and record_date = '" + postgresShortFormat.format(cal.getTime()) + "'";
+	         			
+	         	Query q = entityManager.createNativeQuery(fetchSql);	
+				List<Object[]> listResults = q.getResultList();
+				Iterator<Object[]> iter = listResults.iterator();
 				
 				while (iter.hasNext()) {
 					Object[] rowdata = iter.next();
 					optionnames.add((String)rowdata[0]);
 				}
-			}
-			
-			Map<Integer, OptionGreek> ceOptionGreeksMap = new HashMap<Integer, OptionGreek>();
+	         	
+	         	
+				if (optionnames.size()==0) {
+					fetchSql = "select DISTINCT(trading_symbol) as trading_symbol,1 from fdw_nexcorio_option_greeks"
+	         					+ " where trading_symbol like '" + instrument + "%' "
+	         					+ " and quote_time > '" + postgresShortFormat.format(cal.getTime()) + " 09:15:00'"
+	         					+ " and quote_time < '" + postgresShortFormat.format(cal.getTime()) + " 09:20:00'";
+	         			
+					q = entityManager.createNativeQuery(fetchSql);	
+					listResults = q.getResultList();
+					iter = listResults.iterator();
+					
+					while (iter.hasNext()) {
+						Object[] rowdata = iter.next();
+						optionnames.add((String)rowdata[0]);
+					}
+				}
+				allOptionGreeks = getOptionGreeks(optionnames, cal.getTime());
+            }
+            
+            Map<Integer, OptionGreek> ceOptionGreeksMap = new HashMap<Integer, OptionGreek>();
 			Map<Integer, OptionGreek> peOptionGreeksMap = new HashMap<Integer, OptionGreek>();
 			SortedSet<Integer> allStrikes = new TreeSet<Integer>();
-			
-			
-			List<OptionGreek> allOptionGreeks = getOptionGreeks(optionnames, cal.getTime());
 			
 			for(OptionGreek aGreek:allOptionGreeks ) {
 				if (excludeOddStrikes==true && aGreek.getStrike()%100!=0) continue; 
@@ -4939,6 +4945,11 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ ", lowerDeltaPeMinIv, lowerDeltaPeMaxIv, lowerDeltaPeAvgIv"
 						+ ", fullOtm0x500CEGreeks, fullOtm0x500PEGreeks, fullOtm50x400CEGreeks, fullOtm50x400PEGreeks"
 						+ ", [886] itm1000x500AvgCeIv, itm1000x500AvgPeIv"
+						
+						+ ", ceOutlierCount, peOutlierCount"
+						+ ", allITMCeAvgIv, allITMPeAvgIv"
+						+ ", limitedITMCeAvgIv, limitedITMPeAvgIv"
+						+ ", limitedOTMCeAvgIv, limitedOTMPeAvgIv"
 					
             		+ "\r\n").getBytes());
             
@@ -4963,7 +4974,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				cal.set(Calendar.SECOND, 0);
 				
 				dateStrBegin = postgresFormat.format(cal.getTime());
-				cal.set(Calendar.MINUTE, 30);
+				cal.set(Calendar.MINUTE, 40);
 				cal.set(Calendar.HOUR_OF_DAY, 15);
 				dateStrEnd = postgresFormat.format(cal.getTime());
 			}
@@ -5036,6 +5047,14 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			sqlFields.put("itm1000x500AvgCeIv", idx++);
 			sqlFields.put("itm1000x500AvgPeIv", idx++);
 			
+			sqlFields.put("ceOutlierCount", idx++);
+			sqlFields.put("peOutlierCount", idx++);
+			sqlFields.put("allITMCeAvgIv", idx++);
+			sqlFields.put("allITMPeAvgIv", idx++);
+			sqlFields.put("limitedITMCeAvgIv", idx++);
+			sqlFields.put("limitedITMPeAvgIv", idx++);
+			sqlFields.put("limitedOTMCeAvgIv", idx++);
+			sqlFields.put("limitedOTMPeAvgIv", idx++);
 			
 			String fetchSql = "select " +  String.join(",", sqlFields.keySet())
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
@@ -5112,7 +5131,10 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + (Float) rowdata[sqlFields.get("itm1000x500AvgCeIv")]
 						+ "," + (Float) rowdata[sqlFields.get("itm1000x500AvgPeIv")]
 										
-								
+						+ "," + (Float) rowdata[sqlFields.get("ceOutlierCount")] + "," + (Float) rowdata[sqlFields.get("peOutlierCount")]
+						+ "," + (Float) rowdata[sqlFields.get("allITMCeAvgIv")] + "," + (Float) rowdata[sqlFields.get("allITMPeAvgIv")]
+						+ "," + (Float) rowdata[sqlFields.get("limitedITMCeAvgIv")] + "," + (Float) rowdata[sqlFields.get("limitedITMPeAvgIv")]
+						+ "," + (Float) rowdata[sqlFields.get("limitedOTMCeAvgIv")] + "," + (Float) rowdata[sqlFields.get("limitedOTMPeAvgIv")]
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();
