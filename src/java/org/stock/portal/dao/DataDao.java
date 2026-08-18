@@ -4946,10 +4946,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ ", fullOtm0x500CEGreeks, fullOtm0x500PEGreeks, fullOtm50x400CEGreeks, fullOtm50x400PEGreeks"
 						+ ", [886] itm1000x500AvgCeIv, itm1000x500AvgPeIv"
 						
-						+ ", ceOutlierCount, peOutlierCount"
-						+ ", allITMCeAvgIv, allITMPeAvgIv"
-						+ ", limitedITMCeAvgIv, limitedITMPeAvgIv"
-						+ ", limitedOTMCeAvgIv, limitedOTMPeAvgIv"
+						
 					
             		+ "\r\n").getBytes());
             
@@ -5047,14 +5044,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			sqlFields.put("itm1000x500AvgCeIv", idx++);
 			sqlFields.put("itm1000x500AvgPeIv", idx++);
 			
-			sqlFields.put("ceOutlierCount", idx++);
-			sqlFields.put("peOutlierCount", idx++);
-			sqlFields.put("allITMCeAvgIv", idx++);
-			sqlFields.put("allITMPeAvgIv", idx++);
-			sqlFields.put("limitedITMCeAvgIv", idx++);
-			sqlFields.put("limitedITMPeAvgIv", idx++);
-			sqlFields.put("limitedOTMCeAvgIv", idx++);
-			sqlFields.put("limitedOTMPeAvgIv", idx++);
+			
 			
 			String fetchSql = "select " +  String.join(",", sqlFields.keySet())
 					+ " from fdw_nexcorio_option_atm_movement_data oamd"
@@ -5131,10 +5121,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + (Float) rowdata[sqlFields.get("itm1000x500AvgCeIv")]
 						+ "," + (Float) rowdata[sqlFields.get("itm1000x500AvgPeIv")]
 										
-						+ "," + (Float) rowdata[sqlFields.get("ceOutlierCount")] + "," + (Float) rowdata[sqlFields.get("peOutlierCount")]
-						+ "," + (Float) rowdata[sqlFields.get("allITMCeAvgIv")] + "," + (Float) rowdata[sqlFields.get("allITMPeAvgIv")]
-						+ "," + (Float) rowdata[sqlFields.get("limitedITMCeAvgIv")] + "," + (Float) rowdata[sqlFields.get("limitedITMPeAvgIv")]
-						+ "," + (Float) rowdata[sqlFields.get("limitedOTMCeAvgIv")] + "," + (Float) rowdata[sqlFields.get("limitedOTMPeAvgIv")]
+						
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();
