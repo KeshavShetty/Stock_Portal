@@ -412,6 +412,7 @@ public class DataManagerBean implements DataManager {
     
     @TransactionAttribute( TransactionAttributeType.REQUIRED )
     public void saveKiteRequestToken(String clientId, String requestToken) throws BusinessException {
+    	System.out.println("In saveKiteRequestToken clientId="+clientId);
     	try {
     		Query q = entityManager.createNativeQuery("UPDATE nap_users set zerodha_service_token='" + requestToken +"' WHERE zerodha_user_id='" + clientId + "'");
     		int effCount = q.executeUpdate();
@@ -422,6 +423,7 @@ public class DataManagerBean implements DataManager {
     
     @TransactionAttribute( TransactionAttributeType.REQUIRED )
     public void saveKiteRequestToken(String clientId, String requestToken, String zerodha_user_pin) throws BusinessException {
+    	System.out.println("In saveKiteRequestToken clientId="+clientId);
     	try {
     		String insertSql = "select * from dblink('dbname=nexcorio_db port=5432 host=localhost user=postgres password=jijikos', "
     				+ " 'UPDATE nexcorio_users set zerodha_service_token=''" + requestToken +"'' WHERE zerodha_user_id=''" + clientId + "'' and zerodha_user_id_pin=''" + zerodha_user_pin + "''" + " '"
