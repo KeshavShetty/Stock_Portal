@@ -58,7 +58,7 @@
 								<a href="https://www.google.com/finance?q=BOM:${scrip.bseCode}" target="_blank" title="BSE@Google">
 									<img src="<%=request.getContextPath()%>/metroWL/images/google.png">
 								</a>
-								<a href="http://www.screener.in/company/${scrip.bseCode}/" title="Screener.In(BSE)" target="_blank">
+								<a href="http://www.screener.in/company/${scrip.bseCode}/consolidated/#quarters" title="Screener.In(BSE)" target="_blank">
 									<img src="<%=request.getContextPath()%>/metroWL/images/screener.png" width="16px" height="16px">
 								</a>
 								<a href="https://www.marketwatch.com/investing/stock/${scrip.bseCode}?countrycode=in&mod=over_search" title="Market Watch" target="_blank">
@@ -86,7 +86,7 @@
 								</a>
 							</s:if>
 							<s:if test="%{scrip.nseCode!=null}">
-								<a href="http://www.screener.in/company/${scrip.nseCode}/" title="Screener.In(NSE)" target="_blank">
+								<a href="http://www.screener.in/company/${scrip.nseCode}/consolidated/#quarters" title="Screener.In(NSE)" target="_blank">
 									<img src="<%=request.getContextPath()%>/metroWL/images/screener.png" width="16px" height="16px">
 								</a>
 								<a href="http://www.bloomberg.com/quote/${scrip.nseCode}:IN" title="Bloomberg" target="_blank">

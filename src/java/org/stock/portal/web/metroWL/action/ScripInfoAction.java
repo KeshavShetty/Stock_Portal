@@ -343,21 +343,45 @@ public class ScripInfoAction extends BaseAction {
 	}
 	
 	private String getScripIdFromRequest() {
+		System.out.println("In getScripIdFromRequest");
     	HttpServletRequest request = ServletActionContext.getRequest();
     	String scripId = request.getParameter("scripId");
+    	System.out.println("1. scripId="+scripId);
 		if (scripId==null || scripId.length()==0) { // Try from jqIndex
 			String jqIndex = request.getParameter("jqIndex");
-			if (jqIndex!=null) {
+			System.out.println("1. jqIndex="+jqIndex);
+			if (jqIndex!=null && jqIndex.length()>0) {
 				if (jqIndex.indexOf("_")>=0) scripId = jqIndex.substring(0, jqIndex.indexOf("_"));
 				else scripId = jqIndex;
+				System.out.println("1.1 scripId="+scripId);
+			} else {
+				String xJqIndex = request.getParameter("xJqIndex");
+				if (xJqIndex!=null && xJqIndex.length()>0) {
+					System.out.println("1.2 xJqIndex="+xJqIndex);
+					if (xJqIndex.indexOf("_")>=0) scripId = xJqIndex.substring(0, xJqIndex.indexOf("_"));
+					else scripId = xJqIndex;
+					scripId = getResolvedIdFromLocalDBForTerraceId(scripId);
+				}
 			}
 		}
+		System.out.println("2. scripId="+scripId);
 		if (scripId==null || scripId.length()==0) { // Try from id
 			scripId = request.getParameter("id");
 		}
+		System.out.println("3. Final="+scripId);
 		return scripId;
     }
 
+	private String getResolvedIdFromLocalDBForTerraceId(String terraceId) {
+		String retVal = null; 
+		try {
+			retVal = scripManager.getResolvedIdFromLocalDBForTerraceId(terraceId);
+		} catch (Exception e) { 
+        	log.error(e); 
+        }
+		return retVal;
+	}
+	
 	public List<WatchlistItem> getWatchlistItems() {
 		return watchlistItems;
 	}

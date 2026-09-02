@@ -1003,6 +1003,29 @@ public class ScripDao {
 		return scripLevelPriceVsRatioDTOs;
 	}
 	 
+	public String getResolvedIdFromLocalDBForTerraceId(String terraceId) throws BusinessException {
+		String retStr = "";
+		String sqlStr = "select bse_code, nse_code from fdw_companies where id = " + terraceId ;
+		System.out.println("In getResolvedIdFromLocalDBForTerraceId sqlStr="+sqlStr);
+			
+		Query q = entityManager.createNativeQuery(sqlStr);
+		List<Object[]> listResults = q.getResultList();
+		Iterator<Object[]> iter = listResults.iterator();
+		
+		String nsecCode = null;
+		String bsecCode = null;
+		
+		while (iter.hasNext()) {
+			Object[] rowdata = iter.next(); // Long id, String exchangeCode, String name, float pe, float pb, float qtrRevenue, float qtrProfit, float qtrProfitMargin
+			bsecCode = (String)rowdata[0];
+			nsecCode = (String)rowdata[1];
+			System.out.println("bsecCode="+bsecCode+" nsecCode="+nsecCode);
+		}
+		
+		BigInteger tmpScripId = (BigInteger)this.entityManager.createNativeQuery("select id from scrips where bse_code = '"+bsecCode+"' or nse_code = '" +nsecCode+"' ").getSingleResult();
+		if (tmpScripId!=null) retStr = tmpScripId.longValue()+"";
+		return retStr;
+	}
 	
 	public List<ScripCompareDTO> getScripRatios(String[] scripExcodes, Long selectedWatchlist) throws BusinessException {
 		

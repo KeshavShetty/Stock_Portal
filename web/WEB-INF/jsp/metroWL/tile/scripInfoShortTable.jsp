@@ -55,12 +55,12 @@
 					<img src="<%=request.getContextPath()%>/metroWL/images/et.jpg" width="16px" height="16px">
 				</a>
 				<s:if test="%{scrip.bseCode!=null}">
-					<a href="http://www.screener.in/company/${scrip.bseCode}/" title="Screener.In(BSE)" target="_blank">
+					<a href="http://www.screener.in/company/${scrip.bseCode}/consolidated/#quarters" title="Screener.In(BSE)" target="_blank">
 						<img src="<%=request.getContextPath()%>/metroWL/images/screener.png" width="16px" height="16px">
 					</a>
 				</s:if>
 				<s:else>
-					<a href="http://www.screener.in/company/${scrip.nseCode}/" title="Screener.In(NSE)" target="_blank">
+					<a href="http://www.screener.in/company/${scrip.nseCode}/consolidated/#quarters" title="Screener.In(NSE)" target="_blank">
 						<img src="<%=request.getContextPath()%>/metroWL/images/screener.png" width="16px" height="16px">
 					</a>
 				</s:else>

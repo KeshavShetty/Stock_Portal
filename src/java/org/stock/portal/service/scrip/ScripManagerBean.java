@@ -187,7 +187,13 @@ public class ScripManagerBean implements ScripManager {
     public  List<ScripLevelPriceVsRatioDTO> getScripPriceVsRatio(String scripExcode) throws BusinessException {
     	ScripDao scrDao = new ScripDao(entityManager);
     	return scrDao.getScripPriceVsRatio(scripExcode);
-    } 
+    }
+    
+    @TransactionAttribute( TransactionAttributeType.SUPPORTS )
+    public String getResolvedIdFromLocalDBForTerraceId(String terraceId) throws BusinessException {
+    	ScripDao scrDao = new ScripDao(entityManager);
+    	return scrDao.getResolvedIdFromLocalDBForTerraceId(terraceId);
+    }
     
 }
   

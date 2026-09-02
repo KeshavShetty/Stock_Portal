@@ -40,6 +40,41 @@
 								</div>
 							</div>
 						</div>
+						
+						<div class="c2">
+							<div class="spui-book-content">
+								<div class="spui-titlebar">
+									<div class="float-container">										
+										<div class="spui-titlebar-title-panel">
+											<h1>Terrace Screener Dashboard</h1>
+										</div>
+										<div class="spui-titlebar-button-panel">
+											<a href="javascript:void()" onclick="javascript:toggleDiv('screenerSearchFormTable')">
+												<img src="<%=request.getContextPath()%>/metroWL/images/minimize.png" class="" title="Minimize" alt="Minimize ">
+											</a>
+										</div>
+									</div>
+								</div>
+								<div id="AppDeploymentsPages" class="spui-page">
+									<div id="ScripScripDivBody" class="spui-book">
+										<div class="spui-book-content">
+											<div id="AppDeploymentsControlPage" class="page-content">
+												<div id="AppDeploymentsControlPortlet" class="spui-window  ">
+													<div class="spui-window-content">
+														<div class="contenttable">
+															<div id="screenerSearchFormTable">
+																<JqGridTable:addTable tableIdentifier="ScreenerPage_DashBoard" formRequired="true"/>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
 					</div>
 				</div>
 			</div>

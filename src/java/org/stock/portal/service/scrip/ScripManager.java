@@ -45,5 +45,7 @@ public interface ScripManager {
 	public  List<ScripLevelPriceVsRatioDTO> getScripPriceVsRatio(String scripExcode) throws BusinessException;
 	
 	public Scrip getScripByExCode(String exCode) throws BusinessException ;
+	
+	public String getResolvedIdFromLocalDBForTerraceId(String terraceId) throws BusinessException ;
 }
   
