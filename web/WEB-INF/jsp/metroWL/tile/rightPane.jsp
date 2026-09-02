@@ -205,6 +205,13 @@
 											</li>
 											
 											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
+												Options Insight V2
+												<a href="<%=request.getContextPath()%>/optionsInsightV2Chart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Nifty&mainInstrumentId=2" target="_blank">[Nifty 2]</a>&nbsp;
+												<a href="<%=request.getContextPath()%>/optionsInsightV2Chart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Bank Nifty&mainInstrumentId=3" target="_blank">[BN 2]</a>
+												<a href="<%=request.getContextPath()%>/optionsInsightV2Chart.html?baseDelta=0.5&forDate=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%>&Instrument=Sensex&mainInstrumentId=4" target="_blank">[Sensex 2]</a>
+											</li>
+											
+											<li onmouseover="this.className='quicklinksrowover';" onmouseout="this.className='quicklinksrowout';">
 												Orderflow
 												<a href="<%=request.getContextPath()%>/futuresOrderFlowChart.html?instrument=2&forDateTime=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%> 15:15:00" target="_blank">[Nifty]</a>&nbsp;
 												<a href="<%=request.getContextPath()%>/futuresOrderFlowChart.html?instrument=3&forDateTime=<%=(new SimpleDateFormat("dd/MM/yyyy")).format(new Date())%> 15:15:00" target="_blank">[BN]</a>

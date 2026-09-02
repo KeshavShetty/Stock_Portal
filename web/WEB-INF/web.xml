@@ -158,6 +158,12 @@
 	</servlet>
 	
 	<servlet>
+	    <servlet-name>OptionsInsightChartV2QuoteServlet</servlet-name>
+	    <servlet-class>org.stock.portal.web.servlet.OptionsInsightChartV2QuoteServlet</servlet-class>
+	    <load-on-startup>0</load-on-startup>
+	</servlet>
+	
+	<servlet>
 	    <servlet-name>FuturesOrderflowChartQuoteServlet</servlet-name>
 	    <servlet-class>org.stock.portal.web.servlet.FuturesOrderflowChartQuoteServlet</servlet-class>
 	    <load-on-startup>0</load-on-startup>
@@ -385,6 +391,11 @@
 	<servlet-mapping>
 	    <servlet-name>OptionsInsightChart2QuoteServlet</servlet-name>
 	    <url-pattern>/chart/OptionsInsightChart2Quote</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+	    <servlet-name>OptionsInsightChartV2QuoteServlet</servlet-name>
+	    <url-pattern>/chart/OptionsInsightChartV2Quote</url-pattern>
 	</servlet-mapping>
 	
 	<servlet-mapping>

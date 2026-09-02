@@ -4544,6 +4544,29 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 		return retVal;
 	}
 	
+	private OptionGreek getOptionGreeks(Long id) {
+		
+		OptionGreek retVal = null;
+		try {
+			SimpleDateFormat postgresLongDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			
+			String fetchSql = "select iv, delta, vega, theta, gamma, ltp, oi, underlying_value, trading_symbol from fdw_nexcorio_option_greeks  where id = '" + id + "'";
+			
+			Query q = entityManager.createNativeQuery(fetchSql);	
+			List<Object[]> listResults = q.getResultList();
+			Iterator<Object[]> iter = listResults.iterator();
+			
+			while (iter.hasNext()) {
+				Object[] rowdata = iter.next();
+				retVal = new OptionGreek((String) rowdata[8], (float) rowdata[0], (float) rowdata[1], (float) rowdata[2], (float) rowdata[3], (float) rowdata[4], (float) rowdata[5], (float) rowdata[6]);
+				retVal.setUnderlyingValue((float) rowdata[7]);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return retVal;
+	}
+	
 	private List<OptionGreek> getOptionGreeks(List<String> optionnames, Date forTime) {
 		
 		List<OptionGreek> retList = new ArrayList<OptionGreek>();
@@ -5116,6 +5139,134 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 								
 						+ "," + (Float) rowdata[sqlFields.get("itm1000x500AvgCeIv")]
 						+ "," + (Float) rowdata[sqlFields.get("itm1000x500AvgPeIv")]
+						
+						+"\r\n").getBytes());
+			}
+			retArray = writer.toByteArray();
+			writer.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return retArray;
+	}
+	
+	public byte[] getOptionsInsightV2(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException {
+		log.info("In getOptionTimeValueAnalysis forDate="+forDate);
+		Map<String, List<OptionOI>> oiDataMap = new HashMap<String, List<OptionOI>>();
+		byte[] retArray = null;
+		try {
+			ByteArrayOutputStream writer = new ByteArrayOutputStream(); // writer = new FileWriter(csvFilename);
+			 writer.write(("QuoteTime, indexltp , futureLtp"
+					 + ", StraddlePremium"
+					 + ", Straddle Iv Diff"
+					 + ", Straddle Gamma Diff"
+					 + ", Straddle Vega Diff"
+					 + ", Straddle Theta Diff"
+					 + ", Straddle Oi Diff"
+					 + ", selectedAllCEGreeksAvgIv, selectedAllPEGreeksAvgIv"
+					 + ", lowerStrike, upperStrike"
+					 + ", limitedITMCEGreeks, limitedITMPEGreeks"
+					 + ", limitedOTMCEGreeks, limitedOTMPEGreeks"
+					 + ", outlierCEGreeks, outlierPEGreeks"
+					 + ", drOTMAccumulatedChangein5secCeTheta, drOTMAccumulatedChangein5secPeTheta"
+					 + ", drITMAccumulatedChangein5secCeTheta, drITMAccumulatedChangein5secPeTheta"
+            		+ "\r\n").getBytes());
+            
+            SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat longFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			SimpleDateFormat stdFormat = new SimpleDateFormat("dd/MM/yyyy");
+			
+			DecimalFormat decimalFormat = new DecimalFormat("#.##");
+			 
+			String dateStrEnd = "";
+			String dateStrBegin = "";
+			Calendar cal = Calendar.getInstance();
+			if (forDate.length()>12) {
+				cal.setTime(longFormat.parse(forDate));
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.add(Calendar.MINUTE, 15);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			} else  {
+				cal.setTime(stdFormat.parse(forDate));
+				cal.set(Calendar.HOUR_OF_DAY, 9);
+				cal.set(Calendar.MINUTE, 15);
+				cal.set(Calendar.SECOND, 0);
+				
+				dateStrBegin = postgresFormat.format(cal.getTime());
+				cal.set(Calendar.MINUTE, 40);
+				cal.set(Calendar.HOUR_OF_DAY, 15);
+				dateStrEnd = postgresFormat.format(cal.getTime());
+			}
+			
+	        LinkedHashMap<String, Integer> sqlFields = new LinkedHashMap<>();
+			int idx = 0;
+			sqlFields.put("oamd.record_time", idx++);			
+			sqlFields.put("oamd.instrumentLtp", idx++);
+			sqlFields.put("oamd.futures_ltp", idx++);
+			
+			sqlFields.put("selectedAllCEGreeksAvgIv", idx++);
+			sqlFields.put("selectedAllPEGreeksAvgIv", idx++);
+			sqlFields.put("lowerStrike", idx++);
+			sqlFields.put("upperStrike", idx++);
+			sqlFields.put("limitedITMCEGreeks", idx++);
+			sqlFields.put("limitedITMPEGreeks", idx++);
+			sqlFields.put("limitedOTMCEGreeks", idx++);
+			sqlFields.put("limitedOTMPEGreeks", idx++);
+			sqlFields.put("outlierCEGreeks", idx++);
+			sqlFields.put("outlierPEGreeks", idx++);
+			
+			sqlFields.put("drOTMAccumulatedChangein5secCeTheta", idx++);
+			sqlFields.put("drOTMAccumulatedChangein5secPeTheta", idx++);
+			
+			sqlFields.put("drITMAccumulatedChangein5secCeTheta", idx++);
+			sqlFields.put("drITMAccumulatedChangein5secPeTheta", idx++);
+			
+			//sqlFields.put("atm_ce_optiongreek_id", idx++);
+			//sqlFields.put("atm_pe_optiongreek_id", idx++);
+			
+			String fetchSql = "select " +  String.join(",", sqlFields.keySet())
+					+ ", ceog.ltp as ceLtp, ceog.iv as ceIv, ceog.gamma as ceGamma, ceog.vega as ceVega, ceog.theta as ceTheta, ceog.oi as ceOi"
+					+ ", peog.ltp as peLtp, peog.iv as peIv, peog.gamma as peGamma, peog.vega as peVega, peog.theta as peTheta, peog.oi as peOi"
+					+ " from fdw_nexcorio_option_greek_movement_data oamd,fdw_nexcorio_option_greeks ceog, fdw_nexcorio_option_greeks peog"
+					+ " where oamd.f_main_instrument = '" + mainInstrumentId + "'"
+					+ " and oamd.record_time > '" + dateStrBegin +"' and oamd.record_time < '" + dateStrEnd + "'"
+					+ " and oamd.atm_ce_optiongreek_id = ceog.id and oamd.atm_pe_optiongreek_id = peog.id"
+					+ " order by oamd.record_time";
+			
+			sqlFields.put("ceLtp", idx++);sqlFields.put("ceIv", idx++);sqlFields.put("ceGamma", idx++);sqlFields.put("ceVega", idx++);sqlFields.put("ceTheta", idx++);sqlFields.put("ceOi", idx++);
+			sqlFields.put("peLtp", idx++);sqlFields.put("peIv", idx++);sqlFields.put("peGamma", idx++);sqlFields.put("peVega", idx++);sqlFields.put("peTheta", idx++);sqlFields.put("peOi", idx++);
+			
+			log.info("fetchSql "+fetchSql);
+			Query q = entityManager.createNativeQuery(fetchSql);	
+			List<Object[]> listResults = q.getResultList();
+			Iterator<Object[]> iter = listResults.iterator();
+			
+			float startingMinGammaExposure = 0f;
+			float startingMaxGammaExposure = 0f;
+			boolean startingMinGammaExposureSet = false;
+			
+			while (iter.hasNext()) {
+				Object[] rowdata = iter.next();
+				Date quoteTime = (Timestamp) rowdata[0];
+				float indexltp = (Float) rowdata[1];
+				float futureLtp = (Float) rowdata[2];
+				
+				writer.write((postgresFormat.format(quoteTime)+","+indexltp + "," + futureLtp 
+						+ "," +  ((Float) rowdata[sqlFields.get("ceLtp")]+(Float) rowdata[sqlFields.get("peLtp")])
+						+ "," +  ((Float) rowdata[sqlFields.get("ceIv")]-(Float) rowdata[sqlFields.get("peIv")])
+						+ "," +  ((Float) rowdata[sqlFields.get("ceGamma")]-(Float) rowdata[sqlFields.get("peGamma")])
+						+ "," +  ((Float) rowdata[sqlFields.get("ceVega")]-(Float) rowdata[sqlFields.get("peVega")])
+						+ "," +  ((Float) rowdata[sqlFields.get("ceTheta")]-(Float) rowdata[sqlFields.get("peTheta")])
+						+ "," +  ((Float) rowdata[sqlFields.get("ceOi")]-(Float) rowdata[sqlFields.get("peOi")])
+						
+						
+						+ "," + (Float) rowdata[sqlFields.get("selectedAllCEGreeksAvgIv")] + "," + (Float) rowdata[sqlFields.get("selectedAllPEGreeksAvgIv")]
+						+ "," + (Integer) rowdata[sqlFields.get("lowerStrike")] + "," + (Integer) rowdata[sqlFields.get("upperStrike")]
+						+ "," + (Float) rowdata[sqlFields.get("limitedITMCEGreeks")] + "," + (Float) rowdata[sqlFields.get("limitedITMPEGreeks")]
+						+ "," + (Float) rowdata[sqlFields.get("limitedOTMCEGreeks")] + "," + (Float) rowdata[sqlFields.get("limitedOTMPEGreeks")]
+						+ "," + (Integer) rowdata[sqlFields.get("outlierCEGreeks")] + "," + (Integer) rowdata[sqlFields.get("outlierPEGreeks")]
+						+ "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secCeTheta")] + "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secPeTheta")]
+						+ "," + (Float) rowdata[sqlFields.get("drITMAccumulatedChangein5secCeTheta")] + "," + (Float) rowdata[sqlFields.get("drITMAccumulatedChangein5secPeTheta")]
 						
 						+"\r\n").getBytes());
 			}

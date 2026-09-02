@@ -123,5 +123,7 @@ public interface DataManager {
 	public byte[] getFuturesOrderflow(String instrument, String forDateTime) throws BusinessException;
 	
 	public byte[] getTopOIChange(String instrument, String forDateTime) throws BusinessException;
+	
+	public byte[] getOptionsInsightV2(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException;
 }
   

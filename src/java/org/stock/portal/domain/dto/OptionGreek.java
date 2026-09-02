@@ -9,6 +9,8 @@ import java.sql.Timestamp;
  */
 public class OptionGreek {
 
+	private Long Id;
+	
 	private String tradingSymbol;
 	
 	private float iv;
@@ -204,6 +206,14 @@ public class OptionGreek {
 
 	public void setTimevalue(float timevalue) {
 		this.timevalue = timevalue;
+	}
+	
+	public Long getId() {
+		return Id;
+	}
+
+	public void setId(Long id) {
+		Id = id;
 	}
 }
 
