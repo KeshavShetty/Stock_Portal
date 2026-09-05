@@ -5170,6 +5170,10 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					 + ", outlierCEGreeks, outlierPEGreeks"
 					 + ", drOTMAccumulatedChangein5secCeTheta, drOTMAccumulatedChangein5secPeTheta"
 					 + ", drITMAccumulatedChangein5secCeTheta, drITMAccumulatedChangein5secPeTheta"
+					 + ", drOTMAccumulatedChangein5secCeVega, drOTMAccumulatedChangein5secPeVega"
+					 + ", drOTMAccumulatedChangein5secCeGamma, drOTMAccumulatedChangein5secPeGamma"
+					 + ", drOTMAccumulatedChangein5secCeIv, drOTMAccumulatedChangein5secPeIv"
+					 + ", drSelectedStrikeAccumulatedChangein5secCeTheta, drSelectedStrikeAccumulatedChangein5secPeTheta"
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -5221,6 +5225,17 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			sqlFields.put("drITMAccumulatedChangein5secCeTheta", idx++);
 			sqlFields.put("drITMAccumulatedChangein5secPeTheta", idx++);
 			
+			sqlFields.put("drOTMAccumulatedChangein5secCeVega", idx++);
+			sqlFields.put("drOTMAccumulatedChangein5secPeVega", idx++);
+			
+			sqlFields.put("drOTMAccumulatedChangein5secCeGamma", idx++);
+			sqlFields.put("drOTMAccumulatedChangein5secPeGamma", idx++);
+			
+			sqlFields.put("drOTMAccumulatedChangein5secCeIv", idx++);
+			sqlFields.put("drOTMAccumulatedChangein5secPeIv", idx++);
+			sqlFields.put("drSelectedStrikeAccumulatedChangein5secCeTheta", idx++);
+			sqlFields.put("drSelectedStrikeAccumulatedChangein5secPeTheta", idx++);
+			
 			//sqlFields.put("atm_ce_optiongreek_id", idx++);
 			//sqlFields.put("atm_pe_optiongreek_id", idx++);
 			
@@ -5267,7 +5282,11 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + (Integer) rowdata[sqlFields.get("outlierCEGreeks")] + "," + (Integer) rowdata[sqlFields.get("outlierPEGreeks")]
 						+ "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secCeTheta")] + "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secPeTheta")]
 						+ "," + (Float) rowdata[sqlFields.get("drITMAccumulatedChangein5secCeTheta")] + "," + (Float) rowdata[sqlFields.get("drITMAccumulatedChangein5secPeTheta")]
-						
+						+ "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secCeVega")] + "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secPeVega")]
+						+ "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secCeGamma")] + "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secPeGamma")]
+						+ "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secCeIv")] + "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secPeIv")]
+						+ "," + (Float) rowdata[sqlFields.get("drSelectedStrikeAccumulatedChangein5secCeTheta")] + "," + (Float) rowdata[sqlFields.get("drSelectedStrikeAccumulatedChangein5secPeTheta")]
+								
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();
