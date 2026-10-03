@@ -5179,6 +5179,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					 + ", drOTMAvgAccmlChangein5secCeTheta, drOTMAvgAccmlChangein5secPeTheta"
 					 + ", drOTMAvgAccmlChangein5secCeVega, drOTMAvgAccmlChangein5secPeVega"
 					 + ", extLimitedOTMAccml5secCeVega,extLimitedOTMAccml5secPeVega"
+					 + ", drOTMAccumulatedChangein5secCeVeGamma, drOTMAccumulatedChangein5secPeVeGamma"
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -5253,21 +5254,24 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			sqlFields.put("extLimitedOTMAccml5secCeVega", idx++);
 			sqlFields.put("extLimitedOTMAccml5secPeVega", idx++);
 			
+			sqlFields.put("drOTMAccumulatedChangein5secCeVeGamma", idx++);
+			sqlFields.put("drOTMAccumulatedChangein5secPeVeGamma", idx++);
+			
 			
 			//sqlFields.put("atm_ce_optiongreek_id", idx++);
 			//sqlFields.put("atm_pe_optiongreek_id", idx++);
 			
 			String fetchSql = "select " +  String.join(",", sqlFields.keySet())
-					+ ", ceog.ltp as ceLtp, ceog.iv as ceIv, ceog.gamma as ceGamma, ceog.vega as ceVega, ceog.theta as ceTheta, ceog.oi as ceOi"
-					+ ", peog.ltp as peLtp, peog.iv as peIv, peog.gamma as peGamma, peog.vega as peVega, peog.theta as peTheta, peog.oi as peOi"
+					+ ", ceog.ltp as ceLtp, ceog.iv as ceIv, ceog.gamma as ceGamma, ceog.vega as ceVega, ceog.theta as ceTheta, ceog.oi as ceOi, ceog.delta as ceDelta"
+					+ ", peog.ltp as peLtp, peog.iv as peIv, peog.gamma as peGamma, peog.vega as peVega, peog.theta as peTheta, peog.oi as peOi, peog.delta as peDelta"
 					+ " from fdw_nexcorio_option_greek_movement_data oamd,fdw_nexcorio_option_greeks ceog, fdw_nexcorio_option_greeks peog"
 					+ " where oamd.f_main_instrument = '" + mainInstrumentId + "'"
 					+ " and oamd.record_time > '" + dateStrBegin +"' and oamd.record_time < '" + dateStrEnd + "'"
 					+ " and oamd.atm_ce_optiongreek_id = ceog.id and oamd.atm_pe_optiongreek_id = peog.id"
 					+ " order by oamd.record_time";
 			
-			sqlFields.put("ceLtp", idx++);sqlFields.put("ceIv", idx++);sqlFields.put("ceGamma", idx++);sqlFields.put("ceVega", idx++);sqlFields.put("ceTheta", idx++);sqlFields.put("ceOi", idx++);
-			sqlFields.put("peLtp", idx++);sqlFields.put("peIv", idx++);sqlFields.put("peGamma", idx++);sqlFields.put("peVega", idx++);sqlFields.put("peTheta", idx++);sqlFields.put("peOi", idx++);
+			sqlFields.put("ceLtp", idx++);sqlFields.put("ceIv", idx++);sqlFields.put("ceGamma", idx++);sqlFields.put("ceVega", idx++);sqlFields.put("ceTheta", idx++);sqlFields.put("ceOi", idx++);sqlFields.put("ceDelta", idx++);
+			sqlFields.put("peLtp", idx++);sqlFields.put("peIv", idx++);sqlFields.put("peGamma", idx++);sqlFields.put("peVega", idx++);sqlFields.put("peTheta", idx++);sqlFields.put("peOi", idx++);sqlFields.put("peDelta", idx++);
 			
 			log.info("fetchSql "+fetchSql);
 			Query q = entityManager.createNativeQuery(fetchSql);	
@@ -5284,8 +5288,14 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				float indexltp = (Float) rowdata[1];
 				float futureLtp = (Float) rowdata[2];
 				
+				float straddlePremium =  ((Float) rowdata[sqlFields.get("ceLtp")]+(Float) rowdata[sqlFields.get("peLtp")]);
+				//float straddleDelta =  ((Float) rowdata[sqlFields.get("ceDelta")] - (Float) rowdata[sqlFields.get("peDelta")]);
+				//System.out.println("straddlePremium="+straddlePremium+" straddleDelta="+straddleDelta);
+				//straddlePremium = straddlePremium/straddleDelta;
+				
+				
 				writer.write((postgresFormat.format(quoteTime)+","+indexltp + "," + futureLtp 
-						+ "," +  ((Float) rowdata[sqlFields.get("ceLtp")]+(Float) rowdata[sqlFields.get("peLtp")])
+						+ "," +  straddlePremium
 						+ "," +  ((Float) rowdata[sqlFields.get("ceIv")]-(Float) rowdata[sqlFields.get("peIv")])
 						+ "," +  ((Float) rowdata[sqlFields.get("ceGamma")]-(Float) rowdata[sqlFields.get("peGamma")])
 						+ "," +  ((Float) rowdata[sqlFields.get("ceVega")]-(Float) rowdata[sqlFields.get("peVega")])
@@ -5309,7 +5319,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + (Float) rowdata[sqlFields.get("drOTMAvgAccmlChangein5secCeTheta")] + "," + (Float) rowdata[sqlFields.get("drOTMAvgAccmlChangein5secPeTheta")]
 						+ "," + (Float) rowdata[sqlFields.get("drOTMAvgAccmlChangein5secCeVega")] + "," + (Float) rowdata[sqlFields.get("drOTMAvgAccmlChangein5secPeVega")]
 						+ "," + (Float) rowdata[sqlFields.get("extLimitedOTMAccml5secCeVega")] + "," + (Float) rowdata[sqlFields.get("extLimitedOTMAccml5secPeVega")]
-									
+						+ "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secCeVeGamma")] + "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secPeVeGamma")]
 									
 						+"\r\n").getBytes());
 			}
