@@ -400,6 +400,14 @@
     	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/user/kiteSuccess.jsp"/> 
     </definition>
     
+     <definition name="tiles.heartbeatSuccess" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/user/heartbeatSuccess.jsp"/> 
+    </definition>
+    
+    <definition name="tiles.heartbeatError" extends="floatingBodyOnlyLayout">
+    	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/user/heartbeatError.jsp"/> 
+    </definition>
+    
     <definition name="tiles.optionorder.Success" extends="floatingBodyOnlyLayout">
     	<put-attribute name="body" value="/WEB-INF/jsp/metroWL/user/optionordersuccess.jsp"/> 
     </definition>

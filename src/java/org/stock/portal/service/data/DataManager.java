@@ -125,5 +125,7 @@ public interface DataManager {
 	public byte[] getTopOIChange(String instrument, String forDateTime) throws BusinessException;
 	
 	public byte[] getOptionsInsightV2(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException;
+	
+	public boolean getServerAndTickerDataStatus(String instrument) throws BusinessException;
 }
   

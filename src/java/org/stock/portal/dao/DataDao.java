@@ -4232,6 +4232,41 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 		}
 		return retArray;
 	}
+	public boolean getServerAndTickerDataStatus(String instrument) throws BusinessException {
+		boolean retVal = false;
+		try {
+			List<OptionGreek> allOptionGreeks = allOptionGreeks = RedisCache.getMatchingOptionGreek("OptionGreek:" + instrument + "*");
+			if (allOptionGreeks.size()>0) {
+				long latestLocalRecordTime = 0l; 
+				for(OptionGreek aOptionGreek:allOptionGreeks) {
+					long localrecordTime = Long.parseLong(aOptionGreek.getLocalRecordTime());
+					//System.out.println("quoteTime="+localrecordTime);
+					if (localrecordTime != 0) {
+						if (latestLocalRecordTime != 0) latestLocalRecordTime = localrecordTime;
+						else {
+							if(localrecordTime > latestLocalRecordTime) {
+								latestLocalRecordTime = localrecordTime;
+							}
+						}
+					}
+				}
+				//System.out.println("latestQuoteTime="+latestLocalRecordTime);
+				if (latestLocalRecordTime != 0) {
+					long diffInMs = Math.abs(latestLocalRecordTime - (new Date()).getTime());
+				    long diffInMinutes = diffInMs / (60 * 1000);
+				    System.out.print("latestQuoteTime="+latestLocalRecordTime + " diffInMs="+diffInMs+" diffInMinutes="+diffInMinutes);
+				    if (diffInMinutes < 1) {
+				    	retVal = true;
+				    }
+				}
+			} else {
+				 System.out.print("Empty option greeks");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return retVal;
+	}
 	
 	public byte[] getOptionGreeksSnapshot(String instrument, String forDateTime, boolean excludeOddStrikes, float startingDelta) throws BusinessException {
 		byte[] retArray = null;
@@ -5180,6 +5215,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					 + ", drOTMAvgAccmlChangein5secCeVega, drOTMAvgAccmlChangein5secPeVega"
 					 + ", extLimitedOTMAccml5secCeVega,extLimitedOTMAccml5secPeVega"
 					 + ", drOTMAccumulatedChangein5secCeVeGamma, drOTMAccumulatedChangein5secPeVeGamma"
+					 + ", selectedAllGreeksPcr"
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -5256,7 +5292,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			
 			sqlFields.put("drOTMAccumulatedChangein5secCeVeGamma", idx++);
 			sqlFields.put("drOTMAccumulatedChangein5secPeVeGamma", idx++);
-			
+			sqlFields.put("selectedAllGreeksPcr", idx++);
 			
 			//sqlFields.put("atm_ce_optiongreek_id", idx++);
 			//sqlFields.put("atm_pe_optiongreek_id", idx++);
@@ -5320,6 +5356,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + (Float) rowdata[sqlFields.get("drOTMAvgAccmlChangein5secCeVega")] + "," + (Float) rowdata[sqlFields.get("drOTMAvgAccmlChangein5secPeVega")]
 						+ "," + (Float) rowdata[sqlFields.get("extLimitedOTMAccml5secCeVega")] + "," + (Float) rowdata[sqlFields.get("extLimitedOTMAccml5secPeVega")]
 						+ "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secCeVeGamma")] + "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secPeVeGamma")]
+						+ "," + (Float) rowdata[sqlFields.get("selectedAllGreeksPcr")]
 									
 						+"\r\n").getBytes());
 			}

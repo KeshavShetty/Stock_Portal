@@ -455,6 +455,12 @@
 	        <result name="success" type="tiles">tiles.kiteSuccess</result>
         </action>
         
+        <action name="heartbeat" method="execute"
+	        	class="org.stock.portal.web.action.HeartbeatAction">
+	        <result name="success" type="tiles">tiles.heartbeatSuccess</result>
+	        <result name="error" type="tiles">tiles.heartbeatError</result>
+        </action>
+        
         <action name="optionOrderPlacer" method="execute"
 	        	class="org.stock.portal.web.action.OptionOrderPlacerAction">
 	        <result name="success" type="tiles">tiles.optionorder.Success</result>

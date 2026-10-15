@@ -628,5 +628,10 @@ public class DataManagerBean implements DataManager {
     public byte[] getOptionsInsightV2(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException {
     	return (new DataDao(entityManager)).getOptionsInsightV2(mainInstrumentId, forDate, baseDelta);    	
     }
+    
+    @TransactionAttribute( TransactionAttributeType.SUPPORTS )
+    public boolean getServerAndTickerDataStatus(String instrument) throws BusinessException {
+    	return (new DataDao(entityManager)).getServerAndTickerDataStatus(instrument);    	
+    } 
 }
   

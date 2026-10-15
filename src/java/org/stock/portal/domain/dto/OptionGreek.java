@@ -1,6 +1,7 @@
 package org.stock.portal.domain.dto;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * 
@@ -25,6 +26,7 @@ public class OptionGreek {
 	private long volumeTradedToday;
 	
 	private Timestamp quoteTime;
+	private String localRecordTime;
 	
 	private int strike=0; 
 	
@@ -214,6 +216,14 @@ public class OptionGreek {
 
 	public void setId(Long id) {
 		Id = id;
+	}
+
+	public String getLocalRecordTime() {
+		return localRecordTime;
+	}
+
+	public void setLocalRecordTime(String localRecordTime) {
+		this.localRecordTime = localRecordTime;
 	}
 }
 
