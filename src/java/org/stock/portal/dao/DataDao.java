@@ -5216,6 +5216,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					 + ", extLimitedOTMAccml5secCeVega,extLimitedOTMAccml5secPeVega"
 					 + ", drOTMAccumulatedChangein5secCeVeGamma, drOTMAccumulatedChangein5secPeVeGamma"
 					 + ", selectedAllGreeksPcr"
+					 + ", CE Theta above min, CE Theta below Max"
+					 + ", PE Theta above min, PE Theta below Max"
+					 + ", drSelectedStrikeCEDeltaOIWorth, drSelectedStrikePEDeltaOIWorth"
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -5294,8 +5297,13 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			sqlFields.put("drOTMAccumulatedChangein5secPeVeGamma", idx++);
 			sqlFields.put("selectedAllGreeksPcr", idx++);
 			
-			//sqlFields.put("atm_ce_optiongreek_id", idx++);
-			//sqlFields.put("atm_pe_optiongreek_id", idx++);
+			sqlFields.put("CE_Theta_above_min", idx++);
+			sqlFields.put("CE_Theta_below_Max", idx++);
+			sqlFields.put("PE_Theta_above_min", idx++);
+			sqlFields.put("PE_Theta_below_Max", idx++);
+			
+			sqlFields.put("drSelectedStrikeCEDeltaOIWorth", idx++);
+			sqlFields.put("drSelectedStrikePEDeltaOIWorth", idx++);
 			
 			String fetchSql = "select " +  String.join(",", sqlFields.keySet())
 					+ ", ceog.ltp as ceLtp, ceog.iv as ceIv, ceog.gamma as ceGamma, ceog.vega as ceVega, ceog.theta as ceTheta, ceog.oi as ceOi, ceog.delta as ceDelta"
@@ -5318,6 +5326,12 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			float startingMaxGammaExposure = 0f;
 			boolean startingMinGammaExposureSet = false;
 			
+			float ceThetaMinReached = Float.MAX_VALUE;
+			float ceThetaMaxReached = Float.MIN_VALUE;
+			float peThetaMinReached = Float.MAX_VALUE;
+			float peThetaMaxReached = Float.MIN_VALUE;
+			
+			
 			while (iter.hasNext()) {
 				Object[] rowdata = iter.next();
 				Date quoteTime = (Timestamp) rowdata[0];
@@ -5325,10 +5339,25 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				float futureLtp = (Float) rowdata[2];
 				
 				float straddlePremium =  ((Float) rowdata[sqlFields.get("ceLtp")]+(Float) rowdata[sqlFields.get("peLtp")]);
-				//float straddleDelta =  ((Float) rowdata[sqlFields.get("ceDelta")] - (Float) rowdata[sqlFields.get("peDelta")]);
-				//System.out.println("straddlePremium="+straddlePremium+" straddleDelta="+straddleDelta);
-				//straddlePremium = straddlePremium/straddleDelta;
 				
+				float drOTMAccumulatedChangein5secCeTheta = (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secCeTheta")];
+				float drOTMAccumulatedChangein5secPeTheta = (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secPeTheta")];
+				
+				if (drOTMAccumulatedChangein5secCeTheta < ceThetaMinReached) ceThetaMinReached = drOTMAccumulatedChangein5secCeTheta;
+				if (drOTMAccumulatedChangein5secCeTheta > ceThetaMaxReached) ceThetaMaxReached = drOTMAccumulatedChangein5secCeTheta;
+				
+				if (drOTMAccumulatedChangein5secPeTheta < peThetaMinReached) peThetaMinReached = drOTMAccumulatedChangein5secPeTheta;
+				if (drOTMAccumulatedChangein5secPeTheta > peThetaMaxReached) peThetaMaxReached = drOTMAccumulatedChangein5secPeTheta;
+				
+				float CE_Theta_above_min = (Float) rowdata[sqlFields.get("CE_Theta_above_min")];
+				float CE_Theta_below_Max = (Float) rowdata[sqlFields.get("CE_Theta_below_Max")];
+				float PE_Theta_above_min = (Float) rowdata[sqlFields.get("PE_Theta_above_min")];
+				float PE_Theta_below_Max = (Float) rowdata[sqlFields.get("PE_Theta_below_Max")];
+				
+				if (CE_Theta_above_min==0f) CE_Theta_above_min = (drOTMAccumulatedChangein5secCeTheta - ceThetaMinReached);
+				if (CE_Theta_below_Max==0f) CE_Theta_below_Max = (ceThetaMaxReached-drOTMAccumulatedChangein5secCeTheta);
+				if (PE_Theta_above_min==0f) PE_Theta_above_min = (drOTMAccumulatedChangein5secPeTheta - peThetaMinReached);
+				if (PE_Theta_below_Max==0f) PE_Theta_below_Max = (peThetaMaxReached-drOTMAccumulatedChangein5secPeTheta);
 				
 				writer.write((postgresFormat.format(quoteTime)+","+indexltp + "," + futureLtp 
 						+ "," +  straddlePremium
@@ -5338,13 +5367,12 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," +  ((Float) rowdata[sqlFields.get("ceTheta")]-(Float) rowdata[sqlFields.get("peTheta")])
 						+ "," +  ((Float) rowdata[sqlFields.get("ceOi")]-(Float) rowdata[sqlFields.get("peOi")])
 						
-						
 						+ "," + (Float) rowdata[sqlFields.get("selectedAllCEGreeksAvgIv")] + "," + (Float) rowdata[sqlFields.get("selectedAllPEGreeksAvgIv")]
 						+ "," + (Integer) rowdata[sqlFields.get("lowerStrike")] + "," + (Integer) rowdata[sqlFields.get("upperStrike")]
 						+ "," + (Float) rowdata[sqlFields.get("limitedITMCEGreeks")] + "," + (Float) rowdata[sqlFields.get("limitedITMPEGreeks")]
 						+ "," + (Float) rowdata[sqlFields.get("limitedOTMCEGreeks")] + "," + (Float) rowdata[sqlFields.get("limitedOTMPEGreeks")]
 						+ "," + (Integer) rowdata[sqlFields.get("outlierCEGreeks")] + "," + (Integer) rowdata[sqlFields.get("outlierPEGreeks")]
-						+ "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secCeTheta")] + "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secPeTheta")]
+						+ "," + drOTMAccumulatedChangein5secCeTheta + "," + drOTMAccumulatedChangein5secPeTheta
 						+ "," + (Float) rowdata[sqlFields.get("drITMAccumulatedChangein5secCeTheta")] + "," + (Float) rowdata[sqlFields.get("drITMAccumulatedChangein5secPeTheta")]
 						+ "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secCeVega")] + "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secPeVega")]
 						+ "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secCeGamma")] + "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secPeGamma")]
@@ -5357,6 +5385,9 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + (Float) rowdata[sqlFields.get("extLimitedOTMAccml5secCeVega")] + "," + (Float) rowdata[sqlFields.get("extLimitedOTMAccml5secPeVega")]
 						+ "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secCeVeGamma")] + "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secPeVeGamma")]
 						+ "," + (Float) rowdata[sqlFields.get("selectedAllGreeksPcr")]
+						+ "," + CE_Theta_above_min + "," + CE_Theta_below_Max	
+						+ "," + PE_Theta_above_min + "," + PE_Theta_below_Max
+						+ "," + (Float) rowdata[sqlFields.get("drSelectedStrikeCEDeltaOIWorth")] + "," + (Float) rowdata[sqlFields.get("drSelectedStrikePEDeltaOIWorth")]
 									
 						+"\r\n").getBytes());
 			}
