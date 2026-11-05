@@ -5219,6 +5219,14 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					 + ", CE Theta above min, CE Theta below Max"
 					 + ", PE Theta above min, PE Theta below Max"
 					 + ", drSelectedStrikeCEDeltaOIWorth, drSelectedStrikePEDeltaOIWorth"
+					 + ", drOTMAccumulatedChangein5secCeLtp, drOTMAccumulatedChangein5secPeLtp"
+					 + ", drSelectedStrikeAccumulatedChangein5secCeLtp, drSelectedStrikeAccumulatedChangein5secPeLtp"
+					 
+					 
+					 + ", drITMAccumulatedChangein5secCeIv, drITMAccumulatedChangein5secPeIv"
+					 + ", drITMChangein5secAvgCeIv, drITMChangein5secAvgPeIv"
+            		
+            		
             		+ "\r\n").getBytes());
             
             SimpleDateFormat postgresFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -5252,6 +5260,7 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			sqlFields.put("oamd.record_time", idx++);			
 			sqlFields.put("oamd.instrumentLtp", idx++);
 			sqlFields.put("oamd.futures_ltp", idx++);
+			sqlFields.put("oamd.id", idx++);
 			
 			sqlFields.put("selectedAllCEGreeksAvgIv", idx++);
 			sqlFields.put("selectedAllPEGreeksAvgIv", idx++);
@@ -5305,6 +5314,17 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			sqlFields.put("drSelectedStrikeCEDeltaOIWorth", idx++);
 			sqlFields.put("drSelectedStrikePEDeltaOIWorth", idx++);
 			
+			sqlFields.put("drOTMAccumulatedChangein5secCeLtp", idx++);
+			sqlFields.put("drOTMAccumulatedChangein5secPeLtp", idx++);
+			
+			sqlFields.put("drSelectedStrikeAccumulatedChangein5secCeLtp", idx++);
+			sqlFields.put("drSelectedStrikeAccumulatedChangein5secPeLtp", idx++);
+			
+			sqlFields.put("drITMAccumulatedChangein5secCeIv", idx++);
+			sqlFields.put("drITMAccumulatedChangein5secPeIv", idx++);
+			sqlFields.put("drITMChangein5secAvgCeIv", idx++);
+			sqlFields.put("drITMChangein5secAvgPeIv", idx++);
+			
 			String fetchSql = "select " +  String.join(",", sqlFields.keySet())
 					+ ", ceog.ltp as ceLtp, ceog.iv as ceIv, ceog.gamma as ceGamma, ceog.vega as ceVega, ceog.theta as ceTheta, ceog.oi as ceOi, ceog.delta as ceDelta"
 					+ ", peog.ltp as peLtp, peog.iv as peIv, peog.gamma as peGamma, peog.vega as peVega, peog.theta as peTheta, peog.oi as peOi, peog.delta as peDelta"
@@ -5331,12 +5351,13 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			float peThetaMinReached = Float.MAX_VALUE;
 			float peThetaMaxReached = Float.MIN_VALUE;
 			
-			
+			List<String> updateMinMaxList = new ArrayList<String>();
 			while (iter.hasNext()) {
 				Object[] rowdata = iter.next();
 				Date quoteTime = (Timestamp) rowdata[0];
 				float indexltp = (Float) rowdata[1];
 				float futureLtp = (Float) rowdata[2];
+				Long id = ((BigInteger) rowdata[3]).longValue();
 				
 				float straddlePremium =  ((Float) rowdata[sqlFields.get("ceLtp")]+(Float) rowdata[sqlFields.get("peLtp")]);
 				
@@ -5354,10 +5375,20 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 				float PE_Theta_above_min = (Float) rowdata[sqlFields.get("PE_Theta_above_min")];
 				float PE_Theta_below_Max = (Float) rowdata[sqlFields.get("PE_Theta_below_Max")];
 				
-				if (CE_Theta_above_min==0f) CE_Theta_above_min = (drOTMAccumulatedChangein5secCeTheta - ceThetaMinReached);
-				if (CE_Theta_below_Max==0f) CE_Theta_below_Max = (ceThetaMaxReached-drOTMAccumulatedChangein5secCeTheta);
-				if (PE_Theta_above_min==0f) PE_Theta_above_min = (drOTMAccumulatedChangein5secPeTheta - peThetaMinReached);
-				if (PE_Theta_below_Max==0f) PE_Theta_below_Max = (peThetaMaxReached-drOTMAccumulatedChangein5secPeTheta);
+				int needMinMaxUpdate = 0;
+				if (CE_Theta_above_min==0f) { needMinMaxUpdate++; CE_Theta_above_min = (drOTMAccumulatedChangein5secCeTheta - ceThetaMinReached); }
+				if (CE_Theta_below_Max==0f) { needMinMaxUpdate++; CE_Theta_below_Max = (ceThetaMaxReached-drOTMAccumulatedChangein5secCeTheta); }
+				if (PE_Theta_above_min==0f) { needMinMaxUpdate++; PE_Theta_above_min = (drOTMAccumulatedChangein5secPeTheta - peThetaMinReached); }
+				if (PE_Theta_below_Max==0f) { needMinMaxUpdate++; PE_Theta_below_Max = (peThetaMaxReached-drOTMAccumulatedChangein5secPeTheta); }
+				
+				if (needMinMaxUpdate>=4)
+					updateMinMaxList.add("UPDATE fdw_nexcorio_option_greek_movement_data SET"
+							+ " CE_Theta_above_min="+CE_Theta_above_min
+							+ ",CE_Theta_below_Max="+CE_Theta_below_Max
+							+ ",PE_Theta_above_min="+PE_Theta_above_min
+							+ ",PE_Theta_below_Max="+PE_Theta_below_Max
+							+ " WHERE id="+id
+							);
 				
 				writer.write((postgresFormat.format(quoteTime)+","+indexltp + "," + futureLtp 
 						+ "," +  straddlePremium
@@ -5388,14 +5419,33 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 						+ "," + CE_Theta_above_min + "," + CE_Theta_below_Max	
 						+ "," + PE_Theta_above_min + "," + PE_Theta_below_Max
 						+ "," + (Float) rowdata[sqlFields.get("drSelectedStrikeCEDeltaOIWorth")] + "," + (Float) rowdata[sqlFields.get("drSelectedStrikePEDeltaOIWorth")]
-									
+						+ "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secCeLtp")] + "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedChangein5secPeLtp")]
+						+ "," + (Float) rowdata[sqlFields.get("drSelectedStrikeAccumulatedChangein5secCeLtp")] + "," + (Float) rowdata[sqlFields.get("drSelectedStrikeAccumulatedChangein5secPeLtp")]
+							
+						+ "," + (Float) rowdata[sqlFields.get("drITMAccumulatedChangein5secCeIv")] + "," + (Float) rowdata[sqlFields.get("drITMAccumulatedChangein5secPeIv")]
+						+ "," + (Float) rowdata[sqlFields.get("drITMChangein5secAvgCeIv")] + "," + (Float) rowdata[sqlFields.get("drITMChangein5secAvgPeIv")]
+								
 						+"\r\n").getBytes());
 			}
 			retArray = writer.toByteArray();
 			writer.close();
+			if (updateMinMaxList.size()>0) {
+				//populateMinMaxTheta(updateMinMaxList);
+				for(String aSqlStmt:updateMinMaxList) {
+					System.out.println(aSqlStmt);
+					this.entityManager.createNativeQuery(aSqlStmt).executeUpdate();
+				}
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		return retArray;
+	}
+	
+	public void populateMinMaxTheta(List<String> updateMinMaxList ) {
+		for(String aSqlStmt:updateMinMaxList) {
+			System.out.println(aSqlStmt);
+			this.entityManager.createNativeQuery(aSqlStmt).executeUpdate();
+		}
 	}
 }

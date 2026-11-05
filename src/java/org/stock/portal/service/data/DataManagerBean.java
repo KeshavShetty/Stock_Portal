@@ -624,7 +624,7 @@ public class DataManagerBean implements DataManager {
     	return (new DataDao(entityManager)).getTopOIChange(instrument, forDateTime);    	
     }
     
-    @TransactionAttribute( TransactionAttributeType.SUPPORTS )
+    @TransactionAttribute( TransactionAttributeType.REQUIRED )
     public byte[] getOptionsInsightV2(Long mainInstrumentId, String forDate, float baseDelta) throws BusinessException {
     	return (new DataDao(entityManager)).getOptionsInsightV2(mainInstrumentId, forDate, baseDelta);    	
     }
