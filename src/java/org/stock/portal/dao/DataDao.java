@@ -5225,7 +5225,8 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 					 
 					 + ", drITMAccumulatedChangein5secCeIv, drITMAccumulatedChangein5secPeIv"
 					 + ", drITMChangein5secAvgCeIv, drITMChangein5secAvgPeIv"
-            		
+            		 + ", drSelectedStrikeAccumulatedT5Changein5secCeTheta, drSelectedStrikeAccumulatedT5Changein5secPeTheta"
+					 + ", drOTMAccumulatedT5Changein5secCeTheta, drOTMAccumulatedT5Changein5secPeTheta"
             		
             		+ "\r\n").getBytes());
             
@@ -5324,6 +5325,12 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 			sqlFields.put("drITMAccumulatedChangein5secPeIv", idx++);
 			sqlFields.put("drITMChangein5secAvgCeIv", idx++);
 			sqlFields.put("drITMChangein5secAvgPeIv", idx++);
+			
+			sqlFields.put("drSelectedStrikeAccumulatedT5Changein5secCeTheta", idx++);
+			sqlFields.put("drSelectedStrikeAccumulatedT5Changein5secPeTheta", idx++);
+			
+			sqlFields.put("drOTMAccumulatedT5Changein5secCeTheta", idx++);
+			sqlFields.put("drOTMAccumulatedT5Changein5secPeTheta", idx++);
 			
 			String fetchSql = "select " +  String.join(",", sqlFields.keySet())
 					+ ", ceog.ltp as ceLtp, ceog.iv as ceIv, ceog.gamma as ceGamma, ceog.vega as ceVega, ceog.theta as ceTheta, ceog.oi as ceOi, ceog.delta as ceDelta"
@@ -5424,6 +5431,10 @@ public List<ScripEOD> getEquityEodDataSupportPriceBased(String paddedScripCode, 
 							
 						+ "," + (Float) rowdata[sqlFields.get("drITMAccumulatedChangein5secCeIv")] + "," + (Float) rowdata[sqlFields.get("drITMAccumulatedChangein5secPeIv")]
 						+ "," + (Float) rowdata[sqlFields.get("drITMChangein5secAvgCeIv")] + "," + (Float) rowdata[sqlFields.get("drITMChangein5secAvgPeIv")]
+								
+						+ "," + (Float) rowdata[sqlFields.get("drSelectedStrikeAccumulatedT5Changein5secCeTheta")] + "," + (Float) rowdata[sqlFields.get("drSelectedStrikeAccumulatedT5Changein5secPeTheta")]
+						+ "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedT5Changein5secCeTheta")] + "," + (Float) rowdata[sqlFields.get("drOTMAccumulatedT5Changein5secPeTheta")]
+										
 								
 						+"\r\n").getBytes());
 			}
